@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">BookSearch</string>
+    <string name="tab_search">검색</string>
+    <string name="tab_favorite">즐겨찾기</string>
+</resources>
