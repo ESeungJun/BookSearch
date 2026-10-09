@@ -1,6 +1,5 @@
 package com.leeseungjun.booksearch.di
 
-import com.leeseungjun.booksearch.data.api.RetryInterceptor
 import com.leeseungjun.booksearch.data.api.searchbook.SearchBookApi
 import dagger.Module
 import dagger.Provides
@@ -28,7 +27,6 @@ object NetworkModule {
                 .build()
             chain.proceed(request)
         }
-        .addInterceptor(RetryInterceptor())
         .addInterceptor(
             // BASIC 은 요청 줄과 응답 코드만 남긴다. 헤더(API 키)와 본문(401 본문에 키 일부)은 남기지 않는다
             HttpLoggingInterceptor().setLevel(

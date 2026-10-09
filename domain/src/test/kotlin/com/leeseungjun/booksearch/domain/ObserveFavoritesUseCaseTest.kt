@@ -44,6 +44,7 @@ class ObserveFavoritesUseCaseTest {
     private class FakeRepository(private val favorites: List<Book>) : BookRepository {
         override suspend fun searchBooks(query: String, sort: SearchSort, page: Int): Result<SearchPage> = error("unused")
         override suspend fun getBook(key: String): Book? = null
+        override suspend fun getLastSearch() = null
         override fun observeFavorites(): Flow<List<Book>> = flowOf(favorites)
         override suspend fun addFavorite(book: Book) = Unit
         override suspend fun removeFavorite(key: String) = Unit
