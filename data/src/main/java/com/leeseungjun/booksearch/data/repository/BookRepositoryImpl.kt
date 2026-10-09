@@ -12,6 +12,7 @@ import com.leeseungjun.booksearch.data.db.searchcache.SearchCacheDao
 import com.leeseungjun.booksearch.data.db.searchcache.SearchCacheEntity
 import com.leeseungjun.booksearch.domain.BookRepository
 import com.leeseungjun.booksearch.domain.model.Book
+import com.leeseungjun.booksearch.domain.model.SearchCondition
 import com.leeseungjun.booksearch.domain.model.BookException
 import com.leeseungjun.booksearch.domain.model.BookException.Reason
 import com.leeseungjun.booksearch.domain.model.SearchPage
@@ -55,6 +56,9 @@ class BookRepositoryImpl @Inject constructor(
 
     override suspend fun getBook(key: String): Book? = bookDao.get(key)?.toBook()
 
+    override suspend fun getLastSearch(): SearchCondition? =
+        searchCacheDao.getLatest()?.let { SearchCondition(it.query, SearchSort.valueOf(it.sort)) }
+
     override fun observeFavorites(): Flow<List<Book>> =
         favoriteDao.observeAll().map { entities -> entities.map { it.toBook() } }
 
@@ -94,7 +98,8 @@ class BookRepositoryImpl @Inject constructor(
         val reason = when {
             this is IOException -> Reason.NETWORK
             this is HttpException && (code() == 401 || code() == 403) -> Reason.AUTH
-            else -> Reason.SERVER // 5xx·429(재시도 후에도 실패)·응답 형식 오류
+            // 5xx·429·응답 형식 오류. 자동 재시도는 하지 않고 화면의 "다시 시도"에 맡긴다(D-47)
+            else -> Reason.SERVER
         }
         // 401 응답 본문에 키 일부가 들어 있어 원인 예외를 그대로 붙이지 않는다(로그로 새지 않게)
         return BookException(reason)

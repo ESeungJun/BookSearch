@@ -10,6 +10,7 @@ import com.leeseungjun.booksearch.data.db.searchcache.SearchCacheDao
 import com.leeseungjun.booksearch.data.db.searchcache.SearchCacheEntity
 import com.leeseungjun.booksearch.data.repository.BookRepositoryImpl
 import com.leeseungjun.booksearch.domain.model.BookException
+import com.leeseungjun.booksearch.domain.model.SearchCondition
 import com.leeseungjun.booksearch.domain.model.SearchSort
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -60,6 +61,12 @@ class BookRepositoryImplTest {
         assertNotNull(repository.getBook(books.saved.keys.first()))
     }
 
+    @Test
+    fun `마지막으로 저장한 검색을 돌려준다`() = runTest {
+        repository.searchBooks("kotlin", SearchSort.LATEST, 1)
+        assertEquals(SearchCondition("kotlin", SearchSort.LATEST), repository.getLastSearch())
+    }
+
     private class FakeApi : SearchBookApi {
         var delayMs = 0L
         var error: Exception? = null
@@ -86,6 +93,7 @@ class BookRepositoryImplTest {
 
     private class FakeSearchCacheDao(private val books: FakeBookDao) : SearchCacheDao {
         val rows = mutableListOf<SearchCacheEntity>()
+        override suspend fun getLatest() = rows.maxByOrNull { it.savedAt }
         override suspend fun getPage(query: String, sort: String, page: Int) =
             rows.filter { it.query == query && it.sort == sort && it.page == page }.sortedBy { it.position }
         override suspend fun getBooks(query: String, sort: String, page: Int) =

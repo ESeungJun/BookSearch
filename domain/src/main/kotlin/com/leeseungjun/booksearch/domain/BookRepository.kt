@@ -1,6 +1,7 @@
 package com.leeseungjun.booksearch.domain
 
 import com.leeseungjun.booksearch.domain.model.Book
+import com.leeseungjun.booksearch.domain.model.SearchCondition
 import com.leeseungjun.booksearch.domain.model.SearchPage
 import com.leeseungjun.booksearch.domain.model.SearchSort
 import kotlinx.coroutines.flow.Flow
@@ -10,6 +11,9 @@ interface BookRepository {
     suspend fun searchBooks(query: String, sort: SearchSort, page: Int): Result<SearchPage>
 
     suspend fun getBook(key: String): Book?
+
+    /** 결과를 받아 저장한 마지막 검색. 저장된 검색이 없으면 null. */
+    suspend fun getLastSearch(): SearchCondition?
 
     /** 즐겨찾기 목록. 최근에 추가한 것이 앞이다. */
     fun observeFavorites(): Flow<List<Book>>
