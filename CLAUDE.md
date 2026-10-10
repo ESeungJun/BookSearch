@@ -31,6 +31,7 @@
 
 - 의존 방향: `presentation → domain ← data`. `:data:*`·`:core:network`·`:core:database` 를 의존하는 곳은 `:app` 하나다(Hilt 가 `:app` 에서 그래프를 만든다). presentation 은 data 를 볼 수 없다.
 - 기능 모듈끼리 서로 의존하지 않는다. 화면 이동은 `:app`이 연결한다.
+- 모듈 공통 빌드 설정은 `build-logic`(포함 빌드)의 컨벤션 플러그인에 둔다. 패키지: `convention.config`(SDK·카탈로그 접근·Android 공통 설정) / `convention.base`(application·library·kotlin.jvm·compose·hilt) / `convention.layer`(presentation·domain·data).
 - 의존은 모두 `implementation` 으로 쓴다. `api` 로 다른 모듈을 내보내지 않는다. 레이어 공통 의존(코루틴·`javax.inject`·레이어 base 모듈)은 레이어 컨벤션 플러그인(`convention.domain`·`convention.data`·`convention.presentation`)이 붙이고, 모듈의 build.gradle.kts 에는 그 모듈만 쓰는 의존만 적는다.
 - domain 저장소 인터페이스의 모든 함수는 `DomainResult`(관찰은 `Flow<DomainResult<T>>`)를 돌려준다.
 - 결과의 공통 처리는 레이어마다 따로 둔다: data 저장소는 `safeApiCall {}`(서버)·`safeDbCall {}`·`safeDbFlow()`(DB)로 결과를 만들고(취소는 다시 던짐), domain UseCase 는 저장소가 준 결과를 그대로 돌려준다. presentation 은 3단계에서 정한다.

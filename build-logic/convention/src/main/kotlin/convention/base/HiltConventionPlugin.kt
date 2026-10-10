@@ -1,4 +1,7 @@
+package convention.base
+
 import com.google.devtools.ksp.gradle.KspExtension
+import convention.config.library
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
