@@ -19,7 +19,7 @@
 
 ```
 :app                              MainActivity · navigation/ · 탭·2칸 Scaffold
-:di                               Hilt 모듈 — presentation 과 data 를 잇는 유일한 곳
+:di                               Hilt 모듈 — 루트에 앱 전체 싱글톤(DB·네트워크), book/ · search/ · favorite/ 에 기능별 바인딩
 :presentation:designsystem        테마 · 두 화면 이상이 쓰는 UI
 :presentation:search / favorite / detail    Screen · ViewModel · UiState
 :domain:book                      책 자체(BookDTO·BookException)·상세 조회 — search·favorite 가 함께 본다
