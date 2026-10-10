@@ -1,7 +1,10 @@
 package data.favorite.repo
 
+import data.base.asDbResult
+import data.base.dbCall
 import data.favorite.source.local.IFavoriteLocalDataSource
 import domain.base.data.BookDTO
+import domain.base.data.DomainResult
 import domain.favorite.repo.IFavoriteRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -11,12 +14,11 @@ class FavoriteRepositoryImpl @Inject constructor(
     private val local: IFavoriteLocalDataSource,
 ) : IFavoriteRepository {
 
-    override fun observeFavorites(query: String, priceRange: IntRange?): Flow<List<BookDTO>> =
-        local.observeFavorites(query, priceRange)
+    override fun observeFavorites(query: String, priceRange: IntRange?): Flow<DomainResult<List<BookDTO>>> =
+        local.observeFavorites(query, priceRange).asDbResult()
 
-    override fun observeFavoriteKeys(): Flow<Set<String>> = local.observeFavoriteKeys()
+    override fun observeFavoriteKeys(): Flow<DomainResult<Set<String>>> = local.observeFavoriteKeys().asDbResult()
 
-    override suspend fun toggleFavorite(book: BookDTO, isFavorite: Boolean) {
-        if (isFavorite) local.removeFavorite(book.key) else local.addFavorite(book)
-    }
+    override suspend fun toggleFavorite(book: BookDTO, isFavorite: Boolean): DomainResult<Unit> =
+        dbCall { if (isFavorite) local.removeFavorite(book.key) else local.addFavorite(book) }
 }
