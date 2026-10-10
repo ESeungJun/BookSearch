@@ -33,19 +33,19 @@
 - 의존 방향: `presentation → domain ← data`. `:di:*`만 `:data:*`를 의존한다. presentation 은 data 를 볼 수 없다.
 - 기능 모듈끼리 서로 의존하지 않는다. 화면 이동은 `:app`이 연결한다.
 - **`:domain/usecase`는 사용자 행동 정의서다.** 사용자 행동 하나에 UseCase 하나를 두고 `operator fun invoke`로 부른다. `usecase/` 목록만 읽어도 이 앱으로 무엇을 할 수 있는지 알 수 있어야 한다. 저장소를 그대로 부르기만 하는 UseCase도 이 목적이면 만든다. ViewModel은 Repository가 아니라 UseCase만 부른다.
-- **domain 은 결과를 `DomainResult`(Success·Fail·Error)로 돌려준다 (D-63).** 상황만 전하고 원인을 나누지 않는다. 원인은 data 가 채우고(Fail 은 HTTP 코드, Error 는 원인 예외), 어떻게 보일지는 presentation 이 판단한다. 정렬처럼 보여 주는 방식도 presentation 이 정한다.
-- **domain 에는 비즈니스 로직을 두지 않는다 (D-61).** UseCase 는 행동 이름과 입력만 정하고 저장소 함수 하나를 부른다. 데이터를 고르고 바꾸는 판단(필터·정렬·넣기/빼기)은 `:data:<기능>`, 입력·표시 판단(검색어 공백 제거, 표시 가격)은 `:presentation:<기능>` 이 맡는다.
-- 패키지 이름은 모듈 경로 그대로다: `:data` → `data.*`, `:presentation:search` → `presentation.search`. `:app`만 `com.leeseungjun.booksearch`(applicationId)다 (D-55).
-- `:domain:<기능>` 은 `data`(DTO·enum) · `repo`(저장소 인터페이스) · `usecase` 세 패키지다. 화면 모듈은 쓰는 domain 모듈만 build.gradle.kts 에 적는다 (D-54·D-59).
-- `:data:*` 의 책임 (D-56·D-58·D-60)
+- **domain 은 결과를 `DomainResult`(Success·Fail·Error)로 돌려준다.** 상황만 전하고 원인을 나누지 않는다. 원인은 data 가 채우고(Fail 은 HTTP 코드, Error 는 원인 예외), 어떻게 보일지는 presentation 이 판단한다. 정렬처럼 보여 주는 방식도 presentation 이 정한다.
+- **domain 에는 비즈니스 로직을 두지 않는다.** UseCase 는 행동 이름과 입력만 정하고 저장소 함수 하나를 부른다. 데이터를 고르고 바꾸는 판단(필터·정렬·넣기/빼기)은 `:data:<기능>`, 입력·표시 판단(검색어 공백 제거, 표시 가격)은 `:presentation:<기능>` 이 맡는다.
+- 패키지 이름은 모듈 경로 그대로다: `:data` → `data.*`, `:presentation:search` → `presentation.search`. `:app`만 `com.leeseungjun.booksearch`(applicationId)다.
+- `:domain:<기능>` 은 `data`(DTO·enum) · `repo`(저장소 인터페이스) · `usecase` 세 패키지다. 화면 모듈은 쓰는 domain 모듈만 build.gradle.kts 에 적는다.
+- `:data:*` 의 책임
   - `repo`: 원격과 로컬 중 어디서 가져올지만 정한다(3초 시간 제한·캐시 대체). Retrofit·Room 을 모른다.
   - `source/remote`: 서버 호출. `~Api` → DTO 변환, HTTP 오류 → `DomainResult.Fail(code)`, 그 밖의 실패 → `DomainResult.Error(cause)`. `source/local`: DB·캐시 읽기/쓰기와 캐시 보관 규칙. `~Entity` ↔ DTO 변환.
   - `service`: Retrofit 인터페이스(`I~Service`). `data`: 서버 응답 데이터(`~Api`)와 그 변환 함수. `db/dao`·`db/entity`: Room.
   - `~Api` 는 `source/remote` 밖으로, `~Entity` 는 `source/local` 밖으로 나가지 않는다. 데이터 소스는 DTO 로 주고받는다.
   - `~Api` 필드는 모두 nullable 이고 기본값을 두지 않는다. 서버가 안 보낸 값은 null 그대로 DTO 까지 가고, 어떻게 보일지는 화면이 정한다.
-- Hilt 범위 (D-57·D-59): 저장소와 데이터 소스는 `ViewModelComponent` + `@ViewModelScoped`. `SingletonComponent` 는 앱에 하나여야만 동작하는 것(Room DB, OkHttp·Retrofit)에만 쓰고 이유를 주석으로 남긴다.
+- Hilt 범위: 저장소와 데이터 소스는 `ViewModelComponent` + `@ViewModelScoped`. `SingletonComponent` 는 앱에 하나여야만 동작하는 것(Room DB, OkHttp·Retrofit)에만 쓰고 이유를 주석으로 남긴다.
 
-## 이름 (D-52·D-53)
+## 이름
 
 | 대상 | 규칙 | 예 |
 |---|---|---|
@@ -84,6 +84,7 @@
 - 일시는 `date`로 실측한다.
 - 1절은 주제별 **현재 상태**로 쓴다. 같은 주제를 다시 정하면 새 행을 만들지 않고 그 행을 고치고 ID 를 덧붙인다. 사소한 결정은 묶어 짧게 쓴다. 사람이 읽고 판단할 수 있는 분량을 유지한다.
 - 작성자의 개념·비교 질문(결정이 아닌 것)은 기록하지 않는다.
+- 결정에 번호를 매기지 않는다. 코드 주석·커밋 메시지·다른 문서에서 결정 기록을 번호로 참조하지 않는다.
 
 ## 커밋·브랜치
 
@@ -101,6 +102,7 @@
 
 ## 주석
 - 라이브러리를 고른 이유와 로직의 의도를 남긴다. "무엇"보다 "왜"를 쓴다. 코드를 읽으면 알 수 있는 내용은 쓰지 않는다.
+- 주석에는 그 코드·파일에 대한 객관적인 사실만 쓴다. "어느 문서를 보라", "누가 이렇게 결정했다", 결정 기록 번호 같은 문서 참조는 쓰지 않는다.
 
 ## 빌드·명령
 

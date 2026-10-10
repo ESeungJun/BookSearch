@@ -1,7 +1,7 @@
 package domain.base.data
 
 /**
- * domain 이 돌려주는 결과. **성공·실패·에러라는 상황만** 전하고, 왜 그런지는 정하지 않는다(D-63).
+ * domain 이 돌려주는 결과. **성공·실패·에러라는 상황만** 전하고, 왜 그런지는 정하지 않는다.
  * 구체적인 원인은 보내는 쪽(data)이 채우고, 어떻게 보여 줄지는 받는 쪽(presentation)이 판단한다.
  */
 sealed interface DomainResult<out T> {

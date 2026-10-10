@@ -13,7 +13,7 @@
 | `size` | 20 고정 | 상한 50. 51을 요청하면 50건으로 잘린다 |
 
 ## 응답
-모든 필드를 nullable·기본값 없음으로 받는다(D-60). 필드가 없거나 null 이면 DTO 까지 null 로 간다. `meta`·`documents` 가 없으면 서버 오류로 본다.
+모든 필드를 nullable·기본값 없음으로 받는다. 필드가 없거나 null 이면 DTO 까지 null 로 간다. `meta`·`documents` 가 없으면 서버 오류로 본다.
 
 `meta{total_count, pageable_count, is_end}`, `documents[]{title, contents, url, isbn, datetime, authors[], publisher, translators[], price, sale_price, thumbnail, status}`
 
@@ -22,7 +22,7 @@
 | `total_count` / `pageable_count` | pageable 은 1000에서 잘린다 | 화면의 총 개수는 `total_count` |
 | `isbn` | `"ISBN10 ISBN13"` 공백 결합 91건, ISBN13 단독 19건. ISBN10 단독·빈 값은 미관측(문서상 가능) | 매칭 키 규칙(아래) |
 | `sale_price` | **-1이 19건** = 할인 없음 | `sale_price > 0`일 때만 할인가 |
-| `price` | 0은 미관측 | 그대로 전달(D-60). 표시는 화면이 정한다 |
+| `price` | 0은 미관측 | 그대로 전달. 표시는 화면이 정한다 |
 | `contents` | 약 250자 요약(110건 중 102건이 250~260자, 문장 중간에서 끊김). 빈 문자열 1건 | 끝에 "…", 전문은 `url`을 Custom Tab으로 |
 | `datetime` | ISO-8601 `2019-01-12T00:00:00.000+09:00` | 날짜만 표시 |
 | `title` | 최대 59자 | 카드에서는 줄 수 제한 |
@@ -36,7 +36,7 @@
 - 키 오류·헤더 없음: 401 `{"errorType":"AccessDeniedError","message":...}`. **`message`에 키 일부가 들어가므로 로그·화면에 원문을 남기지 않는다.**
 - 429(할당량)·5xx는 미관측(문서 기반으로만 대응).
 
-## 매칭 키 (작성자 결정, v1 D-12·D-13)
+## 매칭 키 (작성자 결정)
 같은 책을 다시 검색했을 때 즐겨찾기 상태를 맞추고, 목록 key로도 쓴다.
 1. ISBN13이 있으면 `ISBN13 + 제목 + 저자` (둘 다 있으면 ISBN13 — `추천안 기본 채택`)
 2. ISBN10만 있으면 `ISBN10 + 제목 + 저자`
