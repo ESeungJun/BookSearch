@@ -8,7 +8,7 @@ pluginManagement {
     }
 }
 plugins {
-    // gradle-daemon-jvm.properties 의 JDK 17 이 없으면 내려받는다("별도 설정 없이 빌드" 조건)
+    // gradle-daemon-jvm.properties 의 JDK 17 이 없으면 내려받는다
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 dependencyResolutionManagement {
