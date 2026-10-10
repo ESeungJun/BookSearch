@@ -10,7 +10,7 @@ AI 가 작성자 확인 없이 정한 것(`추천안 기본 채택`)을 모은�
 | R-04 | 2단계 | 캐시 LRU 기준 | 마지막 사용 / **마지막 저장 시각** | 저장할 때만 순서를 갱신하면 읽기 경로에 쓰기가 없다 | 캐시로 다시 본 조합도 순서가 오르지 않는다 | `ISearchCacheDao.deleteOldCombinations` |
 | R-05 | 2단계 | 0건 결과 캐시 | 저장 / **저장 안 함** | 남길 책이 없다 | 오프라인에서 0건 검색어는 '결과 없음' 대신 오류로 보인다 | `BookLocalDataSourceImpl.saveSearchPage` |
 | R-06 | 2단계 | 6페이지 이후 책 정보 | 저장 안 함 / **책 정보만 저장, 캐시 목록엔 안 남김** | 상세가 키로 찾을 수 있어야 한다(D-08) | 다음 새 검색 때 정리되므로 그 뒤 프로세스 재시작 시 상세를 못 찾을 수 있다 | `BookLocalDataSourceImpl.saveSearchPage`, `IBookDao.deleteUnreferenced` |
-| R-07 | 2단계 | 즐겨찾기 검색 범위 | 제목만 / **제목 + 저자** | 원문 '질의어 기반 로컬 검색'에 저자 검색도 자연스럽다 | — | `ObserveFavoritesUseCase` |
+| R-07 | 2단계 | 즐겨찾기 검색 범위 | 제목만 / **제목 + 저자** | 원문 '질의어 기반 로컬 검색'에 저자 검색도 자연스럽다 | — | `IFavoriteDao.observe` |
 | R-08 | 2단계 | 마지막 검색 저장 위치 (D-49) | 별도 테이블·DataStore / **검색 캐시의 가장 최근 저장 행** | 저장할 곳을 하나 더 만들지 않는다 | 0건·실패한 검색은 마지막 검색이 되지 않는다(결과를 받은 검색만) | `ISearchCacheDao.getLatest` |
 | R-09 | 이름 규칙 | Hilt `@Binds` 모듈(인터페이스) 이름 | 규칙 예외로 그대로 / **`IRepositoryModule`** | '인터페이스는 항상 `I~`'를 예외 없이 따른다 | 예외를 두면 규칙을 외울 것이 늘어난다 | `:di` |
 | R-10 | 이름 규칙 | 테스트 대역 이름 | `~Impl` / **`Fake~` 유지**(`FakeSearchBookService` 등) | `~Impl` 은 앱의 실제 구현체만 가리키게 둔다. 테스트 안에서만 쓰는 private 클래스다 | 테스트 대역도 `~Impl` 이면 실제 구현과 구분이 안 된다 | `:data`·`:domain` 테스트 |

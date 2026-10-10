@@ -37,6 +37,7 @@ README 의 「AI 활용」 절(어떤 작업에 썼는지 / 어떻게 검증했�
 | D-58 | 2026-10-10 | 3단계 전 | data 패키지 구성 | `api/<경로>/`(Service·Api·Mapper) · `db/<테이블>/`(Dao·Entity) · `repository/`. Room 은 `source/local/db` 아래(AI 권장) | 작성자 지시: **`repo` · `source/remote|local` · `service`(I~Service) · `data`(~Api) · `db/dao` · `db/entity`**. Room 은 AI 가 올린 세 위치 중 별도 루트 `db` 를 택함 | AI 제안과 다름 | `:data` |
 | D-59 | 2026-10-10 | 3단계 전 | domain 기능별 모듈 분리 | 레이어당 모듈 하나(D-40) | 작성자 지시: **domain 을 search·favorite 모듈로 나눈다.** 함께 쓰는 책 DTO·예외·상세 조회는 AI 권장대로 `:domain:book` 에 두고, 저장소도 셋으로 나눔. 데이터 소스도 `@ViewModelScoped` 로 묶자는 작성자 제안 반영(저장소 셋이 같은 인스턴스를 씀). `:di` 도 기능별 패키지(`book`·`search`·`favorite`)로 나누고 싱글톤(DB·네트워크)만 루트에 둠 | AI 제안과 다름 | `:domain:*`, `:data/repo`, `:di` |
 | D-60 | 2026-10-10 | 3단계 전 | data·di 기능별 모듈, 응답 nullable | 응답 필드에 기본값(`""`·0·-1)을 넣고 매퍼에서 빈 값을 null 로 바꿈 | 작성자 지시: **data·di 도 domain 처럼 book·search·favorite 모듈로 나눈다. 응답 데이터는 nullable·기본값 없음** — 서버가 안 보낸 값은 앱이 그대로 믿고 판단한다(빈 값으로 판단하면 예외가 많다). Room 제약으로 DB·DAO·Entity 는 `:data:book` 에 두고 로컬 데이터 소스는 기능별로 나눔(R-12 대체). `meta`·`documents` 가 없으면 서버 오류, 정가 0 을 null 로 바꾸던 규칙은 없앰 | AI 제안과 다름 | `:data:*`, `:di:*`, `SearchBookApi`, `BookDTO`, `docs/api.md` |
+| D-61 | 2026-10-10 | 3단계 전 | domain 의 비즈니스 로직 | 즐겨찾기 필터·정렬(메모리), 토글 분기, 키 집합 변환, 검색어 공백 제거, 표시 가격을 domain 에 둠 | 작성자 지시: **domain 은 사용자 행동 정의서로만 두고 판단 로직은 기능 단위로 뺀다.** 위치는 AI 권장대로 데이터 판단은 `:data:<기능>`(즐겨찾기 필터·정렬은 Room 쿼리), 입력·표시 판단은 `:presentation:<기능>`(3단계에서 구현) | AI 제안과 다름 | `CLAUDE.md` 구조 절, `IFavoriteDao.observe`, `FavoriteRepositoryImpl` |
 ## 2. 논의 중 (미결)
 
 | ID | 일시 | 주제 | 쟁점 | 현재 상태 |
@@ -63,6 +64,7 @@ README 의 「AI 활용」 절(어떤 작업에 썼는지 / 어떻게 검증했�
 | 2026-10-10 | `api/<API 경로>/` 아래 Service·Api·Mapper 묶음 | AI | 작성자가 종류별 패키지(`service`·`data`)를 택함 | D-58 |
 | 2026-10-10 | domain 모듈 둘만 두고 favorite 이 search 를 의존 | AI(선택지) | 즐겨찾기가 검색에 묶임. 공통 `:domain:book` 을 택함 | D-59 |
 | 2026-10-10 | 응답 필드 기본값(빈 문자열·0·-1)과 매퍼의 빈 값 → null 변환 | AI | 작성자가 nullable·기본값 없음으로 서버 값을 그대로 믿기로 함 | D-60 |
+| 2026-10-10 | 판단 로직을 domain UseCase 에 두기 / 전부 ViewModel 로 옮기기 | AI / AI(선택지) | 작성자가 domain 은 행동 정의만, 판단은 data·presentation 기능 모듈로 정함 | D-61 |
 
 ## 4. AI 활용 기록 (v2)
 
@@ -79,6 +81,7 @@ README 의 「AI 활용」 절(어떤 작업에 썼는지 / 어떻게 검증했�
 | 2026-10-10 | data 데이터 소스 분리 | Claude Code(메인 세션) | 데이터 소스 인터페이스·구현 4개, 저장소를 정책만 남게 축소(약 110줄 → 55줄), DI 범위 변경(`IDataSourceModule` 추가), 패키지 이동, 테스트 재구성(저장소 4·로컬 4·원격 3건) | `assembleDebug` 성공, 단위 테스트 20건 통과(data 17, domain 3). Room·싱글톤 위치는 작성자에게 물어 정함. 작성자 diff 검토 대기 |
 | 2026-10-10 | domain 모듈 분리 | Claude Code(메인 세션) | 모듈 3개로 이동, 저장소 인터페이스·구현 셋으로 분리, 빌드 설정·DI 수정 | `assembleDebug` 성공, 단위 테스트 20건 통과. 작성자 diff 검토 대기 |
 | 2026-10-10 | data·di 모듈 분리, 응답 nullable | Claude Code(메인 세션) | 모듈 6개로 이동, 로컬 데이터 소스 기능별 분리, Api·DTO·Entity nullable, 응답 누락 처리 | `assembleDebug` 성공, 단위 테스트 21건 통과(누락 응답 테스트 추가). 작성자 diff 검토 대기 |
+| 2026-10-10 | domain 로직 이동 | Claude Code(메인 세션) | 즐겨찾기 필터·정렬 SQL(LIKE 이스케이프 포함), 키 관찰 쿼리, 토글을 저장소로, UseCase 위임만 남김 | `assembleDebug` 성공(Room 이 SQL 검사), 단위 테스트 18건 통과. 필터 규칙 테스트 3건은 SQL 로 옮겨 지움 — Room 실행 테스트는 아직 없음 |
 ---
 
 ## 부록 A. v1 결정 기록 (D-01~D-38, 원문 그대로)

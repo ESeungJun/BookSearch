@@ -31,6 +31,7 @@
 - 의존 방향: `presentation → domain ← data`. `:di:*`만 `:data:*`를 의존한다. presentation 은 data 를 볼 수 없다.
 - 기능 모듈끼리 서로 의존하지 않는다. 화면 이동은 `:app`이 연결한다.
 - **`:domain/usecase`는 사용자 행동 정의서다.** 사용자 행동 하나에 UseCase 하나를 두고 `operator fun invoke`로 부른다. `usecase/` 목록만 읽어도 이 앱으로 무엇을 할 수 있는지 알 수 있어야 한다. 저장소를 그대로 부르기만 하는 UseCase도 이 목적이면 만든다. ViewModel은 Repository가 아니라 UseCase만 부른다.
+- **domain 에는 비즈니스 로직을 두지 않는다 (D-61).** UseCase 는 행동 이름과 입력만 정하고 저장소 함수 하나를 부른다. 데이터를 고르고 바꾸는 판단(필터·정렬·넣기/빼기)은 `:data:<기능>`, 입력·표시 판단(검색어 공백 제거, 표시 가격)은 `:presentation:<기능>` 이 맡는다.
 - 패키지 이름은 모듈 경로 그대로다: `:data` → `data.*`, `:presentation:search` → `presentation.search`. `:app`만 `com.leeseungjun.booksearch`(applicationId)다 (D-55).
 - `:domain:<기능>` 은 `data`(DTO·enum) · `repo`(저장소 인터페이스) · `usecase` 세 패키지다. 화면 모듈은 쓰는 domain 모듈만 build.gradle.kts 에 적는다 (D-54·D-59).
 - `:data:*` 의 책임 (D-56·D-58·D-60)
