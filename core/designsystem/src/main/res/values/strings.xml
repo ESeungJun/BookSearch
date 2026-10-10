@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="search_field_clear">검색어 지우기</string>
+    <string name="scroll_to_top">맨 위로</string>
+    <string name="action_retry">다시 시도</string>
+</resources>
