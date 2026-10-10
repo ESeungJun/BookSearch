@@ -3,12 +3,11 @@ package data.api.searchbook.data
 import domain.base.data.BookDTO
 import domain.search.data.SearchPageDTO
 
-/** 목록·총 개수·끝 여부가 없으면 페이지를 만들 수 없다. 빈 결과로 보지 않고 예외를 던져 에러로 다룬다. */
-fun SearchBookApi.toPage(): SearchPageDTO {
-    val meta = checkNotNull(meta) { "검색 응답에 meta 가 없다" }
-    val totalCount = checkNotNull(meta.totalCount) { "검색 응답에 total_count 가 없다" }
-    val isEnd = checkNotNull(meta.isEnd) { "검색 응답에 is_end 가 없다" }
-    val documents = checkNotNull(documents) { "검색 응답에 documents 가 없다" }
+/** 목록·총 개수·끝 여부가 없으면 페이지를 만들 수 없어 null 이다(빈 결과로 보지 않는다). */
+fun SearchBookApi.toPageOrNull(): SearchPageDTO? {
+    val totalCount = meta?.totalCount ?: return null
+    val isEnd = meta.isEnd ?: return null
+    val documents = documents ?: return null
     return SearchPageDTO(documents.map { it.toBook() }, totalCount, isEnd)
 }
 

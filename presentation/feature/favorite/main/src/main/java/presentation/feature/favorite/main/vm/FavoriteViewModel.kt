@@ -25,10 +25,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import presentation.base.data.BookViewData
 import presentation.base.mapper.toViewData
-import presentation.feature.favorite.main.data.FavoriteUiStatus
 import presentation.feature.favorite.main.data.FavoriteUiState
+import presentation.feature.favorite.main.data.FavoriteUiStatus
 import presentation.feature.favorite.main.data.PriceRange
 import presentation.feature.favorite.main.data.TitleSort
+import presentation.base.R as BaseR
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -70,7 +71,11 @@ class FavoriteViewModel @Inject constructor(
     fun onFavoriteClick(key: String) {
         val book = filteredBooks.find { it.key == key } ?: return
         // 이 목록의 책은 모두 즐겨찾기다. 빼면 관찰 결과에서 사라진다
-        viewModelScope.launch { toggleFavoriteUseCase(book, isFavorite = true) }
+        viewModelScope.launch { onToggled(toggleFavoriteUseCase(book, isFavorite = true)) }
+    }
+
+    fun onToastShown() {
+        _uiState.update { it.copy(toastRes = null) }
     }
 
     fun retry() {
@@ -130,5 +135,14 @@ class FavoriteViewModel @Inject constructor(
             .map { it.toViewData(isFavorite = true) }
             .sortedWith(compareBy(nullsLast(titleOrder)) { it.title })
             .toImmutableList()
+    }
+
+    private fun onToggled(result: DomainResult<Unit>) {
+        when (result) {
+            // 성공은 즐겨찾기 키 관찰로 하트에 반영된다
+            is DomainResult.Success -> Unit
+            // 저장하지 못하면 하트가 그대로라 눌러도 반응이 없어 보인다. 한 번 알린다
+            is DomainResult.Fail, is DomainResult.Error -> _uiState.update { it.copy(toastRes = BaseR.string.favorite_save_failed) }
+        }
     }
 }

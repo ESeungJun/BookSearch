@@ -19,7 +19,7 @@ import dagger.hilt.android.scopes.ViewModelScoped
 interface IBookModule {
     @Binds
     @ViewModelScoped
-    fun bindDetailRepository(impl: BookRepositoryImpl): IBookRepository
+    fun bindBookRepository(impl: BookRepositoryImpl): IBookRepository
 
     @Binds
     @ViewModelScoped

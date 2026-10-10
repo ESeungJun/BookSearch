@@ -14,7 +14,8 @@ data class FavoriteUiState(
     val sort: TitleSort = TitleSort.ASCENDING,
     val status: FavoriteUiStatus = FavoriteUiStatus.Loading,
     val books: ImmutableList<BookViewData> = persistentListOf(), // 조건에 맞는 책, sort 순서
-    val totalCount: Int = 0, // 조건 없이 센 즐겨찾기 수
+    val totalCount: Int = 0, // 조건 없이 센 즐겨찾기 수,
+    @StringRes val toastRes: Int? = null, // 화면이 한 번 보인 뒤 onToastShown() 으로 지운다
 )
 
 sealed interface FavoriteUiStatus {

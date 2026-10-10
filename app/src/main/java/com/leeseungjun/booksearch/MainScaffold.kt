@@ -15,7 +15,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
@@ -54,7 +54,7 @@ fun MainScaffold(navigator: AppNavigator, entryInstallers: Set<EntryProviderInst
         Tab.FAVORITE to rememberNavBackStack(FavoriteRouter.PageData),
     )
 
-    val layoutType = NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(currentWindowAdaptiveInfo())
+    val layoutType = NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(currentWindowAdaptiveInfoV2())
     val suiteState = rememberNavigationSuiteScaffoldState()
     // 키보드는 하단 탭바를 덮는다. 탭바가 남아 있으면 본문의 키보드 여백이 탭바 높이만큼 더 생기므로, 키보드가 떠 있는 동안 탭바를 숨긴다(측면 레일은 그대로)
     val hideBar = layoutType == NavigationSuiteType.NavigationBar && WindowInsets.isImeVisible
@@ -84,13 +84,8 @@ fun MainScaffold(navigator: AppNavigator, entryInstallers: Set<EntryProviderInst
             modifier = Modifier
                 .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Bottom))
                 .imePadding(),
-            // 지금 탭에 이전 화면이 있을 때만 불린다(CurrentTabSceneStrategy). NavDisplay 는 한 번의 뒤로 가기에
-            // (전체 항목 수 − 이전 항목 수)번 부르는데, 이전 항목에 앞쪽 다른 탭 항목을 넣지 않으므로 그 수만큼 더 불린다.
-            // 탭의 백스택은 목록·상세 두 칸까지라(상세는 바꿔 끼운다) 첫 화면만 남기면 한 번 뒤로 간 것과 같다
-            onBack = {
-                val stack = backStacks.getValue(currentTab)
-                if (stack.size > 1) stack.removeLastOrNull()
-            },
+            // 지금 탭에 이전 화면이 있을 때만 불린다(CurrentTabSceneStrategy)
+            onBack = { backStacks.getValue(currentTab).removeLastOrNull() },
         )
     }
     // 다른 탭의 첫 화면에서 뒤로 가면 검색 탭으로 간다. 검색 탭의 첫 화면에서는 시스템이 처리한다(홈으로)

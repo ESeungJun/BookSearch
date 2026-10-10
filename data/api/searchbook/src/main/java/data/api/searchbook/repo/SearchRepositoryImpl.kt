@@ -1,6 +1,6 @@
 package data.api.searchbook.repo
 
-import data.api.searchbook.data.toPage
+import data.api.searchbook.data.toPageOrNull
 import data.api.searchbook.source.local.ISearchLocalDataSource
 import data.api.searchbook.source.remote.ISearchRemoteDataSource
 import data.base.safeDbCall
@@ -45,9 +45,9 @@ class SearchRepositoryImpl @Inject constructor(
         val response = withTimeoutOrNull(TIMEOUT_MS) { remote.searchBooks(query, sort, page) }
             ?: return DomainResult.Error(SocketTimeoutException("${TIMEOUT_MS}ms 초과"))
         return when (response) {
-            // 목록·총 개수·끝 여부가 없는 응답은 빈 결과가 아니라 에러다(toPage 가 예외를 던진다)
-            is DomainResult.Success -> runCatching { response.data.toPage() }
-                .fold(onSuccess = { DomainResult.Success(it) }, onFailure = { DomainResult.Error(it) })
+            // 목록·총 개수·끝 여부가 없는 응답은 빈 결과가 아니라 에러다
+            is DomainResult.Success -> response.data.toPageOrNull()?.let { DomainResult.Success(it) }
+                ?: DomainResult.Error(IllegalStateException("검색 응답에 목록·총 개수·끝 여부가 없다"))
             is DomainResult.Fail -> response
             is DomainResult.Error -> response
         }

@@ -1,4 +1,4 @@
-package presentation.feature.detail.main.view.component
+package presentation.base.view.component
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -10,15 +10,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import core.designsystem.BookSearchTheme
-import presentation.base.R as BaseR
+import presentation.base.R
 
-/** 상단 바의 하트. 모양·색·설명은 목록 카드의 하트와 같다. */
+/** 즐겨찾기 하트. 목록 카드와 상세 상단 바가 같은 모양·색·설명을 쓴다. */
 @Composable
-internal fun DetailFavoriteButtonView(isFavorite: Boolean, onClick: () -> Unit) {
+fun FavoriteIconButton(isFavorite: Boolean, onClick: () -> Unit) {
     IconButton(onClick = onClick) {
         Icon(
             imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-            contentDescription = stringResource(if (isFavorite) BaseR.string.favorite_remove else BaseR.string.favorite_add),
+            contentDescription = stringResource(if (isFavorite) R.string.favorite_remove else R.string.favorite_add),
             tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
@@ -26,8 +26,8 @@ internal fun DetailFavoriteButtonView(isFavorite: Boolean, onClick: () -> Unit) 
 
 @Preview(showBackground = true)
 @Composable
-private fun DetailFavoriteButtonViewPreview() {
+private fun FavoriteIconButtonPreview() {
     BookSearchTheme {
-        DetailFavoriteButtonView(isFavorite = true, onClick = {})
+        FavoriteIconButton(isFavorite = true, onClick = {})
     }
 }
