@@ -11,7 +11,7 @@
 
 ## 단순하게 — v1 폐기에서 얻은 규칙
 - 작성자가 한 줄씩 설명할 수 있는 코드만 넣는다. 쓰임이 하나뿐인 추상화, 미리 만든 공용 코드는 만들지 않는다.
-- 공용 모듈(`:presentation:designsystem`)에는 두 화면 이상이 실제로 쓰는 것만 둔다.
+- 공통 모듈(`:core`)에는 두 화면 이상이 실제로 쓰는 것만 둔다.
 - 표준 라이브러리가 하는 일은 직접 만들지 않는다(예: 로그는 `HttpLoggingInterceptor`).
 - 작업은 단계별로 한다. 단계를 시작하기 전에 추가할 파일 목록을 작성자에게 확인받고, 끝나면 diff를 보여 주고 병합한다.
 
@@ -19,8 +19,8 @@
 
 ```
 :app                              MainActivity · navigation/ · 탭·2칸 Scaffold
+:core                             designsystem/(테마·두 화면 이상이 쓰는 UI) · util/(공통 유틸) — 기능과 무관한 공통 코드
 :di:book / search / favorite      Hilt 모듈 — 기능별 바인딩. DB 싱글톤은 book, 네트워크 싱글톤은 search
-:presentation:designsystem        테마 · 두 화면 이상이 쓰는 UI
 :presentation:search / favorite / detail    Screen · ViewModel · UiState
 :domain:book                      책 자체(BookDTO·BookException)·상세 조회 — search·favorite 가 함께 본다
 :domain:search / favorite         기능별 data/ · repo/ · usecase/ (순수 Kotlin). 서로 의존하지 않는다
