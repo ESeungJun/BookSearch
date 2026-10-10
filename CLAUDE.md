@@ -2,7 +2,7 @@
 
 카카오 도서 검색 API로 만드는 Android 채용 과제다. Kotlin, Coroutine/Flow, Jetpack Compose를 쓴다.
 요구사항 원문은 `docs/requirements/assignment.md`, API 실측은 `docs/api.md`에 있다.
-이 저장소는 두 번째 버전이다. 첫 버전을 폐기한 이유는 `docs/ai/v1-retrospective.md`에 있다.
+이 저장소는 두 번째 버전이다. 첫 버전은 구조가 과해 폐기했다(이유는 `docs/ai/decision-log.md` 「v1 폐기」).
 
 ## 금지
 - 저장소의 어떤 파일에도 채용 회사명을 쓰지 않는다. GitHub 공개 조건이다. 필요하면 "채용 과제"로 쓴다.
@@ -17,22 +17,21 @@
 
 ## 구조
 
-```
-:app                              MainActivity · navigation/(AppNavigator — INavigator 구현, 화면 등록을 모아 NavDisplay, 600dp 이상 목록-상세 2칸·전환 애니메이션) · 탭 Scaffold
-:core:designsystem                테마·두 화면 이상이 쓰는 UI. 공통 코드는 패키지 단위 모듈(:core:<이름>)로, 쓸 것이 생길 때 만든다
-:core:navigation                  INavigator · EntryProviderInstaller — 기능과 :app 이 함께 쓰는 화면 이동 계약
-:core:network                     OkHttp·Retrofit 제공(di/), API 키 BuildConfig — 키를 아는 유일한 모듈
-:presentation:router              화면마다 XxxRouter(PageData, 이동해 오는 화면은 open 도) — 다른 기능 화면으로 갈 때는 이것만 쓴다
-:presentation:feature:<기능>:main          vm/ · view/(Screen) · view/component/(조각마다 파일·@Preview) · data/(UiState·화면용 타입) · mapper/(DTO → ViewData) · router/ · di/
-:domain:base                      공통 타입만 — BookDTO · DomainResult
-:domain:search / favorite / book     주제별 data/ · repo/ · usecase/ (순수 Kotlin). 데이터가 서버·기기 중 어디서 오는지 모른다. 서로 의존하지 않는다
-:data:base                        data 공통 기반 — safeApiCall {}(서버 호출 → DomainResult), safeDbCall {} · safeDbFlow()(DB 호출 → DomainResult), Entity ↔ DTO 변환, db/(Room DB · dao/ · entity/) · di/(DB·DAO 제공). Room 이 한곳에서 모든 테이블을 알아야 해서 DB 를 여기 모은다
-:data:api:<API 경로>               서버 API 하나: service/ · data/(~Api) · mapper · source/(remote·local 캐시) · repo/ · di/ — 예 :data:api:searchbook
-:data:local:<저장 대상>             기기 DB 만: source/ · repo/ · di/ — 예 :data:local:favorite · :data:local:book. :data:base 의 DAO 를 쓴다
-```
+구조 설명은 문서로 나눠 둔다. 이 파일에는 지켜야 할 규칙만 둔다.
+
+| 문서 | 내용 |
+|---|---|
+| `ARCHITECTURE.md` | 앱 전체: 설계 원칙, 모듈 지도, 데이터 흐름, 화면 이동, DI 범위, 빌드 구성 |
+| `app/README.md` · `core/README.md` · `presentation/README.md` · `domain/README.md` · `data/README.md` | 레이어별 모듈·패키지·동작, 새로 만들 때 순서 |
+| `docs/guide/기능-추가.md` | 새 기능을 더하는 순서와 확인 목록 |
+| `.claude/agents/onboarding.md` · `.claude/agents/feature-dev.md` | 문답용 온보딩 에이전트, 기능 개발 에이전트 |
+
+- **구조를 바꾸면 같은 커밋에서 `ARCHITECTURE.md` 와 해당 레이어 README 를 고친다.** 온보딩 에이전트가 이 문서를 근거로 답하므로 문서가 코드와 어긋나면 안 된다. 숫자로 적은 곳(`ARCHITECTURE.md` 의 모듈 수·테이블 수, 레이어 README 의 모듈·UseCase·테이블 표)도 함께 맞춘다.
+
+### 구조 규칙
 
 - 의존 방향: `presentation → domain ← data`. 기능 data 모듈(`:data:api:*`·`:data:local:*`)과 `:core:network` 를 의존하는 곳은 `:app` 하나다(Hilt 가 `:app` 에서 그래프를 만든다). `:data:base` 는 data 모듈과 `:app` 이 의존한다. presentation 은 data 를 볼 수 없다.
-- presentation 패키지: `vm`(ViewModel) / `view`(Screen + Content) / `view.component`(화면을 이루는 조각, 파일 하나에 컴포넌트 하나와 그 `@Preview`) / `data`(UiState·화면용 타입) / `mapper`(DTO → ViewData 같은 변환 확장 함수 — ViewModel 안에 두지 않는다). `:presentation:base` 도 `data`(BookViewData) / `mapper`(toViewData) / `view.component`(BookCard).
+- presentation 패키지: `vm`(ViewModel) / `view`(Screen + Content) / `view.component`(화면을 이루는 조각, 파일 하나에 컴포넌트 하나와 그 `@Preview`) / `data`(UiState·화면용 타입) / `mapper`(DTO → ViewData 같은 변환 확장 함수 — ViewModel 안에 두지 않는다) / `router`(이 화면의 Router 구현) / `di`(Router 바인딩·화면 등록). `:presentation:base` 도 같은 구성이다: `data`(BookViewData) / `mapper`(카드 표시 값·표시 규칙·숫자 문구) / `view`(ToastEffect) / `view.component`(BookCard·FavoriteIconButton).
 - 기능 main 모듈끼리 서로 의존하지 않는다. 다른 기능 화면으로 갈 때는 `:presentation:router` 의 `XxxRouter` 를 주입받아 `open(PageData)` 를 부른다. 구현 `XxxRouterImpl` 은 그 화면의 main 모듈이 `INavigator` 로 만들고 Hilt 로 바인딩한다. PageData → 화면 연결도 각 main 모듈이 Hilt(`@IntoSet EntryProviderInstaller`)로 내놓고 `:app` 이 모아 그린다.
 - 모듈 공통 빌드 설정은 `build-logic`(포함 빌드)의 컨벤션 플러그인에 둔다. 패키지: `convention.config`(SDK·카탈로그 접근·Android 공통 설정) / `convention.base`(application·library·kotlin.jvm·compose·hilt) / `convention.layer`(presentation·domain·data).
 - 의존은 모두 `implementation` 으로 쓴다. `api` 로 다른 모듈을 내보내지 않는다. 레이어 공통 의존(코루틴·`javax.inject`·레이어 base 모듈)은 레이어 컨벤션 플러그인(`convention.domain`·`convention.data`·`convention.presentation`)이 붙이고, 모듈의 build.gradle.kts 에는 그 모듈만 쓰는 의존만 적는다.
@@ -52,7 +51,7 @@
   - 데이터 소스는 자기 원본 타입(`~Api`·`~Entity`)만 주고받고, DTO 로 바꾸는 것은 `repo` 다. DTO 는 `repo` 부터 나타나고, `~Api`·`~Entity` 는 그 data 모듈 밖으로 나가지 않는다.
   - `~Api` 필드는 모두 nullable 이고 기본값을 두지 않는다. 서버가 안 보낸 값은 null 그대로 DTO 까지 가고, 어떻게 보일지는 화면이 정한다.
 - Hilt 모듈은 바인딩을 구현한 모듈의 `di/` 패키지에 둔다. 별도 di 모듈은 두지 않는다.
-- Hilt 범위: 저장소와 데이터 소스는 `ViewModelComponent` + `@ViewModelScoped`. `SingletonComponent` 는 앱에 하나여야만 동작하는 것(Room DB, OkHttp·Retrofit)에만 쓰고 이유를 주석으로 남긴다.
+- Hilt 범위: 저장소와 데이터 소스는 `ViewModelComponent` + `@ViewModelScoped`. 화면 이동(`AppNavigator`·Router 구현·화면 등록)은 `ActivityRetainedComponent`. `SingletonComponent` 는 앱에 하나여야만 동작하는 것(Room DB, OkHttp·Retrofit)에만 쓰고 이유를 주석으로 남긴다.
 
 ## 이름
 
@@ -94,10 +93,10 @@
 | 검토했던 안을 버렸다 | 3. 폐기한 안. 이유를 함께 적는다 |
 | AI로 산출물을 만들었다 | 4. AI 활용 기록. 작성자가 어떻게 검토·검증했는지를 함께 적는다 |
 
-- 사용자가 하지 않은 판단은 지어내지 않는다. 확인받지 않은 추천은 `추천안 기본 채택`으로 표시하고 `docs/ai/REVIEW.md`에 모은다.
+- 사용자가 하지 않은 판단은 지어내지 않는다. 확인받지 않은 추천은 decision-log 1절 「세부 규칙」 표에 `추천안 기본 채택`으로 적고 작성자 검토를 받는다.
 - AI 제안과 다르게 정한 항목은 `AI 제안과 다름`으로 표시한다. README의 「직접 판단해 바꾼 부분」은 이 표시가 있는 항목에서만 옮긴다.
 - 일시는 `date`로 실측한다.
-- 1절은 주제별 **현재 상태**로 쓴다. 같은 주제를 다시 정하면 새 행을 만들지 않고 그 행을 고치고 ID 를 덧붙인다. 사소한 결정은 묶어 짧게 쓴다. 사람이 읽고 판단할 수 있는 분량을 유지한다.
+- 1절은 주제별 **현재 상태**로 쓴다. 같은 주제를 다시 정하면 새 행을 만들지 않고 그 행을 고친다. 사소한 결정은 묶어 짧게 쓴다. 사람이 읽고 판단할 수 있는 분량을 유지한다.
 - 작성자의 개념·비교 질문(결정이 아닌 것)은 기록하지 않는다.
 - 결정에 번호를 매기지 않는다. 코드 주석·커밋 메시지·다른 문서에서 결정 기록을 번호로 참조하지 않는다.
 
