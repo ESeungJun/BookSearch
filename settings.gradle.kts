@@ -24,6 +24,7 @@ rootProject.name = "BookSearch"
 
 include(":app")
 include(":core:designsystem", ":core:database", ":core:network", ":core:navigation")
+include(":presentation:base")
 include(":presentation:search:route", ":presentation:search:main")
 include(":presentation:favorite:route", ":presentation:favorite:main")
 include(":presentation:detail:route", ":presentation:detail:main")
