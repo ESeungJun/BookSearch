@@ -17,21 +17,21 @@ import presentation.feature.search.main.data.SearchNotice
 
 /** 스크롤하면 접히는 머리: 제목·검색창·오프라인 안내 줄. */
 @Composable
-internal fun SearchHeader(query: String, notice: SearchNotice?, onQueryChange: (String) -> Unit) {
+internal fun SearchHeaderView(query: String, notice: SearchNotice?, onQueryChange: (String) -> Unit) {
     Column(
         modifier = Modifier.padding(Spacing.large),
         verticalArrangement = Arrangement.spacedBy(Spacing.small),
     ) {
         Text(stringResource(R.string.search_title), style = MaterialTheme.typography.headlineMedium)
         SearchField(query, onQueryChange, stringResource(R.string.search_placeholder))
-        if (notice != null) OfflineNotice(notice)
+        if (notice != null) SearchOfflineNoticeView(notice)
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun SearchHeaderPreview() {
+private fun SearchHeaderViewPreview() {
     BookSearchTheme {
-        SearchHeader(query = "코틀린", notice = SearchNotice.LocalMatch, onQueryChange = {})
+        SearchHeaderView(query = "코틀린", notice = SearchNotice.LocalMatch, onQueryChange = {})
     }
 }

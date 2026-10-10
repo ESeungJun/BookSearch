@@ -14,7 +14,7 @@ import presentation.base.R as BaseR
 
 /** 상단 바의 하트. 모양·색·설명은 목록 카드의 하트와 같다. */
 @Composable
-internal fun FavoriteButton(isFavorite: Boolean, onClick: () -> Unit) {
+internal fun DetailFavoriteButtonView(isFavorite: Boolean, onClick: () -> Unit) {
     IconButton(onClick = onClick) {
         Icon(
             imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
@@ -26,8 +26,8 @@ internal fun FavoriteButton(isFavorite: Boolean, onClick: () -> Unit) {
 
 @Preview(showBackground = true)
 @Composable
-private fun FavoriteButtonPreview() {
+private fun DetailFavoriteButtonViewPreview() {
     BookSearchTheme {
-        FavoriteButton(isFavorite = true, onClick = {})
+        DetailFavoriteButtonView(isFavorite = true, onClick = {})
     }
 }

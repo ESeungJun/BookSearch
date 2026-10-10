@@ -14,7 +14,7 @@ import presentation.feature.detail.main.R
 
 /** 책 소개 블록. 요약이 문장 중간에서 끊겼으면([isCut]) 끝에 "…" 를 붙이고, 전체는 도서 페이지([url])에서 보게 한다. */
 @Composable
-internal fun BookDescription(description: String?, isCut: Boolean, url: String?, onOpenUrl: (String) -> Unit) {
+internal fun DetailDescriptionView(description: String?, isCut: Boolean, url: String?, onOpenUrl: (String) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
         Text(stringResource(R.string.detail_description), style = MaterialTheme.typography.titleMedium)
         if (description == null) {
@@ -37,9 +37,9 @@ internal fun BookDescription(description: String?, isCut: Boolean, url: String?,
 
 @Preview(showBackground = true)
 @Composable
-private fun BookDescriptionPreview() {
+private fun DetailDescriptionViewPreview() {
     BookSearchTheme {
-        BookDescription(
+        DetailDescriptionView(
             description = "코틀린이 무엇이며, 코틀린이 왜 자바 개발자에게 좋은 언어인지 설명한다",
             isCut = true,
             url = "https://example.com",

@@ -31,9 +31,9 @@ import presentation.feature.detail.main.R
 import presentation.feature.detail.main.data.DetailUiStatus
 import presentation.feature.detail.main.data.DetailUiState
 import presentation.feature.detail.main.data.DetailViewData
-import presentation.feature.detail.main.view.component.BookDetail
-import presentation.feature.detail.main.view.component.DetailSkeleton
-import presentation.feature.detail.main.view.component.FavoriteButton
+import presentation.feature.detail.main.view.component.DetailBookView
+import presentation.feature.detail.main.view.component.DetailSkeletonView
+import presentation.feature.detail.main.view.component.DetailFavoriteButtonView
 import presentation.feature.detail.main.vm.DetailViewModel
 
 @Composable
@@ -63,7 +63,7 @@ fun DetailScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailContent(
+internal fun DetailContent(
     state: DetailUiState,
     onBack: () -> Unit,
     onFavoriteClick: () -> Unit,
@@ -81,12 +81,12 @@ fun DetailContent(
             },
             actions = {
                 // 책을 찾았을 때만 하트가 의미가 있다
-                if (state.status is DetailUiStatus.Loaded) FavoriteButton(state.isFavorite, onFavoriteClick)
+                if (state.status is DetailUiStatus.Loaded) DetailFavoriteButtonView(state.isFavorite, onFavoriteClick)
             },
         )
         when (val status = state.status) {
-            DetailUiStatus.Loading -> DetailSkeleton()
-            is DetailUiStatus.Loaded -> BookDetail(status.book, onOpenUrl)
+            DetailUiStatus.Loading -> DetailSkeletonView()
+            is DetailUiStatus.Loaded -> DetailBookView(status.book, onOpenUrl)
             DetailUiStatus.NotFound -> EmptyView(
                 icon = Icons.AutoMirrored.Outlined.MenuBook,
                 title = stringResource(R.string.detail_not_found),

@@ -25,7 +25,7 @@ private const val SKELETON_INFO_LINES = 4
 
 /** 책을 찾는 동안 보이는 골격. 정상 화면과 같은 자리에 같은 크기로 그린다. */
 @Composable
-internal fun DetailSkeleton() {
+internal fun DetailSkeletonView() {
     Column(
         modifier = Modifier.fillMaxSize().padding(horizontal = Spacing.large),
         verticalArrangement = Arrangement.spacedBy(Spacing.large),
@@ -47,8 +47,8 @@ private fun SkeletonBlock(modifier: Modifier) {
 
 @Preview(showBackground = true)
 @Composable
-private fun DetailSkeletonPreview() {
+private fun DetailSkeletonViewPreview() {
     BookSearchTheme {
-        DetailSkeleton()
+        DetailSkeletonView()
     }
 }

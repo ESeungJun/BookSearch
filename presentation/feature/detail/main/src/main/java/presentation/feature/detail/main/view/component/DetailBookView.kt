@@ -20,7 +20,7 @@ import presentation.feature.detail.main.data.DetailViewData
 
 /** 책을 찾았을 때의 본문. 위에서부터 제목(가장 크게) → 정보 블록 → 책 소개다. */
 @Composable
-internal fun BookDetail(book: DetailViewData, onOpenUrl: (String) -> Unit) {
+internal fun DetailBookView(book: DetailViewData, onOpenUrl: (String) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -34,16 +34,16 @@ internal fun BookDetail(book: DetailViewData, onOpenUrl: (String) -> Unit) {
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
         )
-        BookInfo(book)
-        BookDescription(book.description, book.isDescriptionCut, book.url, onOpenUrl)
+        DetailInfoView(book)
+        DetailDescriptionView(book.description, book.isDescriptionCut, book.url, onOpenUrl)
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun BookDetailPreview() {
+private fun DetailBookViewPreview() {
     BookSearchTheme {
-        BookDetail(
+        DetailBookView(
             book = DetailViewData(
                 title = "코틀린 인 액션",
                 authors = "드미트리 제메로프",
