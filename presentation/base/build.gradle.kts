@@ -8,8 +8,6 @@ plugins {
 dependencies {
     implementation(projects.domain.base)
     implementation(projects.core.designsystem) // 간격 토큰
-    implementation(libs.coil.compose)
-    // Coil 3 은 네트워크 로더를 따로 붙여야 URL 이미지를 받는다
-    implementation(libs.coil.network.okhttp)
-    implementation(libs.compose.material.icons.extended)
+    // Coil 3 은 네트워크 로더를 따로 붙여야 URL 이미지를 받는다(image 묶음에 함께 있다)
+    implementation(libs.bundles.image)
 }
