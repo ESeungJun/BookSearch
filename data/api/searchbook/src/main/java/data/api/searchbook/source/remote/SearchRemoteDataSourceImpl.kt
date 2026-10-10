@@ -1,10 +1,9 @@
 package data.api.searchbook.source.remote
 
-import data.base.safeApiCall
-import data.api.searchbook.data.toPage
+import data.api.searchbook.data.SearchBookApi
 import data.api.searchbook.service.ISearchBookService
+import data.base.safeApiCall
 import domain.base.data.DomainResult
-import domain.search.data.SearchPageDTO
 import domain.search.data.SearchSort
 import javax.inject.Inject
 
@@ -12,8 +11,8 @@ class SearchRemoteDataSourceImpl @Inject constructor(
     private val service: ISearchBookService,
 ) : ISearchRemoteDataSource {
 
-    override suspend fun searchBooks(query: String, sort: SearchSort, page: Int): DomainResult<SearchPageDTO> =
-        safeApiCall { service.search(query, sort.apiValue, page, PAGE_SIZE).toPage() }
+    override suspend fun searchBooks(query: String, sort: SearchSort, page: Int): DomainResult<SearchBookApi> =
+        safeApiCall { service.search(query, sort.apiValue, page, PAGE_SIZE) }
 
     private val SearchSort.apiValue: String
         get() = when (this) {

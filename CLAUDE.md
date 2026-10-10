@@ -46,10 +46,10 @@
 - domain 은 출처(api·local)로 나누지 않고 주제로 나눈다. data 만 출처별(`api/<경로>`·`local/<저장 대상>`)이다.
 - `:domain:<주제>` 은 `data`(DTO·enum) · `repo`(저장소 인터페이스) · `usecase` 세 패키지다. 화면 모듈은 쓰는 domain 모듈만 build.gradle.kts 에 적는다.
 - `:data:*` 의 책임
-  - `repo`: 원격과 로컬 중 어디서 가져올지만 정한다(3초 시간 제한·캐시 대체). Retrofit·Room 을 모른다.
-  - `source/remote`: 서버 호출. `~Api` → DTO 변환, 서버 호출은 `:data:base` 의 `safeApiCall { }` 로 감싼다 — HTTP 오류 → `DomainResult.Fail(code)`, 그 밖의 실패 → `DomainResult.Error(cause)`, 취소는 다시 던진다. 호출마다 try-catch 를 쓰지 않는다. `source/local`: DB·캐시 읽기/쓰기와 캐시 보관 규칙. `~Entity` ↔ DTO 변환.
+  - `repo`: 원격과 로컬 중 어디서 가져올지 정하고(3초 시간 제한·캐시 대체), 데이터 소스가 준 원본(`~Api`·`~Entity`)을 DTO 로 바꾼다. Retrofit·Room 호출은 모른다.
+  - `source/remote`: 서버 호출. 응답은 `~Api` 그대로 주고, 서버 호출은 `:data:base` 의 `safeApiCall { }` 로 감싼다 — HTTP 오류 → `DomainResult.Fail(code)`, 그 밖의 실패 → `DomainResult.Error(cause)`, 취소는 다시 던진다. 호출마다 try-catch 를 쓰지 않는다. `source/local`: DB·캐시 읽기/쓰기와 캐시 보관 규칙. `~Entity` 를 그대로 주고받는다.
   - `service`: Retrofit 인터페이스(`I~Service`). `data`: 서버 응답 데이터(`~Api`)와 그 변환 함수.
-  - `~Api` 는 `source/remote` 밖으로, `~Entity` 는 `source/local` 밖으로 나가지 않는다. 데이터 소스는 DTO 로 주고받는다.
+  - 데이터 소스는 자기 원본 타입(`~Api`·`~Entity`)만 주고받고, DTO 로 바꾸는 것은 `repo` 다. DTO 는 `repo` 부터 나타나고, `~Api`·`~Entity` 는 그 data 모듈 밖으로 나가지 않는다.
   - `~Api` 필드는 모두 nullable 이고 기본값을 두지 않는다. 서버가 안 보낸 값은 null 그대로 DTO 까지 가고, 어떻게 보일지는 화면이 정한다.
 - Hilt 모듈은 바인딩을 구현한 모듈의 `di/` 패키지에 둔다. 별도 di 모듈은 두지 않는다.
 - Hilt 범위: 저장소와 데이터 소스는 `ViewModelComponent` + `@ViewModelScoped`. `SingletonComponent` 는 앱에 하나여야만 동작하는 것(Room DB, OkHttp·Retrofit)에만 쓰고 이유를 주석으로 남긴다.
