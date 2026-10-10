@@ -20,15 +20,16 @@ class ObserveFavoritesUseCase @Inject constructor(
     private fun filterAndSort(books: List<BookDTO>, query: String, sort: FavoriteSort, priceRange: IntRange?): List<BookDTO> {
         val filtered = books.filter { book ->
             val matchesQuery = query.isEmpty() ||
-                book.title.contains(query, ignoreCase = true) ||
-                book.authors.any { it.contains(query, ignoreCase = true) }
+                book.title?.contains(query, ignoreCase = true) == true ||
+                book.authors.orEmpty().any { it.contains(query, ignoreCase = true) }
             // 가격 정보가 없는 책은 금액 범위를 고르면 빠진다(범위 안인지 알 수 없다)
             val matchesPrice = priceRange == null || book.displayPrice?.let { it in priceRange } == true
             matchesQuery && matchesPrice
         }
+        // 제목이 없는 책은 이름순 비교가 안 되므로 정렬 방향과 관계없이 맨 뒤에 둔다
         return when (sort) {
-            FavoriteSort.TITLE_ASC -> filtered.sortedBy { it.title }
-            FavoriteSort.TITLE_DESC -> filtered.sortedByDescending { it.title }
+            FavoriteSort.TITLE_ASC -> filtered.sortedWith(compareBy(nullsLast()) { it.title })
+            FavoriteSort.TITLE_DESC -> filtered.sortedWith(compareBy(nullsLast(reverseOrder())) { it.title })
         }
     }
 }
