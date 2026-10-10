@@ -19,24 +19,26 @@
 
 ```
 :app                              MainActivity · navigation/ · 탭·2칸 Scaffold
-:di                               Hilt 모듈 — 루트에 앱 전체 싱글톤(DB·네트워크), book/ · search/ · favorite/ 에 기능별 바인딩
+:di:book / search / favorite      Hilt 모듈 — 기능별 바인딩. DB 싱글톤은 book, 네트워크 싱글톤은 search
 :presentation:designsystem        테마 · 두 화면 이상이 쓰는 UI
 :presentation:search / favorite / detail    Screen · ViewModel · UiState
 :domain:book                      책 자체(BookDTO·BookException)·상세 조회 — search·favorite 가 함께 본다
 :domain:search / favorite         기능별 data/ · repo/ · usecase/ (순수 Kotlin). 서로 의존하지 않는다
-:data                             repo/ · source/remote · source/local · service/ · data/ · db/dao · db/entity
+:data:book                        db/(dao·entity — Room 이 한곳에서 모든 테이블을 알아야 함) · source/local · repo/
+:data:search / favorite           repo/ · source/(remote·local) · service/ · data/ — 기능별, :data:book 의 DAO 를 쓴다
 ```
 
-- 의존 방향: `presentation → domain ← data`. `:di`만 `:data`를 의존한다. presentation 은 data 를 볼 수 없다.
+- 의존 방향: `presentation → domain ← data`. `:di:*`만 `:data:*`를 의존한다. presentation 은 data 를 볼 수 없다.
 - 기능 모듈끼리 서로 의존하지 않는다. 화면 이동은 `:app`이 연결한다.
 - **`:domain/usecase`는 사용자 행동 정의서다.** 사용자 행동 하나에 UseCase 하나를 두고 `operator fun invoke`로 부른다. `usecase/` 목록만 읽어도 이 앱으로 무엇을 할 수 있는지 알 수 있어야 한다. 저장소를 그대로 부르기만 하는 UseCase도 이 목적이면 만든다. ViewModel은 Repository가 아니라 UseCase만 부른다.
 - 패키지 이름은 모듈 경로 그대로다: `:data` → `data.*`, `:presentation:search` → `presentation.search`. `:app`만 `com.leeseungjun.booksearch`(applicationId)다 (D-55).
 - `:domain:<기능>` 은 `data`(DTO·enum) · `repo`(저장소 인터페이스) · `usecase` 세 패키지다. 화면 모듈은 쓰는 domain 모듈만 build.gradle.kts 에 적는다 (D-54·D-59).
-- `:data` 의 책임 (D-56·D-58)
+- `:data:*` 의 책임 (D-56·D-58·D-60)
   - `repo`: 원격과 로컬 중 어디서 가져올지만 정한다(3초 시간 제한·캐시 대체). Retrofit·Room 을 모른다.
   - `source/remote`: 서버 호출. `~Api` → DTO 변환, HTTP 오류 → `BookException`. `source/local`: DB·캐시 읽기/쓰기와 캐시 보관 규칙. `~Entity` ↔ DTO 변환.
   - `service`: Retrofit 인터페이스(`I~Service`). `data`: 서버 응답 데이터(`~Api`)와 그 변환 함수. `db/dao`·`db/entity`: Room.
   - `~Api` 는 `source/remote` 밖으로, `~Entity` 는 `source/local` 밖으로 나가지 않는다. 데이터 소스는 DTO 로 주고받는다.
+  - `~Api` 필드는 모두 nullable 이고 기본값을 두지 않는다. 서버가 안 보낸 값은 null 그대로 DTO 까지 가고, 어떻게 보일지는 화면이 정한다.
 - Hilt 범위 (D-57·D-59): 저장소와 데이터 소스는 `ViewModelComponent` + `@ViewModelScoped`. `SingletonComponent` 는 앱에 하나여야만 동작하는 것(Room DB, OkHttp·Retrofit)에만 쓰고 이유를 주석으로 남긴다.
 
 ## 이름 (D-52·D-53)
