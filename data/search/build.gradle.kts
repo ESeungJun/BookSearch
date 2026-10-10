@@ -5,6 +5,7 @@ plugins {
 
 dependencies {
     implementation(projects.domain.search)
+    implementation(projects.data.base)
     implementation(projects.data.database)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.serialization.json)

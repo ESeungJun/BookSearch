@@ -3,31 +3,22 @@ package data.search.source.remote
 import data.search.data.SearchBookApi
 import data.search.service.ISearchBookService
 import domain.base.data.DomainResult
+import domain.search.data.SearchPageDTO
 import domain.search.data.SearchSort
 import kotlinx.coroutines.test.runTest
-import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import retrofit2.HttpException
-import retrofit2.Response
-import java.io.IOException
 
-/** 통신 결과가 성공·실패(상태 코드)·에러(원인 예외)로 나뉘는지 확인한다. */
+/** 응답을 페이지로 바꾸는지, 필수 필드가 없으면 에러가 되는지 확인한다. 오류 분류는 ApiCallTest 가 본다. */
 class SearchRemoteDataSourceImplTest {
     private val service = FakeService()
     private val remote = SearchRemoteDataSourceImpl(service)
 
     @Test
-    fun `연결 실패는 IOException 을 담은 에러다`() = runTest {
-        service.error = IOException()
-        assertTrue((search() as DomainResult.Error).cause is IOException)
-    }
-
-    @Test
-    fun `HTTP 오류는 상태 코드만 담은 실패다(응답 본문은 넘기지 않는다)`() = runTest {
-        service.error = HttpException(Response.error<SearchBookApi>(401, "key".toResponseBody()))
-        assertEquals(DomainResult.Fail(401), search())
+    fun `응답을 페이지로 바꾼다`() = runTest {
+        service.response = SearchBookApi(SearchBookApi.MetaApi(totalCount = 3, isEnd = true), documents = emptyList())
+        assertEquals(DomainResult.Success(SearchPageDTO(emptyList(), 3, true)), search())
     }
 
     @Test
@@ -39,8 +30,7 @@ class SearchRemoteDataSourceImplTest {
     private suspend fun search() = remote.searchBooks("kotlin", SearchSort.ACCURACY, 1)
 
     private class FakeService : ISearchBookService {
-        var error: Exception? = null
         var response: SearchBookApi? = null
-        override suspend fun search(query: String, sort: String, page: Int, size: Int): SearchBookApi = error?.let { throw it } ?: response!!
+        override suspend fun search(query: String, sort: String, page: Int, size: Int): SearchBookApi = response!!
     }
 }
