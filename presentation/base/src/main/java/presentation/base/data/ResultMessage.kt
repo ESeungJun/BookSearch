@@ -1,8 +1,9 @@
-package presentation.base
+package presentation.base.data
 
 import androidx.annotation.StringRes
 import domain.base.data.DomainResult
 import java.io.IOException
+import presentation.base.R
 
 /** 키 오류(401·403). 다시 시도해도 같은 결과라 다른 실패와 따로 알린다. */
 fun DomainResult<*>.isServiceConfigError(): Boolean =

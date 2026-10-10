@@ -10,6 +10,11 @@ class DomainConventionPlugin : Plugin<Project> {
         pluginManager.apply("convention.kotlin.jvm")
         dependencies.add("implementation", library("kotlinx-coroutines-core"))
         dependencies.add("implementation", library("javax-inject")) // UseCase 생성자 주입(@Inject). Hilt 없이 표준 어노테이션만 쓴다
+        // UseCase 의 Dagger 팩토리를 이 모듈에서 한 번 만든다. 만들지 않으면 UseCase 를 주입받는 화면 모듈마다
+        // 같은 팩토리 클래스를 따로 만들어, 두 화면이 같은 UseCase 를 쓰면 앱 빌드(dex 병합)가 중복 클래스로 실패한다
+        pluginManager.apply("com.google.devtools.ksp")
+        dependencies.add("implementation", library("dagger"))
+        dependencies.add("ksp", library("dagger-compiler"))
         dependencies.add("implementation", project(":domain:base"))
     }
 }
