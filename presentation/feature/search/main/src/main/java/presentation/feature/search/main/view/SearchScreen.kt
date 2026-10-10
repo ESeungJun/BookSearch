@@ -19,6 +19,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import core.designsystem.BookSearchTheme
 import core.designsystem.component.CollapsingHeader
+import core.designsystem.component.rememberCollapsingHeaderState
 import core.designsystem.component.EmptyView
 import core.designsystem.component.ErrorView
 import domain.search.data.SearchSort
@@ -73,6 +74,7 @@ fun SearchContent(
     onFavoriteClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val headerState = rememberCollapsingHeaderState()
     // 새로고침 표시는 머리까지 감싼 바깥에 둔다. 목록을 내릴 때 접힌 머리가 먼저 펼쳐지고 그다음에 당겨지게 하려는 순서다
     PullToRefreshBox(
         isRefreshing = state.isRefreshing,
@@ -85,6 +87,7 @@ fun SearchContent(
                 if (state.status == SearchUiStatus.Results) CountSortRow(state.totalCount, state.sort, onSortChange)
             },
             collapseEnabled = state.status == SearchUiStatus.Results,
+            state = headerState,
         ) {
             when (val status = state.status) {
                 SearchUiStatus.Idle -> EmptyView(Icons.Outlined.Search, stringResource(R.string.search_idle))
@@ -95,7 +98,7 @@ fun SearchContent(
                     description = stringResource(R.string.search_empty_hint),
                 )
                 is SearchUiStatus.Error -> ErrorView(stringResource(status.messageRes), onRetry)
-                SearchUiStatus.Results -> BookList(state, onLoadMore, onBookClick, onFavoriteClick)
+                SearchUiStatus.Results -> BookList(state, onLoadMore, onBookClick, onFavoriteClick, headerState::expand)
             }
         }
     }
