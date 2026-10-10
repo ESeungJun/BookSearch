@@ -1,6 +1,6 @@
 package convention.layer
 
-import convention.config.library
+import convention.config.bundle
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -13,14 +13,7 @@ class PresentationConventionPlugin : Plugin<Project> {
         pluginManager.apply("convention.library")
         pluginManager.apply("convention.compose")
         pluginManager.apply("convention.hilt")
-        listOf(
-            "androidx-lifecycle-runtime-compose",
-            "androidx-lifecycle-viewmodel-compose",
-            "hilt-lifecycle-viewmodel-compose",
-            "kotlinx-collections-immutable",
-            "kotlinx-coroutines-core",
-            "nav3-runtime",
-        ).forEach { dependencies.add("implementation", library(it)) }
+        dependencies.add("implementation", bundle("presentation"))
         dependencies.add("implementation", project(":core:designsystem"))
         dependencies.add("implementation", project(":domain:base"))
         dependencies.add("implementation", project(":presentation:base"))
