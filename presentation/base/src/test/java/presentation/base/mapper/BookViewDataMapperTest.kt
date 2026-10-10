@@ -1,4 +1,4 @@
-package presentation.base
+package presentation.base.mapper
 
 import domain.base.data.BookDTO
 import org.junit.Assert.assertEquals
@@ -6,7 +6,7 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 
 /** 카드 표시 규칙의 경계값. 서버 값이 비거나 특수값(-1)일 때 조용히 틀린 값이 보이지 않는지 본다. */
-class BookViewDataTest {
+class BookViewDataMapperTest {
 
     @Test
     fun `할인가가 있으면 할인가를 보이고 정가는 취소선으로 남긴다`() {

@@ -31,7 +31,7 @@ private enum class Tab(@StringRes val label: Int, val icon: ImageVector) {
  * NavigationSuiteScaffold 는 창 너비에 따라 하단 탭바와 측면 레일을 알아서 바꾼다.
  */
 @Composable
-fun MainScaffold(navigator: AppNavigator, entryInstallers: Set<EntryProviderInstaller>) {
+fun MainScaffold(navigator: AppNavigator, entryInstallers: Set<EntryProviderInstaller>, onExit: () -> Unit) {
     var currentTab by rememberSaveable { mutableStateOf(Tab.SEARCH) }
     val backStacks = mapOf(
         Tab.SEARCH to rememberNavBackStack(SearchRouter.PageData),
@@ -50,6 +50,20 @@ fun MainScaffold(navigator: AppNavigator, entryInstallers: Set<EntryProviderInst
             }
         },
     ) {
-        AppNavHost(backStack = backStacks.getValue(currentTab), navigator = navigator, entryInstallers = entryInstallers)
+        AppNavHost(
+            backStacks = backStacks.mapKeys { it.key.name },
+            currentTab = currentTab.name,
+            navigator = navigator,
+            entryInstallers = entryInstallers,
+            onBack = {
+                val stack = backStacks.getValue(currentTab)
+                when {
+                    stack.size > 1 -> stack.removeLastOrNull()
+                    // 다른 탭의 첫 화면에서 뒤로 가면 검색 탭으로, 검색 탭의 첫 화면에서는 앱을 닫는다
+                    currentTab != Tab.SEARCH -> currentTab = Tab.SEARCH
+                    else -> onExit()
+                }
+            },
+        )
     }
 }

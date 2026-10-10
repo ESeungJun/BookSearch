@@ -1,4 +1,4 @@
-package presentation.search.main
+package presentation.search.main.vm
 
 import domain.base.data.BookDTO
 import domain.base.data.DomainResult
@@ -33,6 +33,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import presentation.base.R as BaseR
+import presentation.search.main.data.LoadMoreState
+import presentation.search.main.data.SearchNotice
+import presentation.search.main.data.SearchUiStatus
 
 /** 화면에 조용히 틀리게 보일 수 있는 판단만 확인한다: 디바운스·취소·페이징·캐시 안내·토스트·하트 결합. */
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -71,7 +74,7 @@ class SearchViewModelTest {
         viewModel.onQueryChange("   ")
         advanceUntilIdle()
         assertTrue(search.calls.isEmpty())
-        assertEquals(SearchStatus.Idle, viewModel.uiState.value.status)
+        assertEquals(SearchUiStatus.Idle, viewModel.uiState.value.status)
     }
 
     @Test
@@ -79,7 +82,7 @@ class SearchViewModelTest {
         search.pages["코틀린"] = page(books("a", 3))
         val viewModel = searched("코틀린")
         viewModel.onQueryChange("")
-        assertEquals(SearchStatus.Idle, viewModel.uiState.value.status)
+        assertEquals(SearchUiStatus.Idle, viewModel.uiState.value.status)
         assertTrue(viewModel.uiState.value.books.isEmpty())
     }
 
@@ -124,7 +127,7 @@ class SearchViewModelTest {
         viewModel.loadMore()
         advanceUntilIdle()
         val state = viewModel.uiState.value
-        assertEquals(SearchStatus.Results, state.status)
+        assertEquals(SearchUiStatus.Results, state.status)
         assertEquals(20, state.books.size)
         assertEquals(LoadMoreState.FAILED, state.loadMore)
 
@@ -177,13 +180,13 @@ class SearchViewModelTest {
     @Test
     fun `저장된 결과도 없으면 원인별 문구의 오류 화면이다`() = runTest {
         search.failure = DomainResult.Error(IOException())
-        assertEquals(SearchStatus.Error(BaseR.string.result_connection), searched("a").uiState.value.status)
+        assertEquals(SearchUiStatus.Error(BaseR.string.result_connection), searched("a").uiState.value.status)
 
         search.failure = DomainResult.Fail(403)
-        assertEquals(SearchStatus.Error(BaseR.string.result_service_config), searched("b").uiState.value.status)
+        assertEquals(SearchUiStatus.Error(BaseR.string.result_service_config), searched("b").uiState.value.status)
 
         search.failure = DomainResult.Fail(500)
-        assertEquals(SearchStatus.Error(BaseR.string.result_retry_later), searched("c").uiState.value.status)
+        assertEquals(SearchUiStatus.Error(BaseR.string.result_retry_later), searched("c").uiState.value.status)
     }
 
     @Test
@@ -221,7 +224,7 @@ class SearchViewModelTest {
     fun `앱을 열면 검색어 없이 첫 진입 상태다`() = runTest {
         val viewModel = viewModel()
         advanceUntilIdle()
-        assertEquals(SearchStatus.Idle, viewModel.uiState.value.status)
+        assertEquals(SearchUiStatus.Idle, viewModel.uiState.value.status)
         assertTrue(search.calls.isEmpty())
     }
 
