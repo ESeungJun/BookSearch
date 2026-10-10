@@ -1,11 +1,11 @@
 package data.favorite.source.local
 
-import data.book.db.dao.IBookDao
-import data.book.db.dao.IFavoriteDao
-import data.book.db.entity.FavoriteEntity
-import data.book.db.entity.toBook
-import data.book.db.entity.toEntity
-import domain.book.data.BookDTO
+import data.database.dao.IBookDao
+import data.database.dao.IFavoriteDao
+import data.database.entity.FavoriteEntity
+import data.database.entity.toBook
+import data.database.entity.toEntity
+import domain.base.data.BookDTO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject

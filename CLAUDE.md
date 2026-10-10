@@ -21,12 +21,13 @@
 :app                              MainActivity · navigation/ · 탭·2칸 Scaffold
 :core:designsystem                테마·두 화면 이상이 쓰는 UI. 공통 코드는 패키지 단위 모듈(:core:<이름>)로, 쓸 것이 생길 때 만든다
 :di:network                       OkHttp·Retrofit·API 서비스 제공(싱글톤), API 키 BuildConfig — 키를 아는 유일한 모듈
-:di:book / search / favorite      Hilt 모듈 — 기능별 바인딩. DB 싱글톤은 book
+:di:database                      Room DB·DAO 제공(싱글톤)
+:di:search / favorite / detail    Hilt 모듈 — 기능별 바인딩
 :presentation:search / favorite / detail    Screen · ViewModel · UiState
-:domain:book                      책 자체(BookDTO)·결과 타입(DomainResult)·상세 조회 — search·favorite 가 함께 본다
-:domain:search / favorite         기능별 data/ · repo/ · usecase/ (순수 Kotlin). 서로 의존하지 않는다
-:data:book                        db/(dao·entity — Room 이 한곳에서 모든 테이블을 알아야 함) · source/local · repo/
-:data:search / favorite           repo/ · source/(remote·local) · service/ · data/ — 기능별, :data:book 의 DAO 를 쓴다
+:domain:base                      공통 타입만 — BookDTO · DomainResult
+:domain:search / favorite / detail   기능별 data/ · repo/ · usecase/ (순수 Kotlin). 서로 의존하지 않는다
+:data:database                    Room DB · dao/ · entity/ 만 — Room 이 한곳에서 모든 테이블을 알아야 해서 공통 인프라로 둔다
+:data:search / favorite / detail  repo/ · source/(remote·local) · service/ · data/ — 기능별, :data:database 의 DAO 를 쓴다
 ```
 
 - 의존 방향: `presentation → domain ← data`. `:di:*`만 `:data:*`를 의존한다. presentation 은 data 를 볼 수 없다.

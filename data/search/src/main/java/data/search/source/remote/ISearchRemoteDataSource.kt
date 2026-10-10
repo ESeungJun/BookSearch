@@ -1,6 +1,6 @@
 package data.search.source.remote
 
-import domain.book.data.DomainResult
+import domain.base.data.DomainResult
 import domain.search.data.SearchPageDTO
 import domain.search.data.SearchSort
 

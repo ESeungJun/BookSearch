@@ -2,7 +2,7 @@ package data.search.source.remote
 
 import data.search.data.toBook
 import data.search.service.ISearchBookService
-import domain.book.data.DomainResult
+import domain.base.data.DomainResult
 import domain.search.data.SearchPageDTO
 import domain.search.data.SearchSort
 import kotlinx.coroutines.CancellationException

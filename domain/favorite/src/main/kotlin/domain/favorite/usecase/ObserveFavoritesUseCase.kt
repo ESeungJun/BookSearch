@@ -1,6 +1,6 @@
 package domain.favorite.usecase
 
-import domain.book.data.BookDTO
+import domain.base.data.BookDTO
 import domain.favorite.repo.IFavoriteRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

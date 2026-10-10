@@ -12,9 +12,10 @@ dependencies {
     implementation(projects.presentation.favorite)
     implementation(projects.presentation.detail)
     implementation(projects.di.network)
-    implementation(projects.di.book)
+    implementation(projects.di.database)
     implementation(projects.di.search)
     implementation(projects.di.favorite)
+    implementation(projects.di.detail)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)

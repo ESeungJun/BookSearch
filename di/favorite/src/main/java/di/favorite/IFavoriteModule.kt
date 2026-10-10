@@ -10,7 +10,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
 
-/** 범위는 di.book.IBookModule 과 같은 이유로 ViewModel 이다. */
+/** 범위는 di.detail.IDetailModule 과 같은 이유로 ViewModel 이다. */
 @Module
 @InstallIn(ViewModelComponent::class)
 interface IFavoriteModule {

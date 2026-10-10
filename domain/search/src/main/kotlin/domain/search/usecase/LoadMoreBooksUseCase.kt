@@ -1,6 +1,6 @@
 package domain.search.usecase
 
-import domain.book.data.DomainResult
+import domain.base.data.DomainResult
 import domain.search.data.SearchPageDTO
 import domain.search.data.SearchSort
 import domain.search.repo.ISearchRepository

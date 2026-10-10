@@ -2,7 +2,7 @@ package data.search.repo
 
 import data.search.source.local.ISearchLocalDataSource
 import data.search.source.remote.ISearchRemoteDataSource
-import domain.book.data.DomainResult
+import domain.base.data.DomainResult
 import domain.search.data.SearchConditionDTO
 import domain.search.data.SearchPageDTO
 import domain.search.data.SearchSort

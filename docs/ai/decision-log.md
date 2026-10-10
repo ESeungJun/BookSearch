@@ -41,6 +41,7 @@ README 의 「AI 활용」 절(어떤 작업에 썼는지 / 어떻게 검증했�
 | D-62 | 2026-10-10 | 3단계 전 | 디자인 시스템 위치 | `:presentation:designsystem` | 작성자 지시: **`:core` 모듈로 빼고 공통 유틸·디자인 시스템 등 앱 공통 코드를 모은다** (패키지 `core.designsystem`·`core.util`) | AI 제안과 다름 | `:core` |
 | D-63 | 2026-10-10 | 3단계 전 | domain 결과 타입·정렬·core·커밋 | `Result` + `BookException(Reason)`, domain 에 `FavoriteSort`, `:core` 하나, 코드와 문서를 따로 커밋 | 작성자 지시: **domain 은 커스텀 결과(`DomainResult`: Success·Fail·Error)로 상황만 전하고 원인·표시는 data·presentation 이 정한다**(AI 는 원인 enum 까지 domain 에 두는 안을 냈으나 작성자가 뺌). **정렬은 화면이 정하므로 `FavoriteSort` 를 domain 에서 뺀다.** `:core` 는 패키지 단위 모듈(`:core:designsystem`)로. 커밋은 코드와 결정 기록을 함께. **`:di:network` 를 따로 두어 OkHttp·Retrofit·API 서비스 주입을 모은다**(기능 di 는 바인딩만) | AI 제안과 다름 | `DomainResult`, `:core:designsystem`, `:di:network`, `CLAUDE.md` |
 | D-64 | 2026-10-10 | 3단계 전 | 기획서 남은 확인 2건 | 검색·정렬·다음 페이지·새로고침을 UseCase 하나로 / Custom Tab 은 UseCase 없이 | **다음 페이지만 `LoadMoreBooksUseCase` 로 나눈다**(검색·정렬·새로고침은 `SearchBooksUseCase`). Custom Tab 은 추천안대로 화면 동작 | AI 제안과 다름(1건) · 사용자 확정(1건) | `:domain:search/usecase`, 기획서 7절 |
+| D-65 | 2026-10-10 | 3단계 전 | 공통 `book` 모듈 정리 | 작성자가 `:data:book` 이 꼭 필요한지 물음. AI 가 'DB 를 기능별로 완전히 나누기'와 '기능 코드는 기능 모듈로, 공통은 DB 인프라만' 두 안을 올리고 후자를 권장 | 권장안 채택하되 **공통 domain 모듈 이름은 `book` 대신 `base`**. `:domain:base`(BookDTO·DomainResult), 상세 조회는 `:domain:detail`·`:data:detail`·`:di:detail`, DB 는 `:data:database`·`:di:database` | AI 제안과 다름(이름) | `settings.gradle.kts`, `CLAUDE.md` 구조 절 |
 ## 2. 논의 중 (미결)
 
 | ID | 일시 | 주제 | 쟁점 | 현재 상태 |
@@ -69,6 +70,7 @@ README 의 「AI 활용」 절(어떤 작업에 썼는지 / 어떻게 검증했�
 | 2026-10-10 | 응답 필드 기본값(빈 문자열·0·-1)과 매퍼의 빈 값 → null 변환 | AI | 작성자가 nullable·기본값 없음으로 서버 값을 그대로 믿기로 함 | D-60 |
 | 2026-10-10 | 판단 로직을 domain UseCase 에 두기 / 전부 ViewModel 로 옮기기 | AI / AI(선택지) | 작성자가 domain 은 행동 정의만, 판단은 data·presentation 기능 모듈로 정함 | D-61 |
 | 2026-10-10 | `BookException(Reason)` / 원인 enum(FailReason·ErrorReason)을 담은 domain 결과 | AI | domain 이 원인을 다 알 필요가 없다 — 상황만 전하는 `DomainResult` | D-63 |
+| 2026-10-10 | DB 를 기능별로 나누기(search.db·favorite.db, 즐겨찾기에 책 정보 복사) | AI(선택지) | DB 파일·싱글톤 2개, 책 정보 중복, 상세 조회가 두 DB 를 봐야 함 | D-65 |
 
 ## 4. AI 활용 기록 (v2)
 
