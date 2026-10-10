@@ -1,7 +1,9 @@
 package domain.search.usecase
 
-import domain.search.repo.ISearchRepository
+import domain.base.data.DomainResult
+import domain.base.usecase.useCase
 import domain.search.data.SearchConditionDTO
+import domain.search.repo.ISearchRepository
 import javax.inject.Inject
 
 /**
@@ -12,5 +14,5 @@ import javax.inject.Inject
 class GetLastSearchUseCase @Inject constructor(
     private val repository: ISearchRepository,
 ) {
-    suspend operator fun invoke(): SearchConditionDTO? = repository.getLastSearch()
+    suspend operator fun invoke(): DomainResult<SearchConditionDTO?> = useCase { repository.getLastSearch() }
 }

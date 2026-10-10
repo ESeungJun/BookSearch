@@ -1,6 +1,5 @@
 plugins {
-    id("convention.library")
-    id("convention.hilt")
+    id("convention.di")
 }
 
 // 검색 기능의 바인딩. 서비스·네트워크는 :di:network 가 제공한다.

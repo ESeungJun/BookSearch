@@ -1,8 +1,7 @@
 import java.util.Properties
 
 plugins {
-    id("convention.library")
-    id("convention.hilt")
+    id("convention.di")
 }
 
 // local.properties 의 키를 BuildConfig 로 넣는다. 파일이나 키가 없어도 빌드는 통과한다 —

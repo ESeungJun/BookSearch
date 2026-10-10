@@ -1,10 +1,10 @@
-package data.database.dao
+package core.database.dao
 
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
-import data.database.entity.BookEntity
-import data.database.entity.FavoriteEntity
+import core.database.entity.BookEntity
+import core.database.entity.FavoriteEntity
 import kotlinx.coroutines.flow.Flow
 
 // Room 의 Flow 쿼리는 favorite·book 테이블이 바뀔 때마다 다시 내보낸다 — 다른 화면에서 하트를 바꿔도 바로 반영된다
