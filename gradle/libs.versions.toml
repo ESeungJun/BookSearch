@@ -19,6 +19,8 @@ coil = "3.6.3"
 immutable = "0.4.0"
 browser = "1.8.0"
 junit = "4.13.2"
+robolectric = "4.17"
+androidxTestCore = "1.7.0"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
@@ -40,6 +42,8 @@ nav3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.re
 nav3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "nav3" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
+dagger = { module = "com.google.dagger:dagger", version.ref = "hilt" }
+dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "hilt" }
 hilt-lifecycle-viewmodel-compose = { module = "androidx.hilt:hilt-lifecycle-viewmodel-compose", version.ref = "hiltLifecycle" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
@@ -56,6 +60,8 @@ javax-inject = { module = "javax.inject:javax.inject", version = "1" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
 junit = { module = "junit:junit", version.ref = "junit" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+androidx-test-core = { module = "androidx.test:core", version.ref = "androidxTestCore" }
 androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }
 
 # build-logic 전용 (컨벤션 플러그인이 컴파일 시점에만 참조)
