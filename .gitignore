@@ -6,3 +6,5 @@ local.properties
 .DS_Store
 *.apk
 captures/
+.claude/.onboarded
+.claude/settings.local.json
