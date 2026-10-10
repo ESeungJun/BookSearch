@@ -36,7 +36,7 @@ private const val LOAD_MORE_PREFETCH = 10
 
 /** 검색 결과 카드 목록. 끝에 가까워지면 다음 페이지를 부르고, 목록 끝에 페이징 상태를 둔다. */
 @Composable
-internal fun BookList(
+internal fun SearchBookListView(
     state: SearchUiState,
     onLoadMore: () -> Unit,
     onBookClick: (String) -> Unit,
@@ -86,7 +86,7 @@ private fun LazyListState.isNearEnd(): Boolean {
 
 @Preview(showBackground = true)
 @Composable
-private fun BookListPreview() {
+private fun SearchBookListViewPreview() {
     val book = BookViewData(
         key = "1",
         title = "코틀린 인 액션",
@@ -100,7 +100,7 @@ private fun BookListPreview() {
         isFavorite = false,
     )
     BookSearchTheme {
-        BookList(
+        SearchBookListView(
             state = SearchUiState(
                 status = SearchUiStatus.Results,
                 books = persistentListOf(book, book.copy(key = "2", isFavorite = true)),

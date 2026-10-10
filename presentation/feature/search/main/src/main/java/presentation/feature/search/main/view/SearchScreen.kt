@@ -28,10 +28,10 @@ import presentation.feature.search.main.data.LoadMoreState
 import presentation.feature.search.main.data.SearchNotice
 import presentation.feature.search.main.data.SearchUiStatus
 import presentation.feature.search.main.data.SearchUiState
-import presentation.feature.search.main.view.component.BookList
-import presentation.feature.search.main.view.component.CountSortRow
-import presentation.feature.search.main.view.component.SearchHeader
-import presentation.feature.search.main.view.component.SearchSkeleton
+import presentation.feature.search.main.view.component.SearchBookListView
+import presentation.feature.search.main.view.component.SearchCountSortView
+import presentation.feature.search.main.view.component.SearchHeaderView
+import presentation.feature.search.main.view.component.SearchSkeletonView
 import presentation.feature.search.main.vm.SearchViewModel
 
 @Composable
@@ -54,7 +54,7 @@ fun SearchScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchContent(
+internal fun SearchContent(
     state: SearchUiState,
     onQueryChange: (String) -> Unit,
     onSortChange: (SearchSort) -> Unit,
@@ -73,23 +73,23 @@ fun SearchContent(
         modifier = modifier.fillMaxSize().statusBarsPadding(),
     ) {
         CollapsingHeader(
-            collapsible = { SearchHeader(state.query, state.notice, onQueryChange) },
+            collapsible = { SearchHeaderView(state.query, state.notice, onQueryChange) },
             pinned = {
-                if (state.status == SearchUiStatus.Results) CountSortRow(state.totalCount, state.sort, onSortChange)
+                if (state.status == SearchUiStatus.Results) SearchCountSortView(state.totalCount, state.sort, onSortChange)
             },
             collapseEnabled = state.status == SearchUiStatus.Results,
             state = headerState,
         ) {
             when (val status = state.status) {
                 SearchUiStatus.Idle -> EmptyView(Icons.Outlined.Search, stringResource(R.string.search_idle))
-                SearchUiStatus.Loading -> SearchSkeleton()
+                SearchUiStatus.Loading -> SearchSkeletonView()
                 SearchUiStatus.Empty -> EmptyView(
                     icon = Icons.Outlined.SearchOff,
                     title = stringResource(R.string.search_empty, state.searchedQuery),
                     description = stringResource(R.string.search_empty_hint),
                 )
                 SearchUiStatus.Error -> ErrorView(stringResource(BaseR.string.result_failure), onRetry)
-                SearchUiStatus.Results -> BookList(state, onLoadMore, onBookClick, onFavoriteClick, headerState::expand)
+                SearchUiStatus.Results -> SearchBookListView(state, onLoadMore, onBookClick, onFavoriteClick, headerState::expand)
             }
         }
     }

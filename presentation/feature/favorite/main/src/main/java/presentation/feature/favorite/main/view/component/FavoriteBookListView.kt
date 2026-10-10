@@ -29,7 +29,7 @@ private const val SCROLL_TO_TOP_MIN_INDEX = 5 // 이만큼 내려야 맨 위로 
 
 /** 즐겨찾기 카드 목록. 하트를 빼면 그 카드가 사라지는 움직임을 보인다. */
 @Composable
-internal fun BookList(
+internal fun FavoriteBookListView(
     state: FavoriteUiState,
     onBookClick: (String) -> Unit,
     onFavoriteClick: (String) -> Unit,
@@ -70,7 +70,7 @@ internal fun BookList(
 
 @Preview(showBackground = true)
 @Composable
-private fun BookListPreview() {
+private fun FavoriteBookListViewPreview() {
     val book = BookViewData(
         key = "1",
         title = "코틀린 인 액션",
@@ -84,7 +84,7 @@ private fun BookListPreview() {
         isFavorite = true,
     )
     BookSearchTheme {
-        BookList(
+        FavoriteBookListView(
             state = FavoriteUiState(
                 status = FavoriteUiStatus.Results,
                 books = persistentListOf(book, book.copy(key = "2", title = "이펙티브 코틀린")),
