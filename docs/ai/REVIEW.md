@@ -10,7 +10,7 @@ AI 가 작성자 확인 없이 정한 것(`추천안 기본 채택`)을 모은�
 | 2단계 | 0건 결과 캐시 | 저장 / **저장 안 함** | 남길 책이 없다 | 오프라인에서 0건 검색어는 '결과 없음' 대신 오류로 보인다 | `SearchLocalDataSourceImpl.saveSearchPage` |
 | 2단계 | 6페이지 이후 책 정보 | 저장 안 함 / **책 정보만 저장, 캐시 목록엔 안 남김** | 상세가 키로 찾을 수 있어야 한다 | 다음 새 검색 때 정리되므로 그 뒤 프로세스 재시작 시 상세를 못 찾을 수 있다 | `SearchLocalDataSourceImpl.saveSearchPage`, `IBookDao.deleteUnreferenced` |
 | 2단계 | 즐겨찾기 검색 범위 | 제목만 / **제목 + 저자** | 원문 '질의어 기반 로컬 검색'에 저자 검색도 자연스럽다 | — | `IFavoriteDao.observe` |
-| 이름 규칙 | Hilt `@Binds` 모듈(인터페이스) 이름 | 규칙 예외로 그대로 / **`I~Module`**(`IDetailModule` 등) | '인터페이스는 항상 `I~`'를 예외 없이 따른다 | 예외를 두면 규칙을 외울 것이 늘어난다 | `:di` |
+| 이름 규칙 | Hilt `@Binds` 모듈(인터페이스) 이름 | 규칙 예외로 그대로 / **`I~Module`**(`IBookModule` 등) | '인터페이스는 항상 `I~`'를 예외 없이 따른다 | 예외를 두면 규칙을 외울 것이 늘어난다 | `:di` |
 | 이름 규칙 | 테스트 대역 이름 | `~Impl` / **`Fake~` 유지**(`FakeSearchBookService` 등) | `~Impl` 은 앱의 실제 구현체만 가리키게 둔다. 테스트 안에서만 쓰는 private 클래스다 | 테스트 대역도 `~Impl` 이면 실제 구현과 구분이 안 된다 | `:data`·`:domain` 테스트 |
 | 이름 규칙 | 변환 함수 이름 | `toBookDTO()` / **`toBook()` 유지** | 함수 이름은 무엇으로 바꾸는지만 말하면 충분하다 | — | `SearchBookMapper`, `BookEntity` |
 | data 재구성 | HTTP 오류를 domain 결과로 바꾸는 자리 (`DomainResult`) | 저장소 / **원격 데이터 소스** | 저장소가 Retrofit(`HttpException`)을 몰라도 된다 | — | `SearchRemoteDataSourceImpl` |

@@ -27,5 +27,5 @@ include(":core:designsystem", ":core:database", ":core:network", ":core:navigati
 include(":presentation:base")
 include(":presentation:router")
 include(":presentation:feature:search:main", ":presentation:feature:favorite:main", ":presentation:feature:detail:main")
-include(":domain:base", ":domain:search", ":domain:favorite", ":domain:detail")
-include(":data:base", ":data:search", ":data:favorite", ":data:detail")
+include(":domain:base", ":domain:search", ":domain:favorite", ":domain:book")
+include(":data:base", ":data:api:searchbook", ":data:local:favorite", ":data:local:book")

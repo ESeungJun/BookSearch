@@ -8,7 +8,7 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import domain.base.data.BookDTO
 import domain.base.data.DomainResult
-import domain.detail.usecase.GetBookUseCase
+import domain.book.usecase.GetBookUseCase
 import domain.favorite.usecase.ObserveFavoriteKeysUseCase
 import domain.favorite.usecase.ToggleFavoriteUseCase
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    implementation(projects.domain.detail)
+    implementation(projects.domain.book)
     implementation(projects.domain.favorite)
     // 전체 책 소개(도서 페이지)를 앱을 떠나지 않고 Custom Tab 으로 연다
     implementation(libs.androidx.browser)
