@@ -1,4 +1,4 @@
-package data.api.searchbook
+package data.data
 
 import domain.data.BookDTO
 

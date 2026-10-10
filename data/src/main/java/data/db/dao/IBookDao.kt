@@ -1,8 +1,9 @@
-package data.db.book
+package data.db.dao
 
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
+import data.db.entity.BookEntity
 
 @Dao
 interface IBookDao {

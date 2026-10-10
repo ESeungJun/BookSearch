@@ -1,7 +1,5 @@
-package data
+package data.data
 
-import data.api.searchbook.SearchBookApi
-import data.api.searchbook.toBook
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test

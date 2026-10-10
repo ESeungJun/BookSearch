@@ -4,12 +4,12 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import data.db.book.IBookDao
-import data.db.book.BookEntity
-import data.db.favorite.IFavoriteDao
-import data.db.favorite.FavoriteEntity
-import data.db.searchcache.ISearchCacheDao
-import data.db.searchcache.SearchCacheEntity
+import data.db.dao.IBookDao
+import data.db.entity.BookEntity
+import data.db.dao.IFavoriteDao
+import data.db.entity.FavoriteEntity
+import data.db.dao.ISearchCacheDao
+import data.db.entity.SearchCacheEntity
 import kotlinx.serialization.json.Json
 
 /**

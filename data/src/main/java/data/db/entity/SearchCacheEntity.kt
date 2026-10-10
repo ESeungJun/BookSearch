@@ -1,4 +1,4 @@
-package data.db.searchcache
+package data.db.entity
 
 import androidx.room.Entity
 
