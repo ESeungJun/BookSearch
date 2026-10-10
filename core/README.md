@@ -13,7 +13,7 @@
 | 파일 | 내용 |
 |---|---|
 | `Theme` | `BookSearchTheme`(Material 3, 시스템 다크 모드를 따름) |
-| `theme/Spacing` | 간격 토큰 4 · 8 · 12 · 16 · 32dp. 화면의 여백은 이 값만 쓴다 |
+| `theme/Spacing` | 간격 토큰 8 · 12 · 16 · 32dp. 화면의 여백은 이 값만 쓴다 |
 | `component/SearchField` | 검색 입력창(지우기 버튼 포함) |
 | `component/CollapsingHeader` | 스크롤하면 접히는 머리. 손가락 방향을 머리가 먼저 받고, 고정 줄은 남긴다 |
 | `component/DropdownSelector` | 정렬 · 필터 선택 버튼 + 메뉴 |
@@ -29,6 +29,7 @@
 |---|---|
 | `INavigator` | `navigate` · `replace` · `back` · `current`. 구현은 `:app` 의 `AppNavigator` |
 | `EntryProviderInstaller` | 기능 모듈이 "PageData → 화면" 연결을 등록하는 함수 타입. `:app` 이 Set 으로 모은다 |
+| `LocalCurrentRoute` | 지금 탭에서 맨 위에 보이는 화면의 경로(CompositionLocal). 2칸에서 목록이 상세에 열린 책을 표시하는 데 쓴다 |
 
 ## :core:network
 

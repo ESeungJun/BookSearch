@@ -31,6 +31,15 @@ interface ISearchCacheDao {
         deleteOldCombinations(maxCombinations)
     }
 
+    /**
+     * [block] 을 한 트랜잭션으로 실행한다. 검색 결과 저장(책 저장 → 캐시 행 교체 → 참조 없는 책 정리) 사이에
+     * 다른 저장이 끼면 캐시 행은 있는데 책이 지워진 상태가 될 수 있어 한 번에 묶는다.
+     */
+    @Transaction
+    suspend fun inTransaction(block: suspend () -> Unit) {
+        block()
+    }
+
     @Insert
     suspend fun insert(rows: List<SearchCacheEntity>)
 
