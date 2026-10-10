@@ -20,7 +20,8 @@
 ```
 :app                              MainActivity · navigation/ · 탭·2칸 Scaffold
 :core:designsystem                테마·두 화면 이상이 쓰는 UI. 공통 코드는 패키지 단위 모듈(:core:<이름>)로, 쓸 것이 생길 때 만든다
-:di:book / search / favorite      Hilt 모듈 — 기능별 바인딩. DB 싱글톤은 book, 네트워크 싱글톤은 search
+:di:network                       OkHttp·Retrofit·API 서비스 제공(싱글톤), API 키 BuildConfig — 키를 아는 유일한 모듈
+:di:book / search / favorite      Hilt 모듈 — 기능별 바인딩. DB 싱글톤은 book
 :presentation:search / favorite / detail    Screen · ViewModel · UiState
 :domain:book                      책 자체(BookDTO)·결과 타입(DomainResult)·상세 조회 — search·favorite 가 함께 본다
 :domain:search / favorite         기능별 data/ · repo/ · usecase/ (순수 Kotlin). 서로 의존하지 않는다

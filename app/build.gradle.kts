@@ -11,6 +11,7 @@ dependencies {
     implementation(projects.presentation.search)
     implementation(projects.presentation.favorite)
     implementation(projects.presentation.detail)
+    implementation(projects.di.network)
     implementation(projects.di.book)
     implementation(projects.di.search)
     implementation(projects.di.favorite)
