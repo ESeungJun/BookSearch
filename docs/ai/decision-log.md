@@ -27,6 +27,9 @@ README 의 「AI 활용」 절(어떤 작업에 썼는지 / 어떻게 검증했�
 | D-48 | 2026-10-10 | 2단계 검토 | 즐겨찾기 토글 UseCase 형태 | `AddFavorite`·`RemoveFavorite` 로 나누기 | **지금 형태(`ToggleFavoriteUseCase(book, isFavorite)`) 유지** | AI 제안과 다름 | `ToggleFavoriteUseCase` |
 | D-49 | 2026-10-10 | 2단계 검토 | 앱 재시작 시 마지막 검색 복원(U-13) | 추가(plan-haul 제안) | 추천안 채택 | 사용자 확정 | `GetLastSearchUseCase`, `SearchCacheDao.getLatest` |
 | D-50 | 2026-10-10 | 2단계 검토 | 즐겨찾기 금액 구간 | 전체 / 1만 원 미만 / 1~2만 / 2~3만 / 3만 이상(plan-haul 추천) | 추천안 채택 | 사용자 확정 | 기획서 U-10 |
+| D-51 | 2026-10-10 | 3단계 전 | 커밋 메시지 머리말 | — | 작성자 지시: **커밋 메시지 앞에 `[feat]`·`[fix]`·`[refac]`·`[docs]`·`[merge]`·`[chore]`를 붙이고, 이미 올린 커밋 8개도 맞춘다.** 배정표(어떤 커밋에 어떤 머리말)는 AI 제안 그대로 채택. 이미 올린 이력을 고치려면 force push 금지와 `master`·`release` 금지를 어겨야 해서, AI 가 '이력 재작성 + force push'와 '앞으로만 적용' 두 안을 올렸고 작성자가 **이번 한 번만 예외로 재작성**을 택함(`--force-with-lease`, 로컬 백업 태그) | 사용자 지시 | `CLAUDE.md` 커밋·브랜치 절 |
+| D-52 | 2026-10-10 | 3단계 전 | 이름 규칙 | 서버 응답 `~Response`, 테이블 `~Entity`, domain 모델은 접미사 없음, 인터페이스는 접두사 없음 | 작성자 지시: **data 의 서버 응답 데이터는 `~Api`, domain 데이터는 `~DTO`, 화면은 `~UiState`·`~ViewData`. 인터페이스는 `I~`, 구현체는 `~Impl`, 추상 클래스는 `Abs~`, 베이스 클래스는 `Base~`** | AI 제안과 다름 | `CLAUDE.md` 이름 절, 기존 코드 이름 변경 |
+| D-53 | 2026-10-10 | 3단계 전 | 이름 규칙의 애매한 곳 | Retrofit 인터페이스는 `ISearchBookService`(응답 `SearchBookApi`와 겹치지 않게), Room 테이블은 `~Entity` 유지, `~DTO`는 data class 에만(enum·예외는 그대로) | 추천안 채택 | 사용자 확정 | `ISearchBookService`, `:data/db`, `:domain/model` |
 ## 2. 논의 중 (미결)
 
 | ID | 일시 | 주제 | 쟁점 | 현재 상태 |
@@ -43,6 +46,8 @@ README 의 「AI 활용」 절(어떤 작업에 썼는지 / 어떻게 검증했�
 | 2026-10-10 | 즐겨찾기 토글을 Add/Remove UseCase 둘로 나누기 | AI | 작성자가 지금 형태가 낫다고 판단 | D-48 |
 | 2026-10-10 | 기능 모듈 구조(`:core:*` + `:feature:*`) | AI | 작성자가 레이어 우선 유지 + 별도 di 를 선택 | D-40 |
 | 2026-10-10 | GitHub 저장소 완전 삭제 | AI(선택지) | 되돌릴 수 없어 비공개 보관을 택함 | D-43 |
+| 2026-10-10 | 머리말을 앞으로 올릴 커밋에만 붙이기(이력 재작성 없음) | AI(선택지) | 작성자가 기존 이력까지 맞추는 쪽을 택함 | D-51 |
+| 2026-10-10 | `~Response`·접미사 없는 domain 모델·접두사 없는 인터페이스 | AI | 작성자가 계층별 접미사와 `I~`·`Abs~`·`Base~` 규칙을 정함 | D-52 |
 
 ## 4. AI 활용 기록 (v2)
 
@@ -54,6 +59,7 @@ README 의 「AI 활용」 절(어떤 작업에 썼는지 / 어떻게 검증했�
 | 2026-10-10 | v2 기획서 | plan-haul 에이전트 | `docs/plan/기획서.md`(158줄): 사용자 행동 U-01~U-13 ↔ UseCase, 화면 정의, 네트워크 시나리오, 추적표. 새 UseCase 제안 1(GetLastSearch), 기존 UseCase 와 어긋난 점 5 | 메인 세션이 기존 UseCase·결정 기록과 대조. 자동 재시도 여부가 2단계 구현과 충돌해 작성자 결정으로 올림 |
 | 2026-10-10 | dev-haul 개정 | Claude Code(메인 세션) | v1 실패 사례 절, 단계 위임 모드(승인된 파일 목록 밖 생성 금지·커밋 금지), 단순함 점검표, 레이어당 모듈 하나, UseCase=사용자 행동, `update {}`·함수 새로고침, 배포 전 Room v1, 표준 로그 인터셉터 | 개정 내용은 작성자 지적 9가지와 v2 결정(D-40·D-44)에서 나옴. agent kit 저장소에 로컬 커밋 |
 | 2026-10-10 | 2단계 데이터 계층 | Claude Code(메인 세션) | domain(모델 5·UseCase 5·저장소 인터페이스), data(api/searchbook·재시도 인터셉터·테이블 3·저장소 구현), di(모듈 3), 테스트 13건 | `assembleDebug`, 단위 테스트 13건 통과. 작성자 검토 후 D-47~D-50 반영(재시도 인터셉터 삭제, `GetLastSearchUseCase` 추가) → 테스트 14건 통과 |
+| 2026-10-10 | 이름 규칙 적용 | Claude Code(메인 세션) | 파일 11개 이름 변경, 식별자 일괄 치환(25개 파일), 커밋 머리말 재작성 스크립트 | `assembleDebug` 성공, 단위 테스트 14건 통과. 문서의 옛 이름 검색. 애매한 세 곳은 작성자에게 물어 정함(D-53). 작성자 diff 검토 대기 |
 ---
 
 ## 부록 A. v1 결정 기록 (D-01~D-38, 원문 그대로)
