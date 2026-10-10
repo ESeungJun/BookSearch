@@ -1,3 +1,6 @@
+package convention.layer
+
+import convention.config.library
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 

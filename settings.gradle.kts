@@ -1,5 +1,5 @@
 pluginManagement {
-    // 컨벤션 플러그인은 buildSrc 대신 포함 빌드 — 플러그인 파일 하나를 고쳐도 전 모듈이 다시 구성되지 않는다
+    // 모듈 공통 빌드 설정(컨벤션 플러그인)을 담은 포함 빌드
     includeBuild("build-logic")
     repositories {
         google()
