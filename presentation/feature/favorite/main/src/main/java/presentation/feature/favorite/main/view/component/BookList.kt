@@ -33,6 +33,7 @@ internal fun BookList(
     state: FavoriteUiState,
     onBookClick: (String) -> Unit,
     onFavoriteClick: (String) -> Unit,
+    onScrollToTop: () -> Unit,
 ) {
     // 검색어·금액·정렬이 바뀌면 새 상태로 맨 위부터 보인다. 하트를 빼거나 회전할 때는 위치를 지킨다
     val listState = rememberSaveable(
@@ -58,7 +59,10 @@ internal fun BookList(
         }
         ScrollToTopButton(
             visible = showScrollToTop,
-            onClick = { scope.launch { listState.animateScrollToItem(0) } },
+            onClick = {
+                onScrollToTop()
+                scope.launch { listState.animateScrollToItem(0) }
+            },
             modifier = Modifier.align(Alignment.BottomEnd).padding(Spacing.large),
         )
     }
@@ -87,6 +91,7 @@ private fun BookListPreview() {
             ),
             onBookClick = {},
             onFavoriteClick = {},
+            onScrollToTop = {},
         )
     }
 }
