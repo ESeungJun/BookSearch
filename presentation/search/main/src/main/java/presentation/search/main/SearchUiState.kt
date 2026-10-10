@@ -18,7 +18,7 @@ data class SearchUiState(
     val page: Int = 0, // 받은 마지막 페이지
     val loadMore: LoadMoreState = LoadMoreState.END,
     val isRefreshing: Boolean = false,
-    val cachedTime: String? = null, // 저장된 결과를 보여 줄 때만 그 저장 시각
+    val notice: SearchNotice? = null, // 네트워크가 실패해 대신 보여 주는 결과일 때만
     @StringRes val toastRes: Int? = null, // 화면이 한 번 보여 준 뒤 onToastShown() 으로 지운다
 )
 
@@ -31,3 +31,9 @@ sealed interface SearchStatus {
 }
 
 enum class LoadMoreState { READY, LOADING, FAILED, END }
+
+/** 네트워크가 실패해 대신 보여 주는 결과의 종류. */
+sealed interface SearchNotice {
+    data class Cached(val savedTime: String) : SearchNotice // 같은 검색의 저장 결과(그 저장 시각)
+    data object LocalMatch : SearchNotice // 기기에 저장된 책에서 검색어로 찾은 결과
+}

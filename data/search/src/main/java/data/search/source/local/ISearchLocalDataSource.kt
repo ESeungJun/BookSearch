@@ -1,6 +1,5 @@
 package data.search.source.local
 
-import domain.search.data.SearchConditionDTO
 import domain.search.data.SearchPageDTO
 import domain.search.data.SearchSort
 
@@ -8,5 +7,6 @@ import domain.search.data.SearchSort
 interface ISearchLocalDataSource {
     suspend fun saveSearchPage(query: String, sort: SearchSort, page: Int, result: SearchPageDTO)
     suspend fun getSearchPage(query: String, sort: SearchSort, page: Int): SearchPageDTO?
-    suspend fun getLastSearch(): SearchConditionDTO?
+    /** 저장된 모든 책에서 검색어로 찾는다. 하나도 없으면 null. */
+    suspend fun findSavedBooks(query: String, sort: SearchSort): SearchPageDTO?
 }

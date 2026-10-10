@@ -5,11 +5,9 @@ import domain.base.data.DomainResult
 import domain.favorite.repo.IFavoriteRepository
 import domain.favorite.usecase.ObserveFavoriteKeysUseCase
 import domain.favorite.usecase.ToggleFavoriteUseCase
-import domain.search.data.SearchConditionDTO
 import domain.search.data.SearchPageDTO
 import domain.search.data.SearchSort
 import domain.search.repo.ISearchRepository
-import domain.search.usecase.GetLastSearchUseCase
 import domain.search.usecase.LoadMoreBooksUseCase
 import domain.search.usecase.SearchBooksUseCase
 import java.io.IOException
@@ -162,7 +160,7 @@ class SearchViewModelTest {
         val viewModel = searched("코틀린")
 
         val state = viewModel.uiState.value
-        assertNotNull(state.cachedTime)
+        assertTrue(state.notice is SearchNotice.Cached)
         assertEquals(BaseR.string.result_service_config, state.toastRes)
         viewModel.onToastShown()
         assertNull(viewModel.uiState.value.toastRes)
@@ -172,7 +170,7 @@ class SearchViewModelTest {
     fun `저장된 결과를 보여 줘도 키 오류가 아니면 토스트는 없다`() = runTest {
         search.pages["코틀린"] = page(books("a", 3), cachedAt = 1L, failure = DomainResult.Error(IOException()))
         val viewModel = searched("코틀린")
-        assertNotNull(viewModel.uiState.value.cachedTime)
+        assertTrue(viewModel.uiState.value.notice is SearchNotice.Cached)
         assertNull(viewModel.uiState.value.toastRes)
     }
 
@@ -212,19 +210,25 @@ class SearchViewModelTest {
     }
 
     @Test
-    fun `앱을 열면 마지막 검색어와 정렬로 검색한다`() = runTest {
-        search.last = SearchConditionDTO("코틀린", SearchSort.LATEST)
+    fun `저장된 책에서 찾은 결과면 그 안내 줄을 띄우고 다음 페이지를 요청하지 않는다`() = runTest {
+        search.pages["코틀린"] = page(books("a", 3), isEnd = true).copy(isLocalMatch = true, failure = DomainResult.Error(IOException()))
+        val viewModel = searched("코틀린")
+        assertEquals(SearchNotice.LocalMatch, viewModel.uiState.value.notice)
+        assertEquals(LoadMoreState.END, viewModel.uiState.value.loadMore)
+    }
+
+    @Test
+    fun `앱을 열면 검색어 없이 첫 진입 상태다`() = runTest {
         val viewModel = viewModel()
         advanceUntilIdle()
-        assertEquals("코틀린", viewModel.uiState.value.query)
-        assertEquals(listOf(Call("코틀린", SearchSort.LATEST, 1)), search.calls)
+        assertEquals(SearchStatus.Idle, viewModel.uiState.value.status)
+        assertTrue(search.calls.isEmpty())
     }
 
     private fun viewModel() = SearchViewModel(
         searchBooksUseCase = SearchBooksUseCase(search),
         loadMoreBooksUseCase = LoadMoreBooksUseCase(search),
         toggleFavoriteUseCase = ToggleFavoriteUseCase(favorite),
-        getLastSearchUseCase = GetLastSearchUseCase(search),
         observeFavoriteKeysUseCase = ObserveFavoriteKeysUseCase(favorite),
     )
 
@@ -256,7 +260,6 @@ class SearchViewModelTest {
         val delayMs = mutableMapOf<String, Long>()
         val calls = mutableListOf<Call>()
         var failure: DomainResult<Nothing>? = null
-        var last: SearchConditionDTO? = null
 
         override suspend fun searchBooks(query: String, sort: SearchSort, page: Int): DomainResult<SearchPageDTO> {
             calls += Call(query, sort, page)
@@ -264,8 +267,6 @@ class SearchViewModelTest {
             failure?.let { return it }
             return DomainResult.Success(pages[query] ?: SearchPageDTO(emptyList(), totalCount = 0, isEnd = true))
         }
-
-        override suspend fun getLastSearch(): DomainResult<SearchConditionDTO?> = DomainResult.Success(last)
     }
 
     private class FakeFavoriteRepository : IFavoriteRepository {
