@@ -40,6 +40,7 @@ internal fun BookList(
     onLoadMore: () -> Unit,
     onBookClick: (String) -> Unit,
     onFavoriteClick: (String) -> Unit,
+    onScrollToTop: () -> Unit,
 ) {
     // 다른 검색·정렬의 결과가 오면 새 상태로 맨 위부터 보인다. 같은 검색의 새로고침·회전에서는 위치를 지킨다
     val listState = rememberSaveable(state.searchedQuery, state.sort, saver = LazyListState.Saver) { LazyListState() }
@@ -68,7 +69,10 @@ internal fun BookList(
         }
         ScrollToTopButton(
             visible = showScrollToTop,
-            onClick = { scope.launch { listState.animateScrollToItem(0) } },
+            onClick = {
+                onScrollToTop()
+                scope.launch { listState.animateScrollToItem(0) }
+            },
             modifier = Modifier.align(Alignment.BottomEnd).padding(Spacing.large),
         )
     }
@@ -104,6 +108,7 @@ private fun BookListPreview() {
             onLoadMore = {},
             onBookClick = {},
             onFavoriteClick = {},
+            onScrollToTop = {},
         )
     }
 }

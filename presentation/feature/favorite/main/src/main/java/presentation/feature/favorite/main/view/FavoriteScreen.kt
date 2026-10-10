@@ -16,6 +16,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import core.designsystem.BookSearchTheme
 import core.designsystem.component.CollapsingHeader
+import core.designsystem.component.rememberCollapsingHeaderState
 import core.designsystem.component.EmptyView
 import core.designsystem.component.ErrorView
 import kotlinx.collections.immutable.persistentListOf
@@ -60,6 +61,7 @@ fun FavoriteContent(
     onFavoriteClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val headerState = rememberCollapsingHeaderState()
     CollapsingHeader(
         collapsible = { FavoriteHeader(state.query, onQueryChange) },
         pinned = {
@@ -77,6 +79,7 @@ fun FavoriteContent(
         },
         collapseEnabled = state.status == FavoriteUiStatus.Results,
         modifier = modifier.fillMaxSize().statusBarsPadding(),
+        state = headerState,
     ) {
         when (val status = state.status) {
             // 로컬 조회는 몇 프레임 안에 끝나 골격을 그리면 깜빡임만 보인다. 빈 자리로 둔다
@@ -90,7 +93,7 @@ fun FavoriteContent(
                 },
             )
             is FavoriteUiStatus.Error -> ErrorView(stringResource(status.messageRes), onRetry)
-            FavoriteUiStatus.Results -> BookList(state, onBookClick, onFavoriteClick)
+            FavoriteUiStatus.Results -> BookList(state, onBookClick, onFavoriteClick, headerState::expand)
         }
     }
 }
