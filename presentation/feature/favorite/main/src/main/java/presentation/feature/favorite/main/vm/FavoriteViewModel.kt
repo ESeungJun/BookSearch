@@ -1,5 +1,6 @@
 package presentation.feature.favorite.main.vm
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,6 +35,7 @@ import presentation.base.R as BaseR
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class FavoriteViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
     private val observeFavoritesUseCase: ObserveFavoritesUseCase,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
 ) : ViewModel() {
@@ -44,7 +46,14 @@ class FavoriteViewModel @Inject constructor(
     // DB 읽기가 실패하면 관찰이 끝난다. 다시 시도는 이 관찰을 새로 시작한다
     private var observeJob: Job? = null
 
-    private val _uiState = MutableStateFlow(FavoriteUiState())
+    // 검색어·금액·정렬은 SavedStateHandle 에도 둔다. 백그라운드에서 프로세스가 정리됐다 돌아와도 같은 조건으로 보인다
+    private val _uiState = MutableStateFlow(
+        FavoriteUiState(
+            query = savedStateHandle[KEY_QUERY] ?: "",
+            priceRange = savedStateHandle.get<String>(KEY_PRICE_RANGE)?.let(PriceRange::valueOf) ?: PriceRange.ALL,
+            sort = savedStateHandle.get<String>(KEY_SORT)?.let(TitleSort::valueOf) ?: TitleSort.ASCENDING,
+        ),
+    )
     val uiState: StateFlow<FavoriteUiState> = _uiState.asStateFlow()
 
     init {
@@ -53,18 +62,23 @@ class FavoriteViewModel @Inject constructor(
 
     // 로컬 조회라 입력마다 바로 거른다(디바운스 없음)
     fun onQueryChange(query: String) {
+        savedStateHandle[KEY_QUERY] = query
         _uiState.update { it.copy(query = query) }
     }
 
     fun onPriceRangeChange(priceRange: PriceRange) {
+        savedStateHandle[KEY_PRICE_RANGE] = priceRange.name
         _uiState.update { it.copy(priceRange = priceRange) }
     }
 
     fun onSortChange(sort: TitleSort) {
+        savedStateHandle[KEY_SORT] = sort.name
         _uiState.update { it.copy(sort = sort, books = sortedViewData(sort)) }
     }
 
     fun onResetFilters() {
+        savedStateHandle[KEY_QUERY] = ""
+        savedStateHandle[KEY_PRICE_RANGE] = PriceRange.ALL.name
         _uiState.update { it.copy(query = "", priceRange = PriceRange.ALL) }
     }
 
@@ -144,5 +158,11 @@ class FavoriteViewModel @Inject constructor(
             // 저장하지 못하면 하트가 그대로라 눌러도 반응이 없어 보인다. 한 번 알린다
             is DomainResult.Fail, is DomainResult.Error -> _uiState.update { it.copy(toastRes = BaseR.string.favorite_save_failed) }
         }
+    }
+
+    companion object {
+        private const val KEY_QUERY = "query"
+        private const val KEY_PRICE_RANGE = "priceRange"
+        private const val KEY_SORT = "sort"
     }
 }

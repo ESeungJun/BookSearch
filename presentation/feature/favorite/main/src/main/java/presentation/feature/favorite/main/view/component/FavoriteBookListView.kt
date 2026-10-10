@@ -22,8 +22,8 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 import presentation.base.data.BookViewData
 import presentation.base.view.component.BookCard
-import presentation.feature.favorite.main.data.FavoriteUiStatus
 import presentation.feature.favorite.main.data.FavoriteUiState
+import presentation.feature.favorite.main.data.FavoriteUiStatus
 
 private const val SCROLL_TO_TOP_MIN_INDEX = 5 // 이만큼 내려야 맨 위로 버튼이 보인다
 
@@ -34,6 +34,7 @@ internal fun FavoriteBookListView(
     onBookClick: (String) -> Unit,
     onFavoriteClick: (String) -> Unit,
     onScrollToTop: () -> Unit,
+    selectedBookKey: String? = null,
 ) {
     // 검색어·금액·정렬이 바뀌면 새 상태로 맨 위부터 보인다. 하트를 빼거나 회전할 때는 위치를 지킨다
     val listState = rememberSaveable(
@@ -53,6 +54,7 @@ internal fun FavoriteBookListView(
                     book = book,
                     onClick = { onBookClick(book.key) },
                     onFavoriteClick = { onFavoriteClick(book.key) },
+                    isSelected = book.key == selectedBookKey,
                     modifier = Modifier.animateItem(),
                 )
             }

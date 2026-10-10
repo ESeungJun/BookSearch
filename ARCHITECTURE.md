@@ -90,7 +90,7 @@ domain 은 상황만 전하고 원인을 나누지 않습니다. 사용자에게
 - 탭마다 백스택을 따로 둡니다(`rememberNavBackStack`). 모든 탭의 항목을 한 `NavDisplay` 에 넘겨, 탭을 바꿔도 다른 탭의 화면 상태와 ViewModel 이 남습니다.
 - 다른 기능 화면으로 갈 때는 `:presentation:router` 의 Router 를 주입받아 `open(PageData)` 를 부릅니다. Router 구현은 그 화면을 가진 모듈이 `INavigator` 로 만들고 Hilt 로 바인딩합니다.
 - 각 화면 모듈은 "PageData → 화면" 연결을 Hilt `@IntoSet` 으로 내놓고, `:app` 은 그 Set 하나만 받아 등록합니다. 그래서 `:app` 은 기능 화면을 하나하나 알지 않습니다.
-- 창 너비가 600dp 이상이면 목록과 상세를 한 화면에 나란히 둡니다(`ListDetailSceneStrategy`).
+- 창 너비가 600dp 이상이면 목록과 상세를 한 화면에 나란히 둡니다(`ListDetailSceneStrategy`). `:app` 이 각 화면에 그 탭의 맨 위 경로(`LocalCurrentRoute`)를 내려줘, 목록이 상세에 열린 책을 표시합니다.
 - 뒤로 가기는 지금 탭 안에서만 움직입니다. 2칸이면 상세만 닫고, 즐겨찾기 탭 첫 화면에서는 검색 탭으로, 검색 탭 첫 화면에서는 시스템에 맡깁니다(`CurrentTabSceneStrategy`).
 
 ## 5. 의존성 주입 (Hilt)
