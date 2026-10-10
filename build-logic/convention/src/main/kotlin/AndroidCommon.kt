@@ -20,10 +20,10 @@ internal val Project.libs: VersionCatalog
 
 internal fun Project.library(alias: String) = libs.findLibrary(alias).get()
 
-/** 모든 Android 모듈 공통 설정. 네임스페이스는 모듈 경로에서 만든다(:presentation:search → ….presentation.search). */
+/** 모든 Android 모듈 공통 설정. 네임스페이스는 모듈 경로 그대로다(:presentation:search → presentation.search). 패키지만 보고 어느 모듈인지 알 수 있게 한다. */
 internal fun Project.configureAndroid(extension: CommonExtension) {
     extension.apply {
-        namespace = ProjectConfig.APPLICATION_ID + path.replace(':', '.')
+        namespace = path.removePrefix(":").replace(':', '.')
         compileSdk = ProjectConfig.COMPILE_SDK
         defaultConfig.minSdk = ProjectConfig.MIN_SDK
         compileOptions.sourceCompatibility = JavaVersion.VERSION_17

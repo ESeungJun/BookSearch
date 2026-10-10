@@ -22,14 +22,28 @@
 :di                               Hilt 모듈 — presentation 과 data 를 잇는 유일한 곳
 :presentation:designsystem        테마 · 두 화면 이상이 쓰는 UI
 :presentation:search / favorite / detail    Screen · ViewModel · UiState
-:domain                           usecase/ · model/ · BookRepository 인터페이스 (순수 Kotlin)
+:domain                           data/ · repo/ · usecase/ (순수 Kotlin)
 :data                             api/<API 경로별 패키지>/ · db/<테이블별 패키지>/ · repository/
 ```
 
 - 의존 방향: `presentation → domain ← data`. `:di`만 `:data`를 의존한다. presentation 은 data 를 볼 수 없다.
 - 기능 모듈끼리 서로 의존하지 않는다. 화면 이동은 `:app`이 연결한다.
 - **`:domain/usecase`는 사용자 행동 정의서다.** 사용자 행동 하나에 UseCase 하나를 두고 `operator fun invoke`로 부른다. `usecase/` 목록만 읽어도 이 앱으로 무엇을 할 수 있는지 알 수 있어야 한다. 저장소를 그대로 부르기만 하는 UseCase도 이 목적이면 만든다. ViewModel은 Repository가 아니라 UseCase만 부른다.
-- `:data/api` 아래는 API 경로 하나당 패키지 하나(Api · Response · Mapper). `db` 아래는 테이블 하나당 패키지 하나(Dao · Entity).
+- 패키지 이름은 모듈 경로 그대로다: `:data` → `data.*`, `:presentation:search` → `presentation.search`. `:app`만 `com.leeseungjun.booksearch`(applicationId)다 (D-55).
+- `:domain` 은 `data`(DTO·enum·예외) · `repo`(저장소 인터페이스) · `usecase` 세 패키지다 (D-54).
+- `:data/api` 아래는 API 경로 하나당 패키지 하나(Service · Api · Mapper). `db` 아래는 테이블 하나당 패키지 하나(Dao · Entity).
+
+## 이름 (D-52·D-53)
+
+| 대상 | 규칙 | 예 |
+|---|---|---|
+| 서버 응답 데이터(`:data/api`) | `~Api` | `SearchBookApi`, 안쪽 `DocumentApi` |
+| Retrofit 인터페이스 | `I~Service` | `ISearchBookService` |
+| Room 테이블 | `~Entity` | `BookEntity` |
+| domain 데이터(data class) | `~DTO`. enum·예외는 붙이지 않는다 | `BookDTO`, `SearchSort` |
+| 화면 상태 / 목록 한 칸의 표시용 데이터 | `~UiState` / `~ViewData` | `SearchUiState`, `BookViewData` |
+| 인터페이스 / 구현체 | `I~` / `~Impl` | `IBookRepository` / `BookRepositoryImpl` |
+| 추상 클래스 / 베이스 클래스 | `Abs~` / `Base~` | `AbsBookDatabase` |
 
 ## 코드 순서
 클래스 안의 선언 순서는 다음을 따른다.
@@ -66,6 +80,7 @@
 | `dev` | 통합 브랜치 |
 | `feat/<기능>` | `dev`에서 따고, 끝나면 `dev`로 `--no-ff` 병합한 뒤 삭제한다 |
 
+- 커밋 메시지는 머리말로 시작한다: `[feat]` 기능 · `[fix]` 버그 · `[refac]` 동작이 같은 구조 변경 · `[docs]` 문서 · `[merge]` 병합 · `[chore]` 빌드·설정.
 - 브랜치 이름은 영어 kebab-case. force push는 하지 않는다.
 - `local.properties`, 빌드 산출물은 커밋하지 않는다.
 
