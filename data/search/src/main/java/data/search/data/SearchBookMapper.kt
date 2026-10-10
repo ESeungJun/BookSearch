@@ -1,6 +1,6 @@
 package data.search.data
 
-import domain.book.data.BookDTO
+import domain.base.data.BookDTO
 
 /** 서버 값을 그대로 옮긴다. 바꾸는 것은 ISBN 나누기, 날짜만 남기기, 할인가 -1(할인 없음 표시)뿐이다. */
 fun SearchBookApi.DocumentApi.toBook(): BookDTO {

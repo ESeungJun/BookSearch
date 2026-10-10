@@ -39,6 +39,9 @@ README 의 「AI 활용」 절(어떤 작업에 썼는지 / 어떻게 검증했�
 | D-60 | 2026-10-10 | 3단계 전 | data·di 기능별 모듈, 응답 nullable | 응답 필드에 기본값(`""`·0·-1)을 넣고 매퍼에서 빈 값을 null 로 바꿈 | 작성자 지시: **data·di 도 domain 처럼 book·search·favorite 모듈로 나눈다. 응답 데이터는 nullable·기본값 없음** — 서버가 안 보낸 값은 앱이 그대로 믿고 판단한다(빈 값으로 판단하면 예외가 많다). Room 제약으로 DB·DAO·Entity 는 `:data:book` 에 두고 로컬 데이터 소스는 기능별로 나눔(R-12 대체). `meta`·`documents` 가 없으면 서버 오류, 정가 0 을 null 로 바꾸던 규칙은 없앰 | AI 제안과 다름 | `:data:*`, `:di:*`, `SearchBookApi`, `BookDTO`, `docs/api.md` |
 | D-61 | 2026-10-10 | 3단계 전 | domain 의 비즈니스 로직 | 즐겨찾기 필터·정렬(메모리), 토글 분기, 키 집합 변환, 검색어 공백 제거, 표시 가격을 domain 에 둠 | 작성자 지시: **domain 은 사용자 행동 정의서로만 두고 판단 로직은 기능 단위로 뺀다.** 위치는 AI 권장대로 데이터 판단은 `:data:<기능>`(즐겨찾기 필터·정렬은 Room 쿼리), 입력·표시 판단은 `:presentation:<기능>`(3단계에서 구현) | AI 제안과 다름 | `CLAUDE.md` 구조 절, `IFavoriteDao.observe`, `FavoriteRepositoryImpl` |
 | D-62 | 2026-10-10 | 3단계 전 | 디자인 시스템 위치 | `:presentation:designsystem` | 작성자 지시: **`:core` 모듈로 빼고 공통 유틸·디자인 시스템 등 앱 공통 코드를 모은다** (패키지 `core.designsystem`·`core.util`) | AI 제안과 다름 | `:core` |
+| D-63 | 2026-10-10 | 3단계 전 | domain 결과 타입·정렬·core·커밋 | `Result` + `BookException(Reason)`, domain 에 `FavoriteSort`, `:core` 하나, 코드와 문서를 따로 커밋 | 작성자 지시: **domain 은 커스텀 결과(`DomainResult`: Success·Fail·Error)로 상황만 전하고 원인·표시는 data·presentation 이 정한다**(AI 는 원인 enum 까지 domain 에 두는 안을 냈으나 작성자가 뺌). **정렬은 화면이 정하므로 `FavoriteSort` 를 domain 에서 뺀다.** `:core` 는 패키지 단위 모듈(`:core:designsystem`)로. 커밋은 코드와 결정 기록을 함께. **`:di:network` 를 따로 두어 OkHttp·Retrofit·API 서비스 주입을 모은다**(기능 di 는 바인딩만) | AI 제안과 다름 | `DomainResult`, `:core:designsystem`, `:di:network`, `CLAUDE.md` |
+| D-64 | 2026-10-10 | 3단계 전 | 기획서 남은 확인 2건 | 검색·정렬·다음 페이지·새로고침을 UseCase 하나로 / Custom Tab 은 UseCase 없이 | **다음 페이지만 `LoadMoreBooksUseCase` 로 나눈다**(검색·정렬·새로고침은 `SearchBooksUseCase`). Custom Tab 은 추천안대로 화면 동작 | AI 제안과 다름(1건) · 사용자 확정(1건) | `:domain:search/usecase`, 기획서 7절 |
+| D-65 | 2026-10-10 | 3단계 전 | 공통 `book` 모듈 정리 | 작성자가 `:data:book` 이 꼭 필요한지 물음. AI 가 'DB 를 기능별로 완전히 나누기'와 '기능 코드는 기능 모듈로, 공통은 DB 인프라만' 두 안을 올리고 후자를 권장 | 권장안 채택하되 **공통 domain 모듈 이름은 `book` 대신 `base`**. `:domain:base`(BookDTO·DomainResult), 상세 조회는 `:domain:detail`·`:data:detail`·`:di:detail`, DB 는 `:data:database`·`:di:database` | AI 제안과 다름(이름) | `settings.gradle.kts`, `CLAUDE.md` 구조 절 |
 ## 2. 논의 중 (미결)
 
 | ID | 일시 | 주제 | 쟁점 | 현재 상태 |
@@ -66,6 +69,8 @@ README 의 「AI 활용」 절(어떤 작업에 썼는지 / 어떻게 검증했�
 | 2026-10-10 | domain 모듈 둘만 두고 favorite 이 search 를 의존 | AI(선택지) | 즐겨찾기가 검색에 묶임. 공통 `:domain:book` 을 택함 | D-59 |
 | 2026-10-10 | 응답 필드 기본값(빈 문자열·0·-1)과 매퍼의 빈 값 → null 변환 | AI | 작성자가 nullable·기본값 없음으로 서버 값을 그대로 믿기로 함 | D-60 |
 | 2026-10-10 | 판단 로직을 domain UseCase 에 두기 / 전부 ViewModel 로 옮기기 | AI / AI(선택지) | 작성자가 domain 은 행동 정의만, 판단은 data·presentation 기능 모듈로 정함 | D-61 |
+| 2026-10-10 | `BookException(Reason)` / 원인 enum(FailReason·ErrorReason)을 담은 domain 결과 | AI | domain 이 원인을 다 알 필요가 없다 — 상황만 전하는 `DomainResult` | D-63 |
+| 2026-10-10 | DB 를 기능별로 나누기(search.db·favorite.db, 즐겨찾기에 책 정보 복사) | AI(선택지) | DB 파일·싱글톤 2개, 책 정보 중복, 상세 조회가 두 DB 를 봐야 함 | D-65 |
 
 ## 4. AI 활용 기록 (v2)
 
@@ -83,6 +88,7 @@ README 의 「AI 활용」 절(어떤 작업에 썼는지 / 어떻게 검증했�
 | 2026-10-10 | domain 모듈 분리 | Claude Code(메인 세션) | 모듈 3개로 이동, 저장소 인터페이스·구현 셋으로 분리, 빌드 설정·DI 수정 | `assembleDebug` 성공, 단위 테스트 20건 통과. 작성자 diff 검토 대기 |
 | 2026-10-10 | data·di 모듈 분리, 응답 nullable | Claude Code(메인 세션) | 모듈 6개로 이동, 로컬 데이터 소스 기능별 분리, Api·DTO·Entity nullable, 응답 누락 처리 | `assembleDebug` 성공, 단위 테스트 21건 통과(누락 응답 테스트 추가). 작성자 diff 검토 대기 |
 | 2026-10-10 | domain 로직 이동 | Claude Code(메인 세션) | 즐겨찾기 필터·정렬 SQL(LIKE 이스케이프 포함), 키 관찰 쿼리, 토글을 저장소로, UseCase 위임만 남김 | `assembleDebug` 성공(Room 이 SQL 검사), 단위 테스트 18건 통과. 필터 규칙 테스트 3건은 SQL 로 옮겨 지움 — Room 실행 테스트는 아직 없음 |
+| 2026-10-10 | domain 결과 타입·정렬·core | Claude Code(메인 세션) | `DomainResult` 도입, 원격·저장소 결과 변환, 즐겨찾기 정렬 제거(저장 순), `:core:designsystem` | `assembleDebug` 성공, 단위 테스트 17건 통과(원격·저장소 테스트를 결과 타입 기준으로 다시 씀) |
 ---
 
 ## 부록 A. v1 결정 기록 (D-01~D-38, 원문 그대로)

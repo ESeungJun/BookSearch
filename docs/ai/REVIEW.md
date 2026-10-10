@@ -16,5 +16,5 @@ AI 가 작성자 확인 없이 정한 것(`추천안 기본 채택`)을 모은�
 | R-10 | 이름 규칙 | 테스트 대역 이름 | `~Impl` / **`Fake~` 유지**(`FakeSearchBookService` 등) | `~Impl` 은 앱의 실제 구현체만 가리키게 둔다. 테스트 안에서만 쓰는 private 클래스다 | 테스트 대역도 `~Impl` 이면 실제 구현과 구분이 안 된다 | `:data`·`:domain` 테스트 |
 | R-11 | 이름 규칙 | 변환 함수 이름 | `toBookDTO()` / **`toBook()` 유지** | 함수 이름은 무엇으로 바꾸는지만 말하면 충분하다 | — | `SearchBookMapper`, `BookEntity` |
 | ~~R-12~~ | data 재구성 | **대체 — D-60(로컬 데이터 소스를 기능별로 나눔)** 데이터 소스 개수 | 테이블별 셋 / **로컬 하나·원격 하나** | 검색 캐시를 저장할 때 책 테이블도 함께 바꾼다. 셋으로 나누면 저장소가 그 순서를 알아야 한다 | 테이블이 늘면 로컬 데이터 소스가 커진다 | `source/local`, `source/remote` |
-| R-13 | data 재구성 | HTTP 오류를 `BookException` 으로 바꾸는 자리 | 저장소 / **원격 데이터 소스** | 저장소가 Retrofit(`HttpException`)을 몰라도 된다 | — | `BookRemoteDataSourceImpl` |
+| R-13 | data 재구성 | HTTP 오류를 domain 결과로 바꾸는 자리 (D-63 이후 `DomainResult`) | 저장소 / **원격 데이터 소스** | 저장소가 Retrofit(`HttpException`)을 몰라도 된다 | — | `SearchRemoteDataSourceImpl` |
 | R-14 | data 재구성 | 요청 크기(20)·정렬 값 변환·캐시 보관 수 위치 | 저장소 / **각 데이터 소스** | 페이지 크기·정렬 문자열은 API 사정, 5페이지·20조합은 저장 사정이다. 시간 제한 3초만 저장소에 둔다 | — | 각 `~Impl` 의 `companion object` |

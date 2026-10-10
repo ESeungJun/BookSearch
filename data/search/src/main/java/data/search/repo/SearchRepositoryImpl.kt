@@ -2,13 +2,13 @@ package data.search.repo
 
 import data.search.source.local.ISearchLocalDataSource
 import data.search.source.remote.ISearchRemoteDataSource
-import domain.book.data.BookException
-import domain.book.data.BookException.Reason
+import domain.base.data.DomainResult
 import domain.search.data.SearchConditionDTO
 import domain.search.data.SearchPageDTO
 import domain.search.data.SearchSort
 import domain.search.repo.ISearchRepository
 import kotlinx.coroutines.withTimeoutOrNull
+import java.net.SocketTimeoutException
 import javax.inject.Inject
 
 /**
@@ -22,19 +22,16 @@ class SearchRepositoryImpl @Inject constructor(
     private val local: ISearchLocalDataSource,
 ) : ISearchRepository {
 
-    override suspend fun searchBooks(query: String, sort: SearchSort, page: Int): Result<SearchPageDTO> {
-        // 취소(CancellationException)는 잡지 않는다 — 실패가 아니므로 캐시로 넘기지 않고 호출한 쪽에 그대로 전한다
-        val error = try {
-            val result = withTimeoutOrNull(TIMEOUT_MS) { remote.searchBooks(query, sort, page) }
-            if (result != null) {
-                local.saveSearchPage(query, sort, page, result)
-                return Result.success(result)
-            }
-            BookException(Reason.NETWORK)
-        } catch (e: BookException) {
-            e
+    override suspend fun searchBooks(query: String, sort: SearchSort, page: Int): DomainResult<SearchPageDTO> {
+        // 시간 초과는 연결 문제와 같게 보이도록 IOException 의 한 종류로 넘긴다
+        val result = withTimeoutOrNull(TIMEOUT_MS) { remote.searchBooks(query, sort, page) }
+            ?: DomainResult.Error(SocketTimeoutException("${TIMEOUT_MS}ms 초과"))
+        if (result is DomainResult.Success) {
+            local.saveSearchPage(query, sort, page, result.data)
+            return result
         }
-        return local.getSearchPage(query, sort, page)?.let { Result.success(it) } ?: Result.failure(error)
+        // 실패·에러면 저장해 둔 결과로 대신한다. 그것도 없으면 원래 결과를 그대로 돌려준다
+        return local.getSearchPage(query, sort, page)?.let { DomainResult.Success(it) } ?: result
     }
 
     override suspend fun getLastSearch(): SearchConditionDTO? = local.getLastSearch()
