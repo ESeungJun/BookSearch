@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
 import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
@@ -34,7 +34,7 @@ import presentation.router.SearchRouter
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 internal fun rememberAppSceneStrategy(): ListDetailSceneStrategy<TabRoute> {
-    val windowInfo = currentWindowAdaptiveInfo()
+    val windowInfo = currentWindowAdaptiveInfoV2()
     val directive = calculatePaneScaffoldDirective(windowInfo).let {
         val wide = windowInfo.windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
         it.copy(maxHorizontalPartitions = if (wide) TWO_PANES else ONE_PANE)

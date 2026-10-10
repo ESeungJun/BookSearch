@@ -19,7 +19,6 @@ dependencies {
     implementation(projects.data.local.favorite)
     implementation(projects.data.local.book)
 
-    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.bundles.navigation) // 탭·백스택·넓은 창의 목록-상세 2칸
 }
