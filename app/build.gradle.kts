@@ -15,9 +15,9 @@ dependencies {
     // Hilt 는 :app 에서 그래프를 만든다. Hilt 모듈을 가진 모듈(data 기능·core)을 :app 이 모두 알아야 한다
     implementation(projects.core.network)
     implementation(projects.core.database)
-    implementation(projects.data.search)
-    implementation(projects.data.favorite)
-    implementation(projects.data.detail)
+    implementation(projects.data.api.searchbook)
+    implementation(projects.data.local.favorite)
+    implementation(projects.data.local.book)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
