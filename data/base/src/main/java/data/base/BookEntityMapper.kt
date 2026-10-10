@@ -1,6 +1,6 @@
 package data.base
 
-import core.database.entity.BookEntity
+import data.base.db.entity.BookEntity
 import domain.base.data.BookDTO
 
 fun BookEntity.toBook() = BookDTO(key, title, authors, publisher, publishedDate, price, salePrice, thumbnailUrl, isbn, description, url)

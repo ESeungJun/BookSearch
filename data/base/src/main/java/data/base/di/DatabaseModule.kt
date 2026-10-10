@@ -1,11 +1,11 @@
-package core.database.di
+package data.base.di
 
 import android.content.Context
 import androidx.room.Room
-import core.database.AbsBookDatabase
-import core.database.dao.IBookDao
-import core.database.dao.IFavoriteDao
-import core.database.dao.ISearchCacheDao
+import data.base.db.AbsBookDatabase
+import data.base.db.dao.IBookDao
+import data.base.db.dao.IFavoriteDao
+import data.base.db.dao.ISearchCacheDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
