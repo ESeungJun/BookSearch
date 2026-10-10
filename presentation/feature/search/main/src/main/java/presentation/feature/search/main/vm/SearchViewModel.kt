@@ -26,10 +26,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import presentation.base.R
 import presentation.base.data.BookViewData
-import presentation.base.data.failureMessageRes
-import presentation.base.data.isServiceConfigError
 import presentation.base.mapper.toViewData
 import presentation.feature.search.main.data.LoadMoreState
 import presentation.feature.search.main.data.SearchNotice
@@ -125,7 +122,6 @@ class SearchViewModel @Inject constructor(
                 // 새 책이 하나도 없으면 더 받아도 같은 결과라 끝으로 본다
                 loadMore = if (data.isEnd || newBooks.isEmpty()) LoadMoreState.END else LoadMoreState.READY,
                 notice = noticeFor(data) ?: it.notice,
-                toastRes = toastFor(data) ?: it.toastRes,
             )
         }
     }
@@ -138,10 +134,6 @@ class SearchViewModel @Inject constructor(
         val book = loadedBooks.find { it.key == key } ?: return
         // 결과는 즐겨찾기 키 관찰로 하트에 반영된다
         viewModelScope.launch { toggleFavoriteUseCase(book, isFavorite = key in favoriteKeys) }
-    }
-
-    fun onToastShown() {
-        _uiState.update { it.copy(toastRes = null) }
     }
 
     /** 새 검색·정렬 변경·새로고침·다시 시도 모두 첫 페이지부터 다시 받는다. */
@@ -164,15 +156,15 @@ class SearchViewModel @Inject constructor(
     private fun onFirstPage(query: String, result: DomainResult<SearchPageDTO>) {
         when (result) {
             is DomainResult.Success -> showFirstPage(query, result.data)
-            is DomainResult.Fail, is DomainResult.Error -> showError(query, result)
+            is DomainResult.Fail, is DomainResult.Error -> showError(query)
         }
     }
 
-    private fun showError(query: String, failure: DomainResult<Nothing>) {
+    private fun showError(query: String) {
         loadedBooks = emptyList()
         _uiState.update {
             it.copy(
-                status = SearchUiStatus.Error(failure.failureMessageRes()),
+                status = SearchUiStatus.Error,
                 searchedQuery = query,
                 books = persistentListOf(),
                 notice = null,
@@ -193,7 +185,6 @@ class SearchViewModel @Inject constructor(
                 loadMore = if (data.isEnd) LoadMoreState.END else LoadMoreState.READY,
                 isRefreshing = false,
                 notice = noticeFor(data),
-                toastRes = toastFor(data) ?: it.toastRes,
             )
         }
     }
@@ -210,14 +201,6 @@ class SearchViewModel @Inject constructor(
             else -> null
         }
     }
-
-    // 키 오류인데 저장된 결과로 덮여 원인이 안 보이는 경우만 토스트로 알린다
-    private fun toastFor(page: SearchPageDTO): Int? =
-        if (page.failure?.isServiceConfigError() == true) {
-            R.string.result_service_config
-        } else {
-            null
-        }
 
     companion object {
         const val QUERY_DEBOUNCE_MS = 400L

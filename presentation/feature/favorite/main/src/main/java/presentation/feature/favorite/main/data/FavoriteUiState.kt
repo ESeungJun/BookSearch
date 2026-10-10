@@ -22,7 +22,7 @@ sealed interface FavoriteUiStatus {
     data object NoFavorites : FavoriteUiStatus // 저장한 책이 없다
     data object Results : FavoriteUiStatus
     data object NoMatch : FavoriteUiStatus // 저장한 책은 있지만 검색어·금액에 맞는 책이 없다
-    data class Error(@StringRes val messageRes: Int) : FavoriteUiStatus
+    data object Error : FavoriteUiStatus // 원인과 관계없이 한 문구로 알린다
 }
 
 /** 제목 정렬 방향. 제목이 없는 책은 어느 방향이든 맨 뒤다. */

@@ -38,7 +38,7 @@
 - 모듈 공통 빌드 설정은 `build-logic`(포함 빌드)의 컨벤션 플러그인에 둔다. 패키지: `convention.config`(SDK·카탈로그 접근·Android 공통 설정) / `convention.base`(application·library·kotlin.jvm·compose·hilt) / `convention.layer`(presentation·domain·data).
 - 의존은 모두 `implementation` 으로 쓴다. `api` 로 다른 모듈을 내보내지 않는다. 레이어 공통 의존(코루틴·`javax.inject`·레이어 base 모듈)은 레이어 컨벤션 플러그인(`convention.domain`·`convention.data`·`convention.presentation`)이 붙이고, 모듈의 build.gradle.kts 에는 그 모듈만 쓰는 의존만 적는다.
 - domain 저장소 인터페이스의 모든 함수는 `DomainResult`(관찰은 `Flow<DomainResult<T>>`)를 돌려준다.
-- 결과의 공통 처리는 레이어마다 따로 둔다: data 저장소는 `safeApiCall {}`(서버)·`safeDbCall {}`·`safeDbFlow()`(DB)로 결과를 만들고(취소는 다시 던짐), domain UseCase 는 저장소가 준 결과를 그대로 돌려주고, presentation ViewModel 이 `when` 으로 세 상황을 판단한다(문구는 `:presentation:base` 의 `failureMessageRes()`).
+- 결과의 공통 처리는 레이어마다 따로 둔다: data 저장소는 `safeApiCall {}`(서버)·`safeDbCall {}`·`safeDbFlow()`(DB)로 결과를 만들고(취소는 다시 던짐), domain UseCase 는 저장소가 준 결과를 그대로 돌려주고, presentation ViewModel 이 `when` 으로 세 상황을 판단한다(오류 문구는 원인과 관계없이 `:presentation:base` 의 `result_failure` 하나).
 - **`:domain:<기능>` 의 `usecase` 는 사용자 행동 정의서다.** 사용자 행동 하나에 UseCase 하나를 두고 `operator fun invoke`로 부른다. `usecase/` 목록만 읽어도 이 앱으로 무엇을 할 수 있는지 알 수 있어야 한다. 저장소를 그대로 부르기만 하는 UseCase도 이 목적이면 만든다. ViewModel은 Repository가 아니라 UseCase만 부른다.
 - **domain 은 결과를 `DomainResult`(Success·Fail·Error)로 돌려준다.** 상황만 전하고 원인을 나누지 않는다. 원인은 data 가 채우고(Fail 은 HTTP 코드, Error 는 원인 예외), 어떻게 보일지는 presentation 이 판단한다. 정렬처럼 보여 주는 방식도 presentation 이 정한다.
 - `DomainResult` 를 받아 판단할 때는 `if (… is/!is …)`·`as?` 로 성공만 골라내지 않고 `when` 으로 Success·Fail·Error 를 모두 적는다. 처리가 같은 경우는 `is Fail, is Error ->` 처럼 한 줄에 묶는다. 각 상황을 어떻게 처리하는지가 코드에 드러나게 하려는 것이다.

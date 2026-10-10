@@ -1,6 +1,5 @@
 package presentation.feature.detail.main.data
 
-import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 
 @Immutable
@@ -13,5 +12,5 @@ sealed interface DetailUiStatus {
     data object Loading : DetailUiStatus
     data class Loaded(val book: DetailViewData) : DetailUiStatus
     data object NotFound : DetailUiStatus // 키에 해당하는 저장된 책이 없다
-    data class Error(@StringRes val messageRes: Int) : DetailUiStatus
+    data object Error : DetailUiStatus // 원인과 관계없이 한 문구로 알린다
 }

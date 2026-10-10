@@ -6,7 +6,5 @@
     <string name="book_price_none">가격 정보 없음</string>
     <string name="favorite_add">즐겨찾기에 추가</string>
     <string name="favorite_remove">즐겨찾기에서 빼기</string>
-    <string name="result_connection">인터넷 연결을 확인해 주세요</string>
-    <string name="result_service_config">서비스 설정에 문제가 있어요</string>
-    <string name="result_retry_later">잠시 후 다시 시도해 주세요</string>
+    <string name="result_failure">네트워크 또는 서버가 원활하지 않아요. 잠시 후 다시 시도해 주세요</string>
 </resources>
