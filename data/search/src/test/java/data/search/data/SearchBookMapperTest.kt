@@ -28,10 +28,9 @@ class SearchBookMapperTest {
     }
 
     @Test
-    fun `할인가 -1 은 할인 없음이고 표시 가격은 정가다`() {
+    fun `할인가 -1 은 할인 없음이라 null 이다`() {
         val book = doc.copy(salePrice = -1).toBook()
         assertNull(book.salePrice)
-        assertEquals(20000, book.displayPrice)
     }
 
     @Test

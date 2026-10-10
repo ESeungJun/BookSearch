@@ -6,6 +6,7 @@ import data.book.db.entity.FavoriteEntity
 import data.book.db.entity.toBook
 import data.book.db.entity.toEntity
 import domain.book.data.BookDTO
+import domain.favorite.data.FavoriteSort
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -15,8 +16,15 @@ class FavoriteLocalDataSourceImpl @Inject constructor(
     private val favoriteDao: IFavoriteDao,
 ) : IFavoriteLocalDataSource {
 
-    override fun observeFavorites(): Flow<List<BookDTO>> =
-        favoriteDao.observeAll().map { entities -> entities.map { it.toBook() } }
+    override fun observeFavorites(query: String, sort: FavoriteSort, priceRange: IntRange?): Flow<List<BookDTO>> =
+        favoriteDao.observe(
+            pattern = query.takeIf { it.isNotEmpty() }?.let { "%${it.escapeLike()}%" },
+            minPrice = priceRange?.first,
+            maxPrice = priceRange?.last,
+            ascending = sort == FavoriteSort.TITLE_ASC,
+        ).map { entities -> entities.map { it.toBook() } }
+
+    override fun observeFavoriteKeys(): Flow<Set<String>> = favoriteDao.observeKeys().map { it.toSet() }
 
     override suspend fun addFavorite(book: BookDTO) {
         bookDao.upsert(listOf(book.toEntity()))
@@ -26,4 +34,7 @@ class FavoriteLocalDataSourceImpl @Inject constructor(
     override suspend fun removeFavorite(key: String) {
         favoriteDao.delete(key)
     }
+
+    // 사용자가 입력한 % · _ 가 LIKE 의 와일드카드로 동작하지 않게 한다
+    private fun String.escapeLike(): String = replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
 }

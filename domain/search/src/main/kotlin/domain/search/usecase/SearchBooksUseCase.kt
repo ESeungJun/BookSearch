@@ -10,5 +10,5 @@ class SearchBooksUseCase @Inject constructor(
     private val repository: ISearchRepository,
 ) {
     suspend operator fun invoke(query: String, sort: SearchSort, page: Int): Result<SearchPageDTO> =
-        repository.searchBooks(query.trim(), sort, page)
+        repository.searchBooks(query, sort, page)
 }

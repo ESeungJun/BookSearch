@@ -8,7 +8,5 @@ import javax.inject.Inject
 class ToggleFavoriteUseCase @Inject constructor(
     private val repository: IFavoriteRepository,
 ) {
-    suspend operator fun invoke(book: BookDTO, isFavorite: Boolean) {
-        if (isFavorite) repository.removeFavorite(book.key) else repository.addFavorite(book)
-    }
+    suspend operator fun invoke(book: BookDTO, isFavorite: Boolean) = repository.toggleFavorite(book, isFavorite)
 }
