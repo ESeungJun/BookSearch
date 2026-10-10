@@ -1,9 +1,9 @@
-package core.database.dao
+package data.base.db.dao
 
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
-import core.database.entity.BookEntity
+import data.base.db.entity.BookEntity
 
 @Dao
 interface IBookDao {

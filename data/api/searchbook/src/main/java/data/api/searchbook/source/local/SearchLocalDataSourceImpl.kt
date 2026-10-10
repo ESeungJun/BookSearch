@@ -1,8 +1,8 @@
 package data.api.searchbook.source.local
 
-import core.database.dao.IBookDao
-import core.database.dao.ISearchCacheDao
-import core.database.entity.SearchCacheEntity
+import data.base.db.dao.IBookDao
+import data.base.db.dao.ISearchCacheDao
+import data.base.db.entity.SearchCacheEntity
 import data.base.toBook
 import data.base.toEntity
 import data.base.toLikePattern

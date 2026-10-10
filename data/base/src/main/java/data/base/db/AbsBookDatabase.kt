@@ -1,15 +1,15 @@
-package core.database
+package data.base.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import core.database.dao.IBookDao
-import core.database.entity.BookEntity
-import core.database.dao.IFavoriteDao
-import core.database.entity.FavoriteEntity
-import core.database.dao.ISearchCacheDao
-import core.database.entity.SearchCacheEntity
+import data.base.db.dao.IBookDao
+import data.base.db.entity.BookEntity
+import data.base.db.dao.IFavoriteDao
+import data.base.db.entity.FavoriteEntity
+import data.base.db.dao.ISearchCacheDao
+import data.base.db.entity.SearchCacheEntity
 import kotlinx.serialization.json.Json
 
 /**

@@ -1,6 +1,6 @@
 package data.local.book.source.local
 
-import core.database.dao.IBookDao
+import data.base.db.dao.IBookDao
 import data.base.toBook
 import domain.base.data.BookDTO
 import javax.inject.Inject
