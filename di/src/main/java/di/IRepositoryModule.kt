@@ -1,7 +1,11 @@
 package di
 
 import data.repo.BookRepositoryImpl
-import domain.repo.IBookRepository
+import data.repo.FavoriteRepositoryImpl
+import data.repo.SearchRepositoryImpl
+import domain.book.repo.IBookRepository
+import domain.favorite.repo.IFavoriteRepository
+import domain.search.repo.ISearchRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -18,4 +22,12 @@ interface IRepositoryModule {
     @Binds
     @ViewModelScoped
     fun bindBookRepository(impl: BookRepositoryImpl): IBookRepository
+
+    @Binds
+    @ViewModelScoped
+    fun bindSearchRepository(impl: SearchRepositoryImpl): ISearchRepository
+
+    @Binds
+    @ViewModelScoped
+    fun bindFavoriteRepository(impl: FavoriteRepositoryImpl): IFavoriteRepository
 }

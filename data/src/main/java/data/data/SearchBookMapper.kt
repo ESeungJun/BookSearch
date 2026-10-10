@@ -1,6 +1,6 @@
 package data.data
 
-import domain.data.BookDTO
+import domain.book.data.BookDTO
 
 fun SearchBookApi.DocumentApi.toBook(): BookDTO {
     val isbns = isbn.split(' ').filter { it.isNotBlank() }

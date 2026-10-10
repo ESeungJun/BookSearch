@@ -7,10 +7,10 @@ import data.db.entity.FavoriteEntity
 import data.db.entity.SearchCacheEntity
 import data.db.entity.toBook
 import data.db.entity.toEntity
-import domain.data.BookDTO
-import domain.data.SearchConditionDTO
-import domain.data.SearchPageDTO
-import domain.data.SearchSort
+import domain.book.data.BookDTO
+import domain.search.data.SearchConditionDTO
+import domain.search.data.SearchPageDTO
+import domain.search.data.SearchSort
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject

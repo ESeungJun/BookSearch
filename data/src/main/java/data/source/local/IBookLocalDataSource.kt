@@ -1,9 +1,9 @@
 package data.source.local
 
-import domain.data.BookDTO
-import domain.data.SearchConditionDTO
-import domain.data.SearchPageDTO
-import domain.data.SearchSort
+import domain.book.data.BookDTO
+import domain.search.data.SearchConditionDTO
+import domain.search.data.SearchPageDTO
+import domain.search.data.SearchSort
 import kotlinx.coroutines.flow.Flow
 
 /** 기기에 저장한 책·즐겨찾기·검색 캐시만 맡는다. 무엇을 얼마나 남길지(캐시 보관 규칙)도 여기서 정한다. */

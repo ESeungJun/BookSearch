@@ -2,7 +2,7 @@ package data.db.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import domain.data.BookDTO
+import domain.book.data.BookDTO
 
 /** 책 정보는 이 테이블 한 곳에만 둔다. 즐겨찾기와 검색 캐시는 [key] 로 가리킨다. */
 @Entity(tableName = "book")
