@@ -1,7 +1,7 @@
 package data.local.favorite.source.local
 
-import core.database.dao.IFavoriteDao
-import core.database.entity.FavoriteEntity
+import data.base.db.dao.IFavoriteDao
+import data.base.db.entity.FavoriteEntity
 import data.base.toBook
 import data.base.toEntity
 import data.base.toLikePattern

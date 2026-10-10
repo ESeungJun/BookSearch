@@ -12,9 +12,9 @@ dependencies {
     implementation(projects.presentation.feature.favorite.main)
     implementation(projects.presentation.feature.detail.main)
     implementation(projects.presentation.router)
-    // Hilt 는 :app 에서 그래프를 만든다. Hilt 모듈을 가진 모듈(data 기능·core)을 :app 이 모두 알아야 한다
+    // Hilt 는 :app 에서 그래프를 만든다. Hilt 모듈을 가진 모듈(data·core)을 :app 이 모두 알아야 한다
     implementation(projects.core.network)
-    implementation(projects.core.database)
+    implementation(projects.data.base)
     implementation(projects.data.api.searchbook)
     implementation(projects.data.local.favorite)
     implementation(projects.data.local.book)
