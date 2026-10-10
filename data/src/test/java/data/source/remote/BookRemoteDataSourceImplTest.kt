@@ -2,9 +2,9 @@ package data.source.remote
 
 import data.data.SearchBookApi
 import data.service.ISearchBookService
-import domain.data.BookException
-import domain.data.BookException.Reason
-import domain.data.SearchSort
+import domain.book.data.BookException
+import domain.book.data.BookException.Reason
+import domain.search.data.SearchSort
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals

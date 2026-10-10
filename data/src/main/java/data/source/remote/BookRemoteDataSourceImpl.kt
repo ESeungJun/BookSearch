@@ -2,10 +2,10 @@ package data.source.remote
 
 import data.data.toBook
 import data.service.ISearchBookService
-import domain.data.BookException
-import domain.data.BookException.Reason
-import domain.data.SearchPageDTO
-import domain.data.SearchSort
+import domain.book.data.BookException
+import domain.book.data.BookException.Reason
+import domain.search.data.SearchPageDTO
+import domain.search.data.SearchSort
 import kotlinx.coroutines.CancellationException
 import retrofit2.HttpException
 import java.io.IOException
