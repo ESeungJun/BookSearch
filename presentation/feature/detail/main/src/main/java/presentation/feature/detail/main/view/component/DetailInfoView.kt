@@ -24,9 +24,8 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import core.designsystem.BookSearchTheme
 import core.designsystem.theme.Spacing
-import java.text.NumberFormat
-import java.util.Locale
 import presentation.base.R as BaseR
+import presentation.base.mapper.toNumberText
 import presentation.feature.detail.main.R
 import presentation.feature.detail.main.data.DetailViewData
 
@@ -86,7 +85,7 @@ private fun InfoRow(@StringRes label: Int, value: String?, emphasized: Boolean =
 
 @Composable
 private fun formatPrice(value: Int): String =
-    stringResource(BaseR.string.book_price, NumberFormat.getNumberInstance(Locale.KOREA).format(value))
+    stringResource(BaseR.string.book_price, value.toNumberText())
 
 @Preview(showBackground = true)
 @Composable

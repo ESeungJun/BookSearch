@@ -13,8 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import core.designsystem.BookSearchTheme
 import core.designsystem.component.DropdownSelector
 import core.designsystem.theme.Spacing
-import java.text.NumberFormat
-import java.util.Locale
+import presentation.base.mapper.toNumberText
 import presentation.feature.favorite.main.R
 import presentation.feature.favorite.main.data.PriceRange
 import presentation.feature.favorite.main.data.TitleSort
@@ -29,13 +28,12 @@ internal fun FavoriteCountFilterView(
     onPriceRangeChange: (PriceRange) -> Unit,
     onSortChange: (TitleSort) -> Unit,
 ) {
-    val format = NumberFormat.getNumberInstance(Locale.KOREA)
     Row(
         modifier = Modifier.fillMaxWidth().padding(start = Spacing.large),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            stringResource(R.string.favorite_count, format.format(shownCount), format.format(totalCount)),
+            stringResource(R.string.favorite_count, shownCount.toNumberText(), totalCount.toNumberText()),
             modifier = Modifier.weight(1f),
             style = MaterialTheme.typography.labelLarge,
         )
