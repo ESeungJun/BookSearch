@@ -1,11 +1,11 @@
-package core.database.dao
+package data.base.db.dao
 
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import core.database.AbsBookDatabase
-import core.database.entity.BookEntity
-import core.database.entity.FavoriteEntity
-import core.database.entity.SearchCacheEntity
+import data.base.db.AbsBookDatabase
+import data.base.db.entity.BookEntity
+import data.base.db.entity.FavoriteEntity
+import data.base.db.entity.SearchCacheEntity
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
