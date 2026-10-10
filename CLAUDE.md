@@ -26,6 +26,7 @@
 :presentation:search / favorite / detail    Screen · ViewModel · UiState
 :domain:base                      공통 타입만 — BookDTO · DomainResult
 :domain:search / favorite / detail   기능별 data/ · repo/ · usecase/ (순수 Kotlin). 서로 의존하지 않는다
+:data:base                        원격 데이터 소스 공통 코드 — apiCall {} (서버 호출 → DomainResult)
 :data:database                    Room DB · dao/ · entity/ 만 — Room 이 한곳에서 모든 테이블을 알아야 해서 공통 인프라로 둔다
 :data:search / favorite / detail  repo/ · source/(remote·local) · service/ · data/ — 기능별, :data:database 의 DAO 를 쓴다
 ```
@@ -39,7 +40,7 @@
 - `:domain:<기능>` 은 `data`(DTO·enum) · `repo`(저장소 인터페이스) · `usecase` 세 패키지다. 화면 모듈은 쓰는 domain 모듈만 build.gradle.kts 에 적는다.
 - `:data:*` 의 책임
   - `repo`: 원격과 로컬 중 어디서 가져올지만 정한다(3초 시간 제한·캐시 대체). Retrofit·Room 을 모른다.
-  - `source/remote`: 서버 호출. `~Api` → DTO 변환, HTTP 오류 → `DomainResult.Fail(code)`, 그 밖의 실패 → `DomainResult.Error(cause)`. `source/local`: DB·캐시 읽기/쓰기와 캐시 보관 규칙. `~Entity` ↔ DTO 변환.
+  - `source/remote`: 서버 호출. `~Api` → DTO 변환, 서버 호출은 `:data:base` 의 `apiCall { }` 로 감싼다 — HTTP 오류 → `DomainResult.Fail(code)`, 그 밖의 실패 → `DomainResult.Error(cause)`, 취소는 다시 던진다. 호출마다 try-catch 를 쓰지 않는다. `source/local`: DB·캐시 읽기/쓰기와 캐시 보관 규칙. `~Entity` ↔ DTO 변환.
   - `service`: Retrofit 인터페이스(`I~Service`). `data`: 서버 응답 데이터(`~Api`)와 그 변환 함수. `db/dao`·`db/entity`: Room.
   - `~Api` 는 `source/remote` 밖으로, `~Entity` 는 `source/local` 밖으로 나가지 않는다. 데이터 소스는 DTO 로 주고받는다.
   - `~Api` 필드는 모두 nullable 이고 기본값을 두지 않는다. 서버가 안 보낸 값은 null 그대로 DTO 까지 가고, 어떻게 보일지는 화면이 정한다.
