@@ -16,21 +16,22 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import core.designsystem.BookSearchTheme
 import core.designsystem.component.CollapsingHeader
-import core.designsystem.component.rememberCollapsingHeaderState
 import core.designsystem.component.EmptyView
 import core.designsystem.component.ErrorView
-import presentation.base.R as BaseR
+import core.designsystem.component.rememberCollapsingHeaderState
 import kotlinx.collections.immutable.persistentListOf
 import presentation.base.data.BookViewData
+import presentation.base.view.ToastEffect
 import presentation.feature.favorite.main.R
-import presentation.feature.favorite.main.data.FavoriteUiStatus
 import presentation.feature.favorite.main.data.FavoriteUiState
+import presentation.feature.favorite.main.data.FavoriteUiStatus
 import presentation.feature.favorite.main.data.PriceRange
 import presentation.feature.favorite.main.data.TitleSort
 import presentation.feature.favorite.main.view.component.FavoriteBookListView
 import presentation.feature.favorite.main.view.component.FavoriteCountFilterView
 import presentation.feature.favorite.main.view.component.FavoriteHeaderView
 import presentation.feature.favorite.main.vm.FavoriteViewModel
+import presentation.base.R as BaseR
 
 @Composable
 fun FavoriteScreen(
@@ -38,6 +39,7 @@ fun FavoriteScreen(
     viewModel: FavoriteViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    ToastEffect(state.toastRes, viewModel::onToastShown)
     FavoriteContent(
         state = state,
         onQueryChange = viewModel::onQueryChange,

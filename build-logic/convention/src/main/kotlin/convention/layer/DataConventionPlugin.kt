@@ -1,7 +1,6 @@
 package convention.layer
 
 import convention.config.bundle
-import convention.config.library
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -13,7 +12,7 @@ class DataConventionPlugin : Plugin<Project> {
     override fun apply(target: Project): Unit = with(target) {
         pluginManager.apply("convention.library")
         pluginManager.apply("convention.hilt")
-        dependencies.add("implementation", bundle("layer-common")) // 코루틴, UseCase·구현 생성자 주입(@Inject)
+        dependencies.add("implementation", bundle("layer-common")) // 코루틴, 저장소·데이터 소스 생성자 주입(@Inject)
         dependencies.add("implementation", project(":domain:base"))
         dependencies.add("implementation", project(":data:base"))
     }

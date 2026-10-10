@@ -26,15 +26,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import core.designsystem.BookSearchTheme
 import core.designsystem.component.EmptyView
 import core.designsystem.component.ErrorView
-import presentation.base.R as BaseR
+import presentation.base.view.ToastEffect
+import presentation.base.view.component.FavoriteIconButton
 import presentation.feature.detail.main.R
-import presentation.feature.detail.main.data.DetailUiStatus
 import presentation.feature.detail.main.data.DetailUiState
+import presentation.feature.detail.main.data.DetailUiStatus
 import presentation.feature.detail.main.data.DetailViewData
 import presentation.feature.detail.main.view.component.DetailBookView
 import presentation.feature.detail.main.view.component.DetailSkeletonView
-import presentation.feature.detail.main.view.component.DetailFavoriteButtonView
 import presentation.feature.detail.main.vm.DetailViewModel
+import presentation.base.R as BaseR
 
 @Composable
 fun DetailScreen(
@@ -43,6 +44,7 @@ fun DetailScreen(
     viewModel: DetailViewModel = hiltViewModel<DetailViewModel, DetailViewModel.IFactory> { it.create(bookId) },
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    ToastEffect(state.toastRes, viewModel::onToastShown)
     val context = LocalContext.current
     val noBrowserMessage = stringResource(R.string.detail_no_browser)
     DetailContent(
@@ -81,7 +83,7 @@ internal fun DetailContent(
             },
             actions = {
                 // 책을 찾았을 때만 하트가 의미가 있다
-                if (state.status is DetailUiStatus.Loaded) DetailFavoriteButtonView(state.isFavorite, onFavoriteClick)
+                if (state.status is DetailUiStatus.Loaded) FavoriteIconButton(state.isFavorite, onFavoriteClick)
             },
         )
         when (val status = state.status) {

@@ -1,11 +1,13 @@
 package presentation.feature.detail.main.data
 
+import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 
 @Immutable
 data class DetailUiState(
     val status: DetailUiStatus = DetailUiStatus.Loading,
     val isFavorite: Boolean = false,
+    @StringRes val toastRes: Int? = null, // 화면이 한 번 보인 뒤 onToastShown() 으로 지운다
 )
 
 sealed interface DetailUiStatus {

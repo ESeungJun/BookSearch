@@ -31,9 +31,10 @@ import presentation.base.data.BookViewData
 import presentation.base.mapper.toViewData
 import presentation.feature.search.main.data.LoadMoreState
 import presentation.feature.search.main.data.SearchNotice
-import presentation.feature.search.main.data.SearchUiStatus
 import presentation.feature.search.main.data.SearchUiState
+import presentation.feature.search.main.data.SearchUiStatus
 import presentation.feature.search.main.mapper.toCacheTimeText
+import presentation.base.R as BaseR
 
 @OptIn(FlowPreview::class)
 @HiltViewModel
@@ -114,8 +115,11 @@ class SearchViewModel @Inject constructor(
 
     fun onFavoriteClick(key: String) {
         val book = loadedBooks.find { it.key == key } ?: return
-        // 결과는 즐겨찾기 키 관찰로 하트에 반영된다
-        viewModelScope.launch { toggleFavoriteUseCase(book, isFavorite = key in favoriteKeys) }
+        viewModelScope.launch { onToggled(toggleFavoriteUseCase(book, isFavorite = key in favoriteKeys)) }
+    }
+
+    fun onToastShown() {
+        _uiState.update { it.copy(toastRes = null) }
     }
 
     /** 새 검색·정렬 변경·새로고침·다시 시도 모두 첫 페이지부터 다시 받는다. */
@@ -139,10 +143,16 @@ class SearchViewModel @Inject constructor(
     private fun onFirstPage(query: String, result: DomainResult<SearchPageDTO>, isRefresh: Boolean) {
         when (result) {
             is DomainResult.Success -> showFirstPage(query, result.data)
-            // 새로고침 실패는 저장된 결과도 없을 때만 온다. 보던 목록을 두고 새로고침 표시만 끝낸다
+            // 새로고침 실패는 저장된 결과도 없을 때만 온다. 보던 목록을 두고 새로고침 표시만 끝낸다.
+            // 받던 다음 페이지는 새로고침이 취소했으므로 목록 끝에서 다시 받을 수 있게 되돌린다
             is DomainResult.Fail, is DomainResult.Error ->
                 if (isRefresh && _uiState.value.status == SearchUiStatus.Results) {
-                    _uiState.update { it.copy(isRefreshing = false) }
+                    _uiState.update {
+                        it.copy(
+                            isRefreshing = false,
+                            loadMore = if (it.loadMore == LoadMoreState.LOADING) LoadMoreState.READY else it.loadMore,
+                        )
+                    }
                 } else {
                     showError(query)
                 }
@@ -199,6 +209,15 @@ class SearchViewModel @Inject constructor(
                 loadMore = if (data.isEnd || newBooks.isEmpty()) LoadMoreState.END else LoadMoreState.READY,
                 notice = noticeFor(data) ?: it.notice,
             )
+        }
+    }
+
+    private fun onToggled(result: DomainResult<Unit>) {
+        when (result) {
+            // 성공은 즐겨찾기 키 관찰로 하트에 반영된다
+            is DomainResult.Success -> Unit
+            // 저장하지 못하면 하트가 그대로라 눌러도 반응이 없어 보인다. 한 번 알린다
+            is DomainResult.Fail, is DomainResult.Error -> _uiState.update { it.copy(toastRes = BaseR.string.favorite_save_failed) }
         }
     }
 

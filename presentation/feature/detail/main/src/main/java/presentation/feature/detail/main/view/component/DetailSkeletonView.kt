@@ -20,7 +20,7 @@ private val SkeletonLineHeight = 16.dp
 private val SkeletonTitleHeight = 28.dp
 private const val SKELETON_INFO_LINES = 4
 
-/** 책을 찾는 동안 보이는 골격. 정상 화면과 같은 자리에 같은 크기로 그린다. */
+/** 책을 찾는 동안 보이는 골격. 정상 화면과 비슷한 모양으로 그린다. */
 @Composable
 internal fun DetailSkeletonView() {
     Column(
