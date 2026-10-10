@@ -26,6 +26,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import core.designsystem.BookSearchTheme
 import core.designsystem.component.EmptyView
 import core.designsystem.component.ErrorView
+import presentation.base.R as BaseR
 import presentation.feature.detail.main.R
 import presentation.feature.detail.main.data.DetailUiStatus
 import presentation.feature.detail.main.data.DetailUiState
@@ -91,7 +92,7 @@ fun DetailContent(
                 title = stringResource(R.string.detail_not_found),
                 action = { FilledTonalButton(onClick = onBack) { Text(stringResource(R.string.detail_back)) } },
             )
-            is DetailUiStatus.Error -> ErrorView(stringResource(status.messageRes), onRetry)
+            DetailUiStatus.Error -> ErrorView(stringResource(BaseR.string.result_failure), onRetry)
         }
     }
 }

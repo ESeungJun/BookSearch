@@ -1,6 +1,5 @@
 package presentation.feature.search.main.view
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
@@ -9,10 +8,8 @@ import androidx.compose.material.icons.outlined.SearchOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -22,6 +19,7 @@ import core.designsystem.component.CollapsingHeader
 import core.designsystem.component.rememberCollapsingHeaderState
 import core.designsystem.component.EmptyView
 import core.designsystem.component.ErrorView
+import presentation.base.R as BaseR
 import domain.search.data.SearchSort
 import kotlinx.collections.immutable.persistentListOf
 import presentation.base.data.BookViewData
@@ -42,13 +40,6 @@ fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
-    state.toastRes?.let { res ->
-        LaunchedEffect(res) {
-            Toast.makeText(context, res, Toast.LENGTH_SHORT).show()
-            viewModel.onToastShown()
-        }
-    }
     SearchContent(
         state = state,
         onQueryChange = viewModel::onQueryChange,
@@ -97,7 +88,7 @@ fun SearchContent(
                     title = stringResource(R.string.search_empty, state.searchedQuery),
                     description = stringResource(R.string.search_empty_hint),
                 )
-                is SearchUiStatus.Error -> ErrorView(stringResource(status.messageRes), onRetry)
+                SearchUiStatus.Error -> ErrorView(stringResource(BaseR.string.result_failure), onRetry)
                 SearchUiStatus.Results -> BookList(state, onLoadMore, onBookClick, onFavoriteClick, headerState::expand)
             }
         }

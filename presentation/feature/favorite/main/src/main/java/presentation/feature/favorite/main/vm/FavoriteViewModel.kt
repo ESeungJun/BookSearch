@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import presentation.base.data.BookViewData
-import presentation.base.data.failureMessageRes
 import presentation.base.mapper.toViewData
 import presentation.feature.favorite.main.data.FavoriteUiStatus
 import presentation.feature.favorite.main.data.FavoriteUiState
@@ -93,9 +92,9 @@ class FavoriteViewModel @Inject constructor(
 
     private fun onFavorites(filtered: DomainResult<List<BookDTO>>, all: DomainResult<List<BookDTO>>) {
         when (filtered) {
-            is DomainResult.Fail, is DomainResult.Error -> onFailure(filtered)
+            is DomainResult.Fail, is DomainResult.Error -> onFailure()
             is DomainResult.Success -> when (all) {
-                is DomainResult.Fail, is DomainResult.Error -> onFailure(all)
+                is DomainResult.Fail, is DomainResult.Error -> onFailure()
                 is DomainResult.Success -> showFavorites(filtered.data, all.data)
             }
         }
@@ -116,9 +115,9 @@ class FavoriteViewModel @Inject constructor(
         }
     }
 
-    private fun onFailure(result: DomainResult<Nothing>) {
+    private fun onFailure() {
         filteredBooks = emptyList()
-        _uiState.update { it.copy(status = FavoriteUiStatus.Error(result.failureMessageRes()), books = persistentListOf()) }
+        _uiState.update { it.copy(status = FavoriteUiStatus.Error, books = persistentListOf()) }
     }
 
     // 정렬은 화면이 정한다. 같은 제목은 최근에 넣은 순서를 지킨다(sortedWith 는 안정 정렬)

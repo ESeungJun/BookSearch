@@ -19,6 +19,7 @@ import core.designsystem.component.CollapsingHeader
 import core.designsystem.component.rememberCollapsingHeaderState
 import core.designsystem.component.EmptyView
 import core.designsystem.component.ErrorView
+import presentation.base.R as BaseR
 import kotlinx.collections.immutable.persistentListOf
 import presentation.base.data.BookViewData
 import presentation.feature.favorite.main.R
@@ -92,7 +93,7 @@ fun FavoriteContent(
                     FilledTonalButton(onClick = onResetFilters) { Text(stringResource(R.string.favorite_reset_filters)) }
                 },
             )
-            is FavoriteUiStatus.Error -> ErrorView(stringResource(status.messageRes), onRetry)
+            FavoriteUiStatus.Error -> ErrorView(stringResource(BaseR.string.result_failure), onRetry)
             FavoriteUiStatus.Results -> BookList(state, onBookClick, onFavoriteClick, headerState::expand)
         }
     }
