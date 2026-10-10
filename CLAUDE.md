@@ -24,7 +24,8 @@
 | `ARCHITECTURE.md` | 앱 전체: 설계 원칙, 모듈 지도, 데이터 흐름, 화면 이동, DI 범위, 빌드 구성 |
 | `app/README.md` · `core/README.md` · `presentation/README.md` · `domain/README.md` · `data/README.md` | 레이어별 모듈·패키지·동작, 새로 만들 때 순서 |
 | `docs/guide/기능-추가.md` | 새 기능을 더하는 순서와 확인 목록 |
-| `.claude/agents/onboarding.md` · `.claude/agents/feature-dev.md` | 문답용 온보딩 에이전트, 기능 개발 에이전트 |
+| `.claude/agents/onboarding.md` · `.claude/agents/feature-dev.md` | 문답용 온보딩 에이전트(이 저장소의 기본 메인 에이전트), 기능 개발 에이전트 |
+| `.claude/settings.json` · `.claude/hooks/first-session.sh` | 기본 에이전트 지정, 이 기기에서 처음 연 세션인지 알리는 세션 시작 훅(표시 파일 `.claude/.onboarded` 는 git 에 올리지 않음) |
 
 - **구조를 바꾸면 같은 커밋에서 `ARCHITECTURE.md` 와 해당 레이어 README 를 고친다.** 온보딩 에이전트가 이 문서를 근거로 답하므로 문서가 코드와 어긋나면 안 된다. 숫자로 적은 곳(`ARCHITECTURE.md` 의 모듈 수·테이블 수, 레이어 README 의 모듈·UseCase·테이블 표)도 함께 맞춘다.
 
