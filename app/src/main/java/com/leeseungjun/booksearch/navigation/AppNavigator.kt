@@ -23,6 +23,15 @@ class AppNavigator @Inject constructor() : INavigator {
         if (this.backStack === backStack) this.backStack = null
     }
 
+    override val current: NavKey?
+        get() = backStack?.lastOrNull()
+
+    override fun replace(route: NavKey) {
+        val stack = backStack ?: return
+        stack.removeLastOrNull()
+        stack.add(route)
+    }
+
     override fun navigate(route: NavKey) {
         backStack?.add(route)
     }
