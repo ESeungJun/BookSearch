@@ -2,7 +2,6 @@ package domain.favorite.usecase
 
 import domain.base.data.BookDTO
 import domain.base.data.DomainResult
-import domain.base.usecase.asUseCaseResult
 import domain.favorite.repo.IFavoriteRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
@@ -12,5 +11,5 @@ class ObserveFavoritesUseCase @Inject constructor(
     private val repository: IFavoriteRepository,
 ) {
     operator fun invoke(query: String, priceRange: IntRange?): Flow<DomainResult<List<BookDTO>>> =
-        repository.observeFavorites(query, priceRange).asUseCaseResult()
+        repository.observeFavorites(query, priceRange)
 }
