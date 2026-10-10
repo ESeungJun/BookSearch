@@ -10,7 +10,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
 
-/** 범위는 di.detail.IDetailModule 과 같은 이유로 ViewModel 이다. */
+/** 저장소·데이터 소스는 상태가 없어 앱 전체에 하나일 필요가 없다. ViewModel 하나가 살아 있는 동안 같은 인스턴스를 쓴다. */
 @Module
 @InstallIn(ViewModelComponent::class)
 interface IFavoriteModule {

@@ -36,6 +36,14 @@ class SearchRepositoryImplTest {
     }
 
     @Test
+    fun `키 오류(401)로 저장해 둔 결과를 보여 줄 때 원래 실패를 함께 넘긴다`() = runTest {
+        local.saved["kotlin|1"] = PAGE.copy(cachedAt = 1L)
+        remote.result = DomainResult.Fail(401)
+        val result = repository.searchBooks("kotlin", SearchSort.ACCURACY, 1) as DomainResult.Success
+        assertEquals(DomainResult.Fail(401), result.data.failure)
+    }
+
+    @Test
     fun `실패하고 저장해 둔 결과도 없으면 원격의 결과를 그대로 돌려준다`() = runTest {
         remote.result = DomainResult.Fail(401)
         assertEquals(DomainResult.Fail(401), repository.searchBooks("kotlin", SearchSort.ACCURACY, 1))
