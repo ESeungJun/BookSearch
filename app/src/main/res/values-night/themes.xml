@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 다크 모드에서 앱을 처음 열 때 첫 프레임(창 배경)이 흰색으로 번쩍이지 않게 어두운 테마를 쓴다. -->
+    <style name="Theme.BookSearch" parent="android:Theme.Material.NoActionBar" />
+</resources>

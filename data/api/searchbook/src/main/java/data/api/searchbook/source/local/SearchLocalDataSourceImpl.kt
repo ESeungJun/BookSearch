@@ -25,9 +25,9 @@ class SearchLocalDataSourceImpl @Inject constructor(
         books: List<BookEntity>,
         totalCount: Int,
         isEnd: Boolean,
-    ) {
+    ) = searchCacheDao.inTransaction {
         bookDao.upsert(books)
-        if (page > MAX_CACHED_PAGES || books.isEmpty()) return
+        if (page > MAX_CACHED_PAGES || books.isEmpty()) return@inTransaction
         val now = System.currentTimeMillis()
         val rows = books.mapIndexed { position, book ->
             SearchCacheEntity(query, sort.name, page, position, book.key, totalCount, isEnd, now)
