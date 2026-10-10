@@ -7,5 +7,4 @@ dependencies {
     implementation(projects.domain.search)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit)
-    implementation(libs.okhttp)
 }

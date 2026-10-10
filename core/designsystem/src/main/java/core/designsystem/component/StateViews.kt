@@ -3,17 +3,14 @@ package core.designsystem.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ErrorOutline
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -82,29 +79,3 @@ private fun CenteredMessage(
     }
 }
 
-/**
- * 목록 끝. 다음 페이지를 받는 중이면 프로그레스, 실패했으면 다시 시도.
- * 다음 페이지 실패는 이미 받은 목록을 지우지 않고 여기서만 알린다.
- */
-@Composable
-fun LoadMoreFooter(
-    isFailed: Boolean,
-    onRetry: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier.fillMaxWidth().padding(Spacing.large),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        if (isFailed) {
-            Text(
-                stringResource(R.string.load_more_failed),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            TextButton(onClick = onRetry) { Text(stringResource(R.string.action_retry)) }
-        } else {
-            CircularProgressIndicator()
-        }
-    }
-}

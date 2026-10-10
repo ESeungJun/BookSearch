@@ -15,8 +15,7 @@ import core.designsystem.BookSearchTheme
 import core.designsystem.component.DropdownSelector
 import core.designsystem.theme.Spacing
 import domain.search.data.SearchSort
-import java.text.NumberFormat
-import java.util.Locale
+import presentation.base.mapper.toNumberText
 import presentation.feature.search.main.R
 
 /** 스크롤해도 남는 고정 줄: 왼쪽 총 개수, 오른쪽 정렬. */
@@ -27,7 +26,7 @@ internal fun SearchCountSortView(totalCount: Int, sort: SearchSort, onSortChange
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            stringResource(R.string.search_total_count, NumberFormat.getNumberInstance(Locale.KOREA).format(totalCount)),
+            stringResource(R.string.search_total_count, totalCount.toNumberText()),
             modifier = Modifier.weight(1f),
             style = MaterialTheme.typography.labelLarge,
         )
