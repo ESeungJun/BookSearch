@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             BookSearchTheme {
-                MainScaffold(navigator, entryInstallers, onExit = ::finish)
+                MainScaffold(navigator, entryInstallers)
             }
         }
     }

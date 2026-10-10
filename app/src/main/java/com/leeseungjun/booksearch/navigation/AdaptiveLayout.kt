@@ -71,8 +71,7 @@ internal fun backTransition(scope: AnimatedContentTransitionScope<Scene<TabRoute
     if (scope.isTabSwitch()) noTransition() else slideInHorizontally { -it } togetherWith slideOutHorizontally { it }
 
 private fun AnimatedContentTransitionScope<Scene<TabRoute>>.isTabSwitch(): Boolean =
-    initialState.entries.lastOrNull()?.contentKey?.toString()?.substringBefore('/') !=
-        targetState.entries.lastOrNull()?.contentKey?.toString()?.substringBefore('/')
+    initialState.entries.lastOrNull()?.tab != targetState.entries.lastOrNull()?.tab
 
 private fun noTransition(): ContentTransform = EnterTransition.None togetherWith ExitTransition.None
 
