@@ -69,6 +69,7 @@
 | 목록 한 칸·블록 하나의 표시용 데이터 | `~ViewData` (mapper 가 만든다. 여러 화면이 쓰면 `:presentation:base`) | `BookViewData`, `DetailViewData` |
 | 인터페이스 / 구현체 | `I~` / `~Impl` | `IBookRepository` / `BookRepositoryImpl` |
 | 추상 클래스 / 베이스 클래스 | `Abs~` / `Base~` | `AbsBookDatabase` |
+| 화면 이동 계약(`:presentation:router`) | `<화면>Router` — abstract class 지만 `Abs~` 를 붙이지 않는다(예외). 다른 화면이 "어디로 가는지"를 화면 이름으로 읽게 하려는 것 | `DetailRouter` |
 
 ## 코드 순서
 클래스 안의 선언 순서는 다음을 따른다.

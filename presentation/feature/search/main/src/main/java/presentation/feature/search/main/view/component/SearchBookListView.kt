@@ -26,8 +26,8 @@ import kotlinx.coroutines.launch
 import presentation.base.data.BookViewData
 import presentation.base.view.component.BookCard
 import presentation.feature.search.main.data.LoadMoreState
-import presentation.feature.search.main.data.SearchUiStatus
 import presentation.feature.search.main.data.SearchUiState
+import presentation.feature.search.main.data.SearchUiStatus
 
 private const val SCROLL_TO_TOP_MIN_INDEX = 5 // 이만큼 내려야 맨 위로 버튼이 보인다
 // 끝에서 이만큼 남았을 때 다음 페이지를 부른다. 반 페이지 앞에서 불러야 빠르게 내리거나 연결이 느려도 응답이 끝에 닿기 전에 온다
@@ -41,6 +41,7 @@ internal fun SearchBookListView(
     onBookClick: (String) -> Unit,
     onFavoriteClick: (String) -> Unit,
     onScrollToTop: () -> Unit,
+    selectedBookKey: String? = null,
 ) {
     // 다른 검색·정렬의 결과가 오면 새 상태로 맨 위부터 보인다. 같은 검색의 새로고침·회전에서는 위치를 지킨다
     val listState = rememberSaveable(state.searchedQuery, state.sort, saver = LazyListState.Saver) { LazyListState() }
@@ -61,6 +62,7 @@ internal fun SearchBookListView(
                     book = book,
                     onClick = { onBookClick(book.key) },
                     onFavoriteClick = { onFavoriteClick(book.key) },
+                    isSelected = book.key == selectedBookKey,
                 )
             }
             if (state.loadMore != LoadMoreState.END) {

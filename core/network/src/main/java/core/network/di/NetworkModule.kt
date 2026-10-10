@@ -16,7 +16,8 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import javax.inject.Singleton
 
 /**
- * 네트워크 공통 설정. OkHttp 는 연결 풀·스레드를 클라이언트마다 따로 가지므로 앱에 하나만 둔다.
+ * 네트워크 공통 설정. OkHttp 는 연결 풀·스레드를 클라이언트마다 따로 가지므로 API 호출용 클라이언트는 앱에 하나만 둔다
+ * (이미지는 Coil 이 자기 클라이언트로 받는다).
  * API 서비스(Retrofit 인터페이스)는 그것을 쓰는 data 모듈이 이 Retrofit 으로 만든다.
  */
 @Module

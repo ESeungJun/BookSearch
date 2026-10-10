@@ -2,6 +2,7 @@ package com.leeseungjun.booksearch.navigation
 
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -13,6 +14,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import core.navigation.EntryProviderInstaller
+import core.navigation.LocalCurrentRoute
 
 /** NavDisplay 에 넘기는 한 칸. 같은 경로(예: 같은 책 상세)가 두 탭에 있어도 키가 겹치지 않게 탭과 함께 둔다. */
 data class TabRoute(val tab: String, val route: NavKey)
@@ -62,7 +64,12 @@ fun AppNavHost(
                 key = tabRoute,
                 contentKey = "${tabRoute.tab}/${entry.contentKey}",
                 metadata = entry.metadata + paneMetadata(tabRoute),
-            ) { entry.Content() }
+            ) {
+                // 항목이 속한 탭의 맨 위 화면을 알린다(2칸에서 목록이 지금 열린 책을 표시한다)
+                CompositionLocalProvider(LocalCurrentRoute provides backStacks.getValue(tabRoute.tab).lastOrNull()) {
+                    entry.Content()
+                }
+            }
         },
         sceneStrategies = listOf(sceneStrategy),
         transitionSpec = { forwardTransition(this) },

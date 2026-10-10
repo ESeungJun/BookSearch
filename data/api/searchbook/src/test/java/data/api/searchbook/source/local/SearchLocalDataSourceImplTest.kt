@@ -70,5 +70,6 @@ class SearchLocalDataSourceImplTest {
             rows.removeAll { it.query == query && it.sort == sort && it.page == page }
         }
         override suspend fun deleteOldCombinations(max: Int) = Unit
+        override suspend fun inTransaction(block: suspend () -> Unit) = block()
     }
 }

@@ -1,5 +1,6 @@
 package presentation.feature.search.main.vm
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,9 +40,10 @@ import presentation.base.R as BaseR
 @OptIn(FlowPreview::class)
 @HiltViewModel
 class SearchViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
     private val searchBooksUseCase: SearchBooksUseCase,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
-    observeFavoriteKeysUseCase: ObserveFavoriteKeysUseCase,
+    private val observeFavoriteKeysUseCase: ObserveFavoriteKeysUseCase,
 ) : ViewModel() {
 
     // 카드(BookViewData)는 받은 책과 즐겨찾기 키를 합쳐 만든다. 검색 결과에 즐겨찾기 여부를 저장하지 않으려고 둘을 따로 둔다
@@ -54,7 +56,13 @@ class SearchViewModel @Inject constructor(
     // 마지막으로 첫 페이지를 요청한 검색어(빈 검색어 포함)
     private var lastQuery = ""
 
-    private val _uiState = MutableStateFlow(SearchUiState())
+    // 검색어·정렬은 SavedStateHandle 에도 둔다. 백그라운드에서 프로세스가 정리됐다 돌아와도 같은 검색을 다시 받는다
+    private val _uiState = MutableStateFlow(
+        SearchUiState(
+            query = savedStateHandle[KEY_QUERY] ?: "",
+            sort = savedStateHandle.get<String>(KEY_SORT)?.let(SearchSort::valueOf) ?: SearchSort.ACCURACY,
+        ),
+    )
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
     init {
@@ -79,9 +87,14 @@ class SearchViewModel @Inject constructor(
                 }
             }
             .launchIn(viewModelScope)
+
+        // 복원한 검색어가 있으면 디바운스를 기다리지 않고 바로 다시 받는다
+        val restoredQuery = _uiState.value.query.trim()
+        if (restoredQuery.isNotEmpty()) search(restoredQuery)
     }
 
     fun onQueryChange(query: String) {
+        savedStateHandle[KEY_QUERY] = query
         _uiState.update { it.copy(query = query) }
         // 비우면 디바운스를 기다리지 않고 바로 첫 진입 상태로 돌아간다
         if (query.isBlank()) search("")
@@ -89,6 +102,7 @@ class SearchViewModel @Inject constructor(
 
     fun onSortChange(sort: SearchSort) {
         if (sort == _uiState.value.sort) return
+        savedStateHandle[KEY_SORT] = sort.name
         _uiState.update { it.copy(sort = sort) }
         search(_uiState.value.query.trim())
     }
@@ -134,7 +148,7 @@ class SearchViewModel @Inject constructor(
             return
         }
         _uiState.update {
-            if (isRefresh) it.copy(isRefreshing = true) else it.copy(status = SearchUiStatus.Loading, notice = null)
+            if (isRefresh) it.copy(isRefreshing = true) else it.copy(status = SearchUiStatus.Loading, notice = null, isRefreshing = false)
         }
         val sort = _uiState.value.sort
         requestJob = viewModelScope.launch { onFirstPage(query, searchBooksUseCase(query, sort, FIRST_PAGE), isRefresh) }
@@ -147,6 +161,8 @@ class SearchViewModel @Inject constructor(
             // 받던 다음 페이지는 새로고침이 취소했으므로 목록 끝에서 다시 받을 수 있게 되돌린다
             is DomainResult.Fail, is DomainResult.Error ->
                 if (isRefresh && _uiState.value.status == SearchUiStatus.Results) {
+                    // 보이는 목록은 이전 검색어의 것이다. 입력창의 새 검색어가 다시 검색되도록 마지막 검색어를 되돌린다
+                    lastQuery = _uiState.value.searchedQuery
                     _uiState.update {
                         it.copy(
                             isRefreshing = false,
@@ -236,6 +252,8 @@ class SearchViewModel @Inject constructor(
 
     companion object {
         private const val QUERY_DEBOUNCE_MS = 400L
+        private const val KEY_QUERY = "query"
+        private const val KEY_SORT = "sort"
         private const val FIRST_PAGE = 1
     }
 }
