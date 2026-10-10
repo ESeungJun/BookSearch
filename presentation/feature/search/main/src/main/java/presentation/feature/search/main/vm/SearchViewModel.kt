@@ -9,7 +9,6 @@ import domain.favorite.usecase.ObserveFavoriteKeysUseCase
 import domain.favorite.usecase.ToggleFavoriteUseCase
 import domain.search.data.SearchPageDTO
 import domain.search.data.SearchSort
-import domain.search.usecase.LoadMoreBooksUseCase
 import domain.search.usecase.SearchBooksUseCase
 import javax.inject.Inject
 import kotlinx.collections.immutable.ImmutableList
@@ -42,7 +41,6 @@ import presentation.feature.search.main.mapper.toCacheTimeText
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val searchBooksUseCase: SearchBooksUseCase,
-    private val loadMoreBooksUseCase: LoadMoreBooksUseCase,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
     observeFavoriteKeysUseCase: ObserveFavoriteKeysUseCase,
 ) : ViewModel() {
@@ -100,7 +98,7 @@ class SearchViewModel @Inject constructor(
         val nextPage = state.page + 1
         _uiState.update { it.copy(loadMore = LoadMoreState.LOADING) }
         requestJob = viewModelScope.launch {
-            onNextPage(loadMoreBooksUseCase(state.searchedQuery, state.sort, nextPage), nextPage)
+            onNextPage(searchBooksUseCase(state.searchedQuery, state.sort, nextPage), nextPage)
         }
     }
 
@@ -155,7 +153,7 @@ class SearchViewModel @Inject constructor(
             if (isRefresh) it.copy(isRefreshing = true) else it.copy(status = SearchUiStatus.Loading, notice = null)
         }
         val sort = _uiState.value.sort
-        requestJob = viewModelScope.launch { onFirstPage(query, searchBooksUseCase(query, sort)) }
+        requestJob = viewModelScope.launch { onFirstPage(query, searchBooksUseCase(query, sort, FIRST_PAGE)) }
     }
 
     private fun onFirstPage(query: String, result: DomainResult<SearchPageDTO>) {
