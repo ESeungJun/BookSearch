@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 
 internal object ProjectConfig {
     const val APPLICATION_ID = "com.leeseungjun.booksearch"
-    const val COMPILE_SDK = 37 // 과제 지정
+    const val COMPILE_SDK = 37
     const val TARGET_SDK = 37
     const val MIN_SDK = 26
 }

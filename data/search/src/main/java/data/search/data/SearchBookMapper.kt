@@ -23,7 +23,7 @@ fun SearchBookApi.DocumentApi.toBook(): BookDTO {
 }
 
 /**
- * 매칭 키 (작성자 결정 D-12·D-13). ISBN 만으로는 다른 책과 겹칠 수 있어 제목·저자를 함께 쓴다.
+ * 매칭 키. ISBN 만으로는 다른 책과 겹칠 수 있어 제목·저자를 함께 쓴다.
  * ISBN13 → ISBN10 → (ISBN 없음) 출판사 순으로 정해, 같은 책은 다시 검색해도 같은 키가 나온다.
  */
 private fun SearchBookApi.DocumentApi.bookKey(isbn13: String?, isbn10: String?): String {
@@ -37,5 +37,5 @@ private fun SearchBookApi.DocumentApi.bookKey(isbn13: String?, isbn10: String?):
     }
 }
 
-// 서버가 "할인 없음"을 -1 로 보낸다(실측 110건 중 19건). 가격이 아니라 표시이므로 null 로 바꾼다
+// 서버가 "할인 없음"을 -1 로 보낸다. 가격이 아니라 표시이므로 null 로 바꾼다
 private const val NO_SALE_PRICE = -1
