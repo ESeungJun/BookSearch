@@ -17,6 +17,9 @@ gradlePlugin {
         register("kotlinJvm") { id = "convention.kotlin.jvm"; implementationClass = "KotlinJvmConventionPlugin" }
         register("compose") { id = "convention.compose"; implementationClass = "ComposeConventionPlugin" }
         register("hilt") { id = "convention.hilt"; implementationClass = "HiltConventionPlugin" }
-        register("feature") { id = "convention.feature"; implementationClass = "FeatureConventionPlugin" }
+        register("presentation") { id = "convention.presentation"; implementationClass = "PresentationConventionPlugin" }
+        register("domain") { id = "convention.domain"; implementationClass = "DomainConventionPlugin" }
+        register("data") { id = "convention.data"; implementationClass = "DataConventionPlugin" }
+        register("di") { id = "convention.di"; implementationClass = "DiConventionPlugin" }
     }
 }

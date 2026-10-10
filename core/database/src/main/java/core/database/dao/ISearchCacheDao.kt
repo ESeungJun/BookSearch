@@ -1,11 +1,11 @@
-package data.database.dao
+package core.database.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
-import data.database.entity.BookEntity
-import data.database.entity.SearchCacheEntity
+import core.database.entity.BookEntity
+import core.database.entity.SearchCacheEntity
 
 @Dao
 interface ISearchCacheDao {

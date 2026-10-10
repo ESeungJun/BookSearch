@@ -1,10 +1,9 @@
 plugins {
-    id("convention.library")
-    id("convention.hilt")
+    id("convention.di")
 }
 
 dependencies {
     implementation(projects.domain.favorite)
-    implementation(projects.data.database)
+    implementation(projects.core.database)
     implementation(projects.data.favorite)
 }

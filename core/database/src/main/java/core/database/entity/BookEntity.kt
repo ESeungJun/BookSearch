@@ -1,8 +1,7 @@
-package data.database.entity
+package core.database.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import domain.base.data.BookDTO
 
 /** 책 정보는 이 테이블 한 곳에만 둔다. 즐겨찾기와 검색 캐시는 [key] 로 가리킨다. */
 @Entity(tableName = "book")
@@ -19,7 +18,3 @@ data class BookEntity(
     val description: String?,
     val url: String?,
 )
-
-fun BookEntity.toBook() = BookDTO(key, title, authors, publisher, publishedDate, price, salePrice, thumbnailUrl, isbn, description, url)
-
-fun BookDTO.toEntity() = BookEntity(key, title, authors, publisher, publishedDate, price, salePrice, thumbnailUrl, isbn, description, url)

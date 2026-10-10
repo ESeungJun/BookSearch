@@ -1,10 +1,11 @@
 plugins {
-    id("convention.kotlin.jvm")
+    id("convention.library")
 }
 
-// 원격 데이터 소스가 함께 쓰는 공통 코드. Android 가 필요 없어 순수 Kotlin 모듈이다.
+// data 공통: 서버 호출 결과 변환(apiCall), Entity ↔ DTO 변환.
 dependencies {
-    api(projects.domain.base) // apiCall 이 DomainResult 를 돌려준다
+    implementation(projects.domain.base)
+    implementation(projects.core.database)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.retrofit)
 }

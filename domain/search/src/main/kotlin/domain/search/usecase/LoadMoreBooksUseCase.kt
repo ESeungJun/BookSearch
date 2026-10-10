@@ -1,6 +1,7 @@
 package domain.search.usecase
 
 import domain.base.data.DomainResult
+import domain.base.usecase.useCaseResult
 import domain.search.data.SearchPageDTO
 import domain.search.data.SearchSort
 import domain.search.repo.ISearchRepository
@@ -11,5 +12,5 @@ class LoadMoreBooksUseCase @Inject constructor(
     private val repository: ISearchRepository,
 ) {
     suspend operator fun invoke(query: String, sort: SearchSort, page: Int): DomainResult<SearchPageDTO> =
-        repository.searchBooks(query, sort, page)
+        useCaseResult { repository.searchBooks(query, sort, page) }
 }
