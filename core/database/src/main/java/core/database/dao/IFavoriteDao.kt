@@ -2,6 +2,7 @@ package core.database.dao
 
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Upsert
 import core.database.entity.BookEntity
 import core.database.entity.FavoriteEntity
@@ -29,6 +30,19 @@ interface IFavoriteDao {
 
     @Query("SELECT bookKey FROM favorite")
     fun observeKeys(): Flow<List<String>>
+
+    /**
+     * 책 정보와 즐겨찾기를 한 트랜잭션으로 저장한다. 따로 저장하면 그 사이에 새 검색이 "참조 없는 책"을 지워
+     * 즐겨찾기가 책 없이 남고, 목록(book 과 JOIN)에서 사라질 수 있다.
+     */
+    @Transaction
+    suspend fun add(book: BookEntity, favorite: FavoriteEntity) {
+        upsertBook(book)
+        upsert(favorite)
+    }
+
+    @Upsert
+    suspend fun upsertBook(book: BookEntity)
 
     @Upsert
     suspend fun upsert(favorite: FavoriteEntity)

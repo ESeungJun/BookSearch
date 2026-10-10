@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 
 // 모든 필드를 nullable 로 두고 기본값을 넣지 않는다. 서버가 값을 안 보내거나 필드가 없으면 null 그대로 받아
 // 앱이 "값 없음"으로 판단한다 — 빈 문자열·0 같은 기본값으로 채우면 "정말 빈 값"과 "안 온 값"을 구분할 수 없다.
-// 필드가 아예 없어도 파싱이 실패하지 않는 것은 Json 설정의 explicitNulls = false 덕분이다(:di:search NetworkModule).
+// 필드가 아예 없어도 파싱이 실패하지 않으려면 Json 설정에 explicitNulls = false 가 있어야 한다.
 @Serializable
 data class SearchBookApi(
     val meta: MetaApi?,

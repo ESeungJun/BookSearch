@@ -6,7 +6,7 @@ import domain.favorite.repo.IFavoriteRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 
-/** 즐겨찾기한 책을 검색어·금액 범위로 골라 본다. 고르는 규칙은 :data:favorite, 보여 줄 순서는 화면이 정한다. */
+/** 즐겨찾기한 책을 검색어·금액 범위로 골라 본다. 최근에 넣은 것이 앞이다. */
 class ObserveFavoritesUseCase @Inject constructor(
     private val repository: IFavoriteRepository,
 ) {
