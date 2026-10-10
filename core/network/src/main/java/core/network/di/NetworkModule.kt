@@ -21,21 +21,24 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
     private const val BASE_URL = "https://dapi.kakao.com/"
+    private const val AUTHORIZATION = "Authorization"
 
     @Provides
     @Singleton
     fun provideOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
         .addInterceptor { chain ->
             val request = chain.request().newBuilder()
-                .header("Authorization", "KakaoAK ${BuildConfig.KAKAO_REST_API_KEY}")
+                .header(AUTHORIZATION, "KakaoAK ${BuildConfig.KAKAO_REST_API_KEY}")
                 .build()
             chain.proceed(request)
         }
         .addInterceptor(
-            // BASIC 은 요청 줄과 응답 코드만 남긴다. 헤더(API 키)와 본문(401 본문에 키 일부)은 남기지 않는다
-            HttpLoggingInterceptor().setLevel(
-                if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BASIC else HttpLoggingInterceptor.Level.NONE,
-            ),
+            // debug 빌드만 요청·응답 본문까지 남기고 release 는 남기지 않는다. 인증 헤더(API 키)는 가린다.
+            // 401 응답 본문에는 키 일부가 들어 있어 debug 로그캣에는 남는다(화면에는 보이지 않는다)
+            HttpLoggingInterceptor().apply {
+                level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+                redactHeader(AUTHORIZATION)
+            },
         )
         .build()
 
