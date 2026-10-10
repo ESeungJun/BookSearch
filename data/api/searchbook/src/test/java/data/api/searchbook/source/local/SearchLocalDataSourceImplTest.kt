@@ -4,13 +4,10 @@ import data.base.db.dao.IBookDao
 import data.base.db.dao.ISearchCacheDao
 import data.base.db.entity.BookEntity
 import data.base.db.entity.SearchCacheEntity
-import domain.base.data.BookDTO
-import domain.search.data.SearchPageDTO
 import domain.search.data.SearchSort
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -21,42 +18,35 @@ class SearchLocalDataSourceImplTest {
     private val local = SearchLocalDataSourceImpl(books, cache)
 
     @Test
-    fun `저장한 페이지를 저장 시각과 함께 돌려준다`() = runTest {
-        local.saveSearchPage("kotlin", SearchSort.ACCURACY, 1, page("A", "B"))
-        val cached = local.getSearchPage("kotlin", SearchSort.ACCURACY, 1)
-        assertEquals(listOf("A", "B"), cached?.books?.map { it.key })
-        assertNotNull(cached?.cachedAt)
+    fun `저장한 페이지의 책을 순서대로, 캐시 행에 저장 시각을 남긴다`() = runTest {
+        save(1, "A", "B")
+        assertEquals(listOf("A", "B"), local.getCachedBooks("kotlin", SearchSort.ACCURACY, 1).map { it.key })
+        assertTrue(local.getCachedRows("kotlin", SearchSort.ACCURACY, 1).all { it.savedAt > 0 })
     }
 
     @Test
     fun `6페이지부터는 캐시 목록에 남기지 않지만 책 정보는 저장한다`() = runTest {
-        local.saveSearchPage("kotlin", SearchSort.ACCURACY, 6, page("A"))
+        save(6, "A")
         assertTrue(cache.rows.isEmpty())
         assertNotNull(books.saved["A"])
     }
 
     @Test
     fun `0건 페이지는 캐시에 남기지 않는다`() = runTest {
-        local.saveSearchPage("kotlin", SearchSort.ACCURACY, 1, page())
-        assertNull(local.getSearchPage("kotlin", SearchSort.ACCURACY, 1))
+        save(1)
+        assertTrue(local.getCachedRows("kotlin", SearchSort.ACCURACY, 1).isEmpty())
     }
 
     @Test
-    fun `저장된 책에서 찾은 결과는 다음 페이지가 없고 기기에서 찾은 것으로 표시한다`() = runTest {
-        local.saveSearchPage("kotlin", SearchSort.ACCURACY, 1, page("A", "B"))
-        val found = local.findSavedBooks("A", SearchSort.ACCURACY)
-        assertEquals(listOf("A"), found?.books?.map { it.key })
-        assertTrue(found!!.isLocalMatch && found.isEnd)
+    fun `저장된 모든 책에서 검색어로 찾는다`() = runTest {
+        save(1, "A", "B")
+        assertEquals(listOf("A"), local.findSavedBooks("A", SearchSort.ACCURACY).map { it.key })
     }
 
-    @Test
-    fun `저장된 책에서도 못 찾으면 null 이다`() = runTest {
-        assertNull(local.findSavedBooks("없는책", SearchSort.ACCURACY))
-    }
+    private suspend fun save(page: Int, vararg keys: String) =
+        local.saveSearchPage("kotlin", SearchSort.ACCURACY, page, keys.map(::book), totalCount = keys.size, isEnd = true)
 
-    private fun page(vararg keys: String) = SearchPageDTO(keys.map(::book), totalCount = keys.size, isEnd = true)
-
-    private fun book(key: String) = BookDTO(key, key, emptyList(), "", "", null, null, null, "", "", "")
+    private fun book(key: String) = BookEntity(key, key, emptyList(), "", "", null, null, null, "", "", "")
 
     private class FakeBookDao : IBookDao {
         val saved = linkedMapOf<String, BookEntity>()
