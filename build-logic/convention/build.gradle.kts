@@ -20,6 +20,5 @@ gradlePlugin {
         register("presentation") { id = "convention.presentation"; implementationClass = "PresentationConventionPlugin" }
         register("domain") { id = "convention.domain"; implementationClass = "DomainConventionPlugin" }
         register("data") { id = "convention.data"; implementationClass = "DataConventionPlugin" }
-        register("di") { id = "convention.di"; implementationClass = "DiConventionPlugin" }
     }
 }
