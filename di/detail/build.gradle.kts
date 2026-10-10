@@ -1,6 +1,5 @@
 plugins {
-    id("convention.library")
-    id("convention.hilt")
+    id("convention.di")
 }
 
 dependencies {

@@ -1,4 +1,4 @@
-package data.database.entity
+package core.database.entity
 
 import androidx.room.Entity
 

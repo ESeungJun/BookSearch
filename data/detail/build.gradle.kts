@@ -1,10 +1,7 @@
 plugins {
-    id("convention.library")
+    id("convention.data")
 }
 
 dependencies {
     implementation(projects.domain.detail)
-    implementation(projects.data.database)
-    implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.javax.inject)
 }
