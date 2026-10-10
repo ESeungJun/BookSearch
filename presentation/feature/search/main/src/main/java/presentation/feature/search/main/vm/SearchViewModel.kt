@@ -65,10 +65,13 @@ class SearchViewModel @Inject constructor(
 
         observeFavoriteKeysUseCase()
             .onEach { result ->
-                // 키를 못 읽으면 하트만 이전 상태로 남는다. 목록은 그대로 쓸 수 있어 화면 상태를 바꾸지 않는다
-                if (result is DomainResult.Success) {
-                    favoriteKeys = result.data
-                    _uiState.update { it.copy(books = bookViewData()) }
+                when (result) {
+                    is DomainResult.Success -> {
+                        favoriteKeys = result.data
+                        _uiState.update { it.copy(books = bookViewData()) }
+                    }
+                    // 키를 못 읽으면 하트만 이전 상태로 남는다. 목록은 그대로 쓸 수 있어 화면 상태를 바꾸지 않는다
+                    is DomainResult.Fail, is DomainResult.Error -> Unit
                 }
             }
             .launchIn(viewModelScope)
@@ -103,12 +106,14 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun onNextPage(result: DomainResult<SearchPageDTO>, page: Int) {
-        if (result !is DomainResult.Success) {
+        when (result) {
+            is DomainResult.Success -> appendPage(result.data, page)
             // 다음 페이지 실패는 화면 단위가 아니다. 받은 목록을 두고 목록 끝에서 다시 시도한다
-            _uiState.update { it.copy(loadMore = LoadMoreState.FAILED) }
-            return
+            is DomainResult.Fail, is DomainResult.Error -> _uiState.update { it.copy(loadMore = LoadMoreState.FAILED) }
         }
-        val data = result.data
+    }
+
+    private fun appendPage(data: SearchPageDTO, page: Int) {
         val knownKeys = loadedBooks.mapTo(HashSet()) { it.key }
         // 마지막 페이지를 넘기면 서버가 같은 페이지를 다시 보내므로 이미 받은 책은 뺀다(목록 key 가 겹치면 안 된다)
         val newBooks = data.books.filter { knownKeys.add(it.key) }
@@ -157,20 +162,26 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun onFirstPage(query: String, result: DomainResult<SearchPageDTO>) {
-        if (result !is DomainResult.Success) {
-            loadedBooks = emptyList()
-            _uiState.update {
-                it.copy(
-                    status = SearchUiStatus.Error(result.failureMessageRes()),
-                    searchedQuery = query,
-                    books = persistentListOf(),
-                    notice = null,
-                    isRefreshing = false,
-                )
-            }
-            return
+        when (result) {
+            is DomainResult.Success -> showFirstPage(query, result.data)
+            is DomainResult.Fail, is DomainResult.Error -> showError(query, result)
         }
-        val data = result.data
+    }
+
+    private fun showError(query: String, failure: DomainResult<Nothing>) {
+        loadedBooks = emptyList()
+        _uiState.update {
+            it.copy(
+                status = SearchUiStatus.Error(failure.failureMessageRes()),
+                searchedQuery = query,
+                books = persistentListOf(),
+                notice = null,
+                isRefreshing = false,
+            )
+        }
+    }
+
+    private fun showFirstPage(query: String, data: SearchPageDTO) {
         loadedBooks = data.books.distinctBy { it.key }
         _uiState.update {
             it.copy(
