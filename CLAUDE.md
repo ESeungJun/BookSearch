@@ -25,9 +25,9 @@
 :di:database                      Room DB·DAO 제공(싱글톤)
 :di:search / favorite / detail    Hilt 모듈 — 기능별 바인딩
 :presentation:search / favorite / detail    Screen · ViewModel · UiState
-:domain:base                      공통 타입(BookDTO · DomainResult)과 UseCase 결과 처리(useCaseResult {} · asUseCaseResult())
+:domain:base                      공통 타입만 — BookDTO · DomainResult
 :domain:search / favorite / detail   기능별 data/ · repo/ · usecase/ (순수 Kotlin). 서로 의존하지 않는다
-:data:base                        data 공통 — apiCall {}(서버 호출 → DomainResult), dbCall {} · asDbResult()(DB 호출 → DomainResult), Entity ↔ DTO 변환
+:data:base                        data 공통 — safeApiCall {}(서버 호출 → DomainResult), safeDbCall {} · safeDbFlow()(DB 호출 → DomainResult), Entity ↔ DTO 변환
 :data:search / favorite / detail  repo/ · source/(remote·local) · service/ · data/ — 기능별, :core:database 의 DAO 를 쓴다
 ```
 
@@ -35,7 +35,7 @@
 - 기능 모듈끼리 서로 의존하지 않는다. 화면 이동은 `:app`이 연결한다.
 - 의존은 모두 `implementation` 으로 쓴다. `api` 로 다른 모듈을 내보내지 않는다. 레이어 공통 의존(코루틴·`javax.inject`·레이어 base 모듈)은 레이어 컨벤션 플러그인(`convention.domain`·`convention.data`·`convention.di`·`convention.presentation`)이 붙이고, 모듈의 build.gradle.kts 에는 그 모듈만 쓰는 의존만 적는다.
 - domain 저장소 인터페이스의 모든 함수는 `DomainResult`(관찰은 `Flow<DomainResult<T>>`)를 돌려준다.
-- 결과의 공통 처리는 레이어마다 따로 둔다: data 저장소는 `apiCall {}`·`dbCall {}`·`asDbResult()` 로 결과를 만들고, domain UseCase 는 `useCaseResult {}`·`asUseCaseResult()` 로 감싸 밖으로 새는 예외만 Error 로 바꾼다(취소는 다시 던짐). presentation 은 3단계에서 정한다.
+- 결과의 공통 처리는 레이어마다 따로 둔다: data 저장소는 `safeApiCall {}`(서버)·`safeDbCall {}`·`safeDbFlow()`(DB)로 결과를 만들고(취소는 다시 던짐), domain UseCase 는 저장소가 준 결과를 그대로 돌려준다. presentation 은 3단계에서 정한다.
 - **`:domain/usecase`는 사용자 행동 정의서다.** 사용자 행동 하나에 UseCase 하나를 두고 `operator fun invoke`로 부른다. `usecase/` 목록만 읽어도 이 앱으로 무엇을 할 수 있는지 알 수 있어야 한다. 저장소를 그대로 부르기만 하는 UseCase도 이 목적이면 만든다. ViewModel은 Repository가 아니라 UseCase만 부른다.
 - **domain 은 결과를 `DomainResult`(Success·Fail·Error)로 돌려준다.** 상황만 전하고 원인을 나누지 않는다. 원인은 data 가 채우고(Fail 은 HTTP 코드, Error 는 원인 예외), 어떻게 보일지는 presentation 이 판단한다. 정렬처럼 보여 주는 방식도 presentation 이 정한다.
 - **domain 에는 비즈니스 로직을 두지 않는다.** UseCase 는 행동 이름과 입력만 정하고 저장소 함수 하나를 부른다. 데이터를 고르고 바꾸는 판단(필터·정렬·넣기/빼기)은 `:data:<기능>`, 입력·표시 판단(검색어 공백 제거, 표시 가격)은 `:presentation:<기능>` 이 맡는다.
@@ -43,7 +43,7 @@
 - `:domain:<기능>` 은 `data`(DTO·enum) · `repo`(저장소 인터페이스) · `usecase` 세 패키지다. 화면 모듈은 쓰는 domain 모듈만 build.gradle.kts 에 적는다.
 - `:data:*` 의 책임
   - `repo`: 원격과 로컬 중 어디서 가져올지만 정한다(3초 시간 제한·캐시 대체). Retrofit·Room 을 모른다.
-  - `source/remote`: 서버 호출. `~Api` → DTO 변환, 서버 호출은 `:data:base` 의 `apiCall { }` 로 감싼다 — HTTP 오류 → `DomainResult.Fail(code)`, 그 밖의 실패 → `DomainResult.Error(cause)`, 취소는 다시 던진다. 호출마다 try-catch 를 쓰지 않는다. `source/local`: DB·캐시 읽기/쓰기와 캐시 보관 규칙. `~Entity` ↔ DTO 변환.
+  - `source/remote`: 서버 호출. `~Api` → DTO 변환, 서버 호출은 `:data:base` 의 `safeApiCall { }` 로 감싼다 — HTTP 오류 → `DomainResult.Fail(code)`, 그 밖의 실패 → `DomainResult.Error(cause)`, 취소는 다시 던진다. 호출마다 try-catch 를 쓰지 않는다. `source/local`: DB·캐시 읽기/쓰기와 캐시 보관 규칙. `~Entity` ↔ DTO 변환.
   - `service`: Retrofit 인터페이스(`I~Service`). `data`: 서버 응답 데이터(`~Api`)와 그 변환 함수.
   - `~Api` 는 `source/remote` 밖으로, `~Entity` 는 `source/local` 밖으로 나가지 않는다. 데이터 소스는 DTO 로 주고받는다.
   - `~Api` 필드는 모두 nullable 이고 기본값을 두지 않는다. 서버가 안 보낸 값은 null 그대로 DTO 까지 가고, 어떻게 보일지는 화면이 정한다.

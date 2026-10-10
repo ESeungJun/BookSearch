@@ -1,7 +1,6 @@
 package domain.favorite.usecase
 
 import domain.base.data.DomainResult
-import domain.base.usecase.asUseCaseResult
 import domain.favorite.repo.IFavoriteRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
@@ -13,5 +12,5 @@ import kotlinx.coroutines.flow.Flow
 class ObserveFavoriteKeysUseCase @Inject constructor(
     private val repository: IFavoriteRepository,
 ) {
-    operator fun invoke(): Flow<DomainResult<Set<String>>> = repository.observeFavoriteKeys().asUseCaseResult()
+    operator fun invoke(): Flow<DomainResult<Set<String>>> = repository.observeFavoriteKeys()
 }
