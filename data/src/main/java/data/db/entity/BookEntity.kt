@@ -1,4 +1,4 @@
-package data.db.book
+package data.db.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

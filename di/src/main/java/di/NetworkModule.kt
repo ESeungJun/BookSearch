@@ -1,6 +1,6 @@
 package di
 
-import data.api.searchbook.ISearchBookService
+import data.service.ISearchBookService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,6 +13,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import javax.inject.Singleton
 
+/** OkHttp 는 연결 풀·스레드를 클라이언트마다 따로 가지므로 앱에 하나만 둔다. Retrofit 서비스도 그 클라이언트에 묶여 하나다. */
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
@@ -37,7 +38,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideSearchBookApi(client: OkHttpClient): ISearchBookService {
+    fun provideSearchBookService(client: OkHttpClient): ISearchBookService {
         // 응답에 이 앱이 쓰지 않는 필드(translators·status 등)가 있어 모르는 키는 무시한다
         val json = Json { ignoreUnknownKeys = true }
         return Retrofit.Builder()

@@ -1,4 +1,4 @@
-package data.api.searchbook
+package data.data
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

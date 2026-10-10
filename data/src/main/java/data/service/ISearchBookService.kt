@@ -1,5 +1,6 @@
-package data.api.searchbook
+package data.service
 
+import data.data.SearchBookApi
 import retrofit2.http.GET
 import retrofit2.http.Query
 

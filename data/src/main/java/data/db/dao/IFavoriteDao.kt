@@ -1,9 +1,10 @@
-package data.db.favorite
+package data.db.dao
 
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
-import data.db.book.BookEntity
+import data.db.entity.BookEntity
+import data.db.entity.FavoriteEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
