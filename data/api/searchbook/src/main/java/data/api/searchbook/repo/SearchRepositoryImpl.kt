@@ -35,9 +35,8 @@ class SearchRepositoryImpl @Inject constructor(
             is DomainResult.Fail -> result
             is DomainResult.Error -> result
         }
-        // 대신 보여 줄 것이 있으면 원래 실패를 함께 넘긴다
         val fallback = savedPage(query, sort, page) ?: return failure
-        return DomainResult.Success(fallback.copy(failure = failure))
+        return DomainResult.Success(fallback)
     }
 
     /**
