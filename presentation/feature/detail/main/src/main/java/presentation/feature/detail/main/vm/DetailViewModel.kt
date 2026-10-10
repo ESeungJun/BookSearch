@@ -29,7 +29,7 @@ class DetailViewModel @AssistedInject constructor(
     @Assisted private val bookId: String,
     private val getBookUseCase: GetBookUseCase,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
-    observeFavoriteKeysUseCase: ObserveFavoriteKeysUseCase,
+    private val observeFavoriteKeysUseCase: ObserveFavoriteKeysUseCase,
 ) : ViewModel() {
 
     // 하트를 누르면 이 책을 그대로 넘긴다

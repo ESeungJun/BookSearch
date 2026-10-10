@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -31,8 +32,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.rememberNavBackStack
 import com.leeseungjun.booksearch.navigation.AppNavHost
-import core.navigation.EntryProviderInstaller
 import com.leeseungjun.booksearch.navigation.AppNavigator
+import core.navigation.EntryProviderInstaller
 import presentation.router.FavoriteRouter
 import presentation.router.SearchRouter
 
@@ -80,8 +81,10 @@ fun MainScaffold(navigator: AppNavigator, entryInstallers: Set<EntryProviderInst
             navigator = navigator,
             entryInstallers = entryInstallers,
             // 본문 아래를 시스템 내비 바·키보드 위까지로 줄인다. 하단 탭바는 내비 바 높이를 이미 차지하지만,
-            // 측면 레일은 옆만 차지해 넓은 창(작업 표시줄이 있는 폴더블·태블릿)에서는 목록 끝이 내비 바에 가려진다
+            // 측면 레일은 옆만 차지해 넓은 창(작업 표시줄이 있는 폴더블·태블릿)에서는 목록 끝이 내비 바에 가려진다.
+            // 가로 모드의 좌우 내비 바·화면 컷아웃도 피한다(탭바·레일이 이미 차지한 쪽은 빠진다)
             modifier = Modifier
+                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
                 .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Bottom))
                 .imePadding(),
             // 지금 탭에 이전 화면이 있을 때만 불린다(CurrentTabSceneStrategy)
