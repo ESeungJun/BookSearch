@@ -1,7 +1,7 @@
 package domain.favorite.usecase
 
 import domain.favorite.repo.IFavoriteRepository
-import domain.book.data.BookDTO
+import domain.base.data.BookDTO
 import javax.inject.Inject
 
 /** 책을 즐겨찾기에 넣거나 뺀다. 검색 목록·즐겨찾기 목록·상세 어디서든 같은 행동이다. */

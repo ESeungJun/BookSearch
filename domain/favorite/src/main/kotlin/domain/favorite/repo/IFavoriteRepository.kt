@@ -1,6 +1,6 @@
 package domain.favorite.repo
 
-import domain.book.data.BookDTO
+import domain.base.data.BookDTO
 import kotlinx.coroutines.flow.Flow
 
 interface IFavoriteRepository {

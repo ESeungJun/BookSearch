@@ -1,6 +1,6 @@
 package domain.search.data
 
-import domain.book.data.BookDTO
+import domain.base.data.BookDTO
 
 /**
  * 검색 결과 한 페이지.
