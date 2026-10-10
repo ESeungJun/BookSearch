@@ -2,7 +2,7 @@ package domain.detail.usecase
 
 import domain.base.data.BookDTO
 import domain.base.data.DomainResult
-import domain.base.usecase.useCase
+import domain.base.usecase.useCaseResult
 import domain.detail.repo.IDetailRepository
 import javax.inject.Inject
 
@@ -10,5 +10,5 @@ import javax.inject.Inject
 class GetBookUseCase @Inject constructor(
     private val repository: IDetailRepository,
 ) {
-    suspend operator fun invoke(key: String): DomainResult<BookDTO?> = useCase { repository.getBook(key) }
+    suspend operator fun invoke(key: String): DomainResult<BookDTO?> = useCaseResult { repository.getBook(key) }
 }

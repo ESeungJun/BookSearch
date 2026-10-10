@@ -2,7 +2,7 @@ package domain.favorite.usecase
 
 import domain.base.data.BookDTO
 import domain.base.data.DomainResult
-import domain.base.usecase.useCase
+import domain.base.usecase.useCaseResult
 import domain.favorite.repo.IFavoriteRepository
 import javax.inject.Inject
 
@@ -11,5 +11,5 @@ class ToggleFavoriteUseCase @Inject constructor(
     private val repository: IFavoriteRepository,
 ) {
     suspend operator fun invoke(book: BookDTO, isFavorite: Boolean): DomainResult<Unit> =
-        useCase { repository.toggleFavorite(book, isFavorite) }
+        useCaseResult { repository.toggleFavorite(book, isFavorite) }
 }
