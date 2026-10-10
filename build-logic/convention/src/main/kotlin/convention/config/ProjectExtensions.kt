@@ -11,7 +11,8 @@ val Project.libs: VersionCatalog
 
 fun Project.library(alias: String) = libs.findLibrary(alias).get()
 
+fun Project.bundle(alias: String) = libs.findBundle(alias).get()
+
 fun Project.addTestDependencies() {
-    dependencies.add("testImplementation", library("junit"))
-    dependencies.add("testImplementation", library("kotlinx-coroutines-test"))
+    dependencies.add("testImplementation", bundle("test-unit"))
 }

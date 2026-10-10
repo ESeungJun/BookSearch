@@ -21,10 +21,5 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.nav3)
-    implementation(libs.nav3.runtime)
-    implementation(libs.nav3.ui)
-    implementation(libs.compose.navigation.suite)
-    implementation(libs.compose.adaptive.navigation3) // 넓은 창의 목록-상세 2칸
-    implementation(libs.compose.material.icons.extended)
+    implementation(libs.bundles.navigation) // 탭·백스택·넓은 창의 목록-상세 2칸
 }
