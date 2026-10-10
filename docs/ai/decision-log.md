@@ -35,7 +35,7 @@ README 의 「AI 활용」 절(어떤 작업에 썼는지 / 어떻게 검증했�
 | D-56 | 2026-10-10 | 3단계 전 | data 계층에 데이터 소스 두기 | 저장소가 API·DAO 를 직접 부른다(데이터 소스 계층 없음, v1 지적 9 대응). 작성자 요청 후 AI 가 repo / source(remote·local) 설계안을 올림 | 작성자 지시: **클린 아키텍처 기반으로 `repo` 와 `source/remote`(API 호출)·`source/local`(DB·캐시)로 나눈다**. 로컬 데이터 소스는 하나(R-12) | AI 제안과 다름 | `:data/repo`, `:data/source` |
 | D-57 | 2026-10-10 | 3단계 전 | 저장소 Hilt 범위 | `SingletonComponent` + `@Singleton` | 작성자 지시: **저장소는 ViewModel 범위로 한정하고, 싱글톤은 정말 필요할 때만 쓴다.** AI 가 Room DB·OkHttp·Retrofit 은 앱에 하나여야 동작한다(Room 변경 감지는 인스턴스 단위, OkHttp 연결 풀)는 이유로 싱글톤 유지를 제안했고 작성자가 그대로 진행 | AI 제안과 다름 | `IRepositoryModule`, `IDataSourceModule`, `DatabaseModule`·`NetworkModule` 주석 |
 | D-58 | 2026-10-10 | 3단계 전 | data 패키지 구성 | `api/<경로>/`(Service·Api·Mapper) · `db/<테이블>/`(Dao·Entity) · `repository/`. Room 은 `source/local/db` 아래(AI 권장) | 작성자 지시: **`repo` · `source/remote|local` · `service`(I~Service) · `data`(~Api) · `db/dao` · `db/entity`**. Room 은 AI 가 올린 세 위치 중 별도 루트 `db` 를 택함 | AI 제안과 다름 | `:data` |
-| D-59 | 2026-10-10 | 3단계 전 | domain 기능별 모듈 분리 | 레이어당 모듈 하나(D-40) | 작성자 지시: **domain 을 search·favorite 모듈로 나눈다.** 함께 쓰는 책 DTO·예외·상세 조회는 AI 권장대로 `:domain:book` 에 두고, 저장소도 셋으로 나눔. 데이터 소스도 `@ViewModelScoped` 로 묶자는 작성자 제안 반영(저장소 셋이 같은 인스턴스를 씀) | AI 제안과 다름 | `:domain:*`, `:data/repo`, `:di` |
+| D-59 | 2026-10-10 | 3단계 전 | domain 기능별 모듈 분리 | 레이어당 모듈 하나(D-40) | 작성자 지시: **domain 을 search·favorite 모듈로 나눈다.** 함께 쓰는 책 DTO·예외·상세 조회는 AI 권장대로 `:domain:book` 에 두고, 저장소도 셋으로 나눔. 데이터 소스도 `@ViewModelScoped` 로 묶자는 작성자 제안 반영(저장소 셋이 같은 인스턴스를 씀). `:di` 도 기능별 패키지(`book`·`search`·`favorite`)로 나누고 싱글톤(DB·네트워크)만 루트에 둠 | AI 제안과 다름 | `:domain:*`, `:data/repo`, `:di` |
 ## 2. 논의 중 (미결)
 
 | ID | 일시 | 주제 | 쟁점 | 현재 상태 |
