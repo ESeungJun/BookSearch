@@ -3,8 +3,12 @@ package com.leeseungjun.booksearch
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.isImeVisible
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
@@ -74,8 +78,11 @@ fun MainScaffold(navigator: AppNavigator, entryInstallers: Set<EntryProviderInst
             currentTab = currentTab.name,
             navigator = navigator,
             entryInstallers = entryInstallers,
-            // 키보드가 목록 끝을 가리지 않게 본문을 키보드 위까지로 줄인다
-            modifier = Modifier.imePadding(),
+            // 본문 아래를 시스템 내비 바·키보드 위까지로 줄인다. 하단 탭바는 내비 바 높이를 이미 차지하지만,
+            // 측면 레일은 옆만 차지해 넓은 창(작업 표시줄이 있는 폴더블·태블릿)에서는 목록 끝이 내비 바에 가려진다
+            modifier = Modifier
+                .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Bottom))
+                .imePadding(),
             onBack = {
                 val stack = backStacks.getValue(currentTab)
                 when {
