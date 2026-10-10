@@ -1,15 +1,19 @@
 package domain.search.usecase
 
 import domain.book.data.DomainResult
-import domain.search.repo.ISearchRepository
 import domain.search.data.SearchPageDTO
 import domain.search.data.SearchSort
+import domain.search.repo.ISearchRepository
 import javax.inject.Inject
 
-/** 검색어로 책을 찾는다. 정렬을 고르고 다음 페이지를 이어 받을 수 있다. */
+/** 검색어와 정렬로 책을 찾는다. 새 검색·정렬 변경·새로고침 모두 첫 페이지부터 다시 받는 같은 행동이다. */
 class SearchBooksUseCase @Inject constructor(
     private val repository: ISearchRepository,
 ) {
-    suspend operator fun invoke(query: String, sort: SearchSort, page: Int): DomainResult<SearchPageDTO> =
-        repository.searchBooks(query, sort, page)
+    suspend operator fun invoke(query: String, sort: SearchSort): DomainResult<SearchPageDTO> =
+        repository.searchBooks(query, sort, FIRST_PAGE)
+
+    private companion object {
+        const val FIRST_PAGE = 1
+    }
 }

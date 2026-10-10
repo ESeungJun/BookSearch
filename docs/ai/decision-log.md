@@ -40,6 +40,7 @@ README 의 「AI 활용」 절(어떤 작업에 썼는지 / 어떻게 검증했�
 | D-61 | 2026-10-10 | 3단계 전 | domain 의 비즈니스 로직 | 즐겨찾기 필터·정렬(메모리), 토글 분기, 키 집합 변환, 검색어 공백 제거, 표시 가격을 domain 에 둠 | 작성자 지시: **domain 은 사용자 행동 정의서로만 두고 판단 로직은 기능 단위로 뺀다.** 위치는 AI 권장대로 데이터 판단은 `:data:<기능>`(즐겨찾기 필터·정렬은 Room 쿼리), 입력·표시 판단은 `:presentation:<기능>`(3단계에서 구현) | AI 제안과 다름 | `CLAUDE.md` 구조 절, `IFavoriteDao.observe`, `FavoriteRepositoryImpl` |
 | D-62 | 2026-10-10 | 3단계 전 | 디자인 시스템 위치 | `:presentation:designsystem` | 작성자 지시: **`:core` 모듈로 빼고 공통 유틸·디자인 시스템 등 앱 공통 코드를 모은다** (패키지 `core.designsystem`·`core.util`) | AI 제안과 다름 | `:core` |
 | D-63 | 2026-10-10 | 3단계 전 | domain 결과 타입·정렬·core·커밋 | `Result` + `BookException(Reason)`, domain 에 `FavoriteSort`, `:core` 하나, 코드와 문서를 따로 커밋 | 작성자 지시: **domain 은 커스텀 결과(`DomainResult`: Success·Fail·Error)로 상황만 전하고 원인·표시는 data·presentation 이 정한다**(AI 는 원인 enum 까지 domain 에 두는 안을 냈으나 작성자가 뺌). **정렬은 화면이 정하므로 `FavoriteSort` 를 domain 에서 뺀다.** `:core` 는 패키지 단위 모듈(`:core:designsystem`)로. 커밋은 코드와 결정 기록을 함께. **`:di:network` 를 따로 두어 OkHttp·Retrofit·API 서비스 주입을 모은다**(기능 di 는 바인딩만) | AI 제안과 다름 | `DomainResult`, `:core:designsystem`, `:di:network`, `CLAUDE.md` |
+| D-64 | 2026-10-10 | 3단계 전 | 기획서 남은 확인 2건 | 검색·정렬·다음 페이지·새로고침을 UseCase 하나로 / Custom Tab 은 UseCase 없이 | **다음 페이지만 `LoadMoreBooksUseCase` 로 나눈다**(검색·정렬·새로고침은 `SearchBooksUseCase`). Custom Tab 은 추천안대로 화면 동작 | AI 제안과 다름(1건) · 사용자 확정(1건) | `:domain:search/usecase`, 기획서 7절 |
 ## 2. 논의 중 (미결)
 
 | ID | 일시 | 주제 | 쟁점 | 현재 상태 |
