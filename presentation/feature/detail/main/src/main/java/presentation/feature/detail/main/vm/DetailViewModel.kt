@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import presentation.base.data.failureMessageRes
 import presentation.feature.detail.main.data.DetailUiStatus
 import presentation.feature.detail.main.data.DetailUiState
 import presentation.feature.detail.main.mapper.toDetailViewData
@@ -70,7 +69,7 @@ class DetailViewModel @AssistedInject constructor(
         when (result) {
             is DomainResult.Success -> showBook(result.data)
             is DomainResult.Fail, is DomainResult.Error ->
-                _uiState.update { it.copy(status = DetailUiStatus.Error(result.failureMessageRes())) }
+                _uiState.update { it.copy(status = DetailUiStatus.Error) }
         }
     }
 
