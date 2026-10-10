@@ -89,6 +89,13 @@ fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    state.toastRes?.let { res ->
+        LaunchedEffect(res) {
+            Toast.makeText(context, res, Toast.LENGTH_SHORT).show()
+            viewModel.onToastShown()
+        }
+    }
     SearchContent(
         state = state,
         onQueryChange = viewModel::onQueryChange,
@@ -98,7 +105,6 @@ fun SearchScreen(
         onRetry = viewModel::retry,
         onBookClick = onBookClick,
         onFavoriteClick = viewModel::onFavoriteClick,
-        onToastShown = viewModel::onToastShown,
     )
 }
 
@@ -113,16 +119,8 @@ fun SearchContent(
     onRetry: () -> Unit,
     onBookClick: (String) -> Unit,
     onFavoriteClick: (String) -> Unit,
-    onToastShown: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
-    state.toastRes?.let { res ->
-        LaunchedEffect(res) {
-            Toast.makeText(context, res, Toast.LENGTH_SHORT).show()
-            onToastShown()
-        }
-    }
     // 새로고침 표시는 머리까지 감싼 바깥에 둔다. 목록을 내릴 때 접힌 머리가 먼저 펼쳐지고 그다음에 당겨지게 하려는 순서다
     PullToRefreshBox(
         isRefreshing = state.isRefreshing,
@@ -344,7 +342,6 @@ private fun SearchContentPreview() {
             onRetry = {},
             onBookClick = {},
             onFavoriteClick = {},
-            onToastShown = {},
         )
     }
 }
