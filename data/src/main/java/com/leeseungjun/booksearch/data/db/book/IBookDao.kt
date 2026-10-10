@@ -5,7 +5,7 @@ import androidx.room.Query
 import androidx.room.Upsert
 
 @Dao
-interface BookDao {
+interface IBookDao {
     @Upsert
     suspend fun upsert(books: List<BookEntity>)
 

@@ -1,16 +1,16 @@
 package com.leeseungjun.booksearch.data
 
+import com.leeseungjun.booksearch.data.api.searchbook.ISearchBookService
 import com.leeseungjun.booksearch.data.api.searchbook.SearchBookApi
-import com.leeseungjun.booksearch.data.api.searchbook.SearchBookResponse
-import com.leeseungjun.booksearch.data.db.book.BookDao
+import com.leeseungjun.booksearch.data.db.book.IBookDao
 import com.leeseungjun.booksearch.data.db.book.BookEntity
-import com.leeseungjun.booksearch.data.db.favorite.FavoriteDao
+import com.leeseungjun.booksearch.data.db.favorite.IFavoriteDao
 import com.leeseungjun.booksearch.data.db.favorite.FavoriteEntity
-import com.leeseungjun.booksearch.data.db.searchcache.SearchCacheDao
+import com.leeseungjun.booksearch.data.db.searchcache.ISearchCacheDao
 import com.leeseungjun.booksearch.data.db.searchcache.SearchCacheEntity
 import com.leeseungjun.booksearch.data.repository.BookRepositoryImpl
 import com.leeseungjun.booksearch.domain.model.BookException
-import com.leeseungjun.booksearch.domain.model.SearchCondition
+import com.leeseungjun.booksearch.domain.model.SearchConditionDTO
 import com.leeseungjun.booksearch.domain.model.SearchSort
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -25,7 +25,7 @@ import java.io.IOException
 
 /** 저장소의 "네트워크 먼저 → 3초 넘거나 실패하면 캐시" 분기를 확인한다. LRU 삭제는 SQL 이라 여기서 다루지 않는다. */
 class BookRepositoryImplTest {
-    private val api = FakeApi()
+    private val api = FakeSearchBookService()
     private val books = FakeBookDao()
     private val cache = FakeSearchCacheDao(books)
     private val repository = BookRepositoryImpl(api, books, FakeFavoriteDao(), cache)
@@ -64,34 +64,34 @@ class BookRepositoryImplTest {
     @Test
     fun `마지막으로 저장한 검색을 돌려준다`() = runTest {
         repository.searchBooks("kotlin", SearchSort.LATEST, 1)
-        assertEquals(SearchCondition("kotlin", SearchSort.LATEST), repository.getLastSearch())
+        assertEquals(SearchConditionDTO("kotlin", SearchSort.LATEST), repository.getLastSearch())
     }
 
-    private class FakeApi : SearchBookApi {
+    private class FakeSearchBookService : ISearchBookService {
         var delayMs = 0L
         var error: Exception? = null
-        override suspend fun search(query: String, sort: String, page: Int, size: Int): SearchBookResponse {
+        override suspend fun search(query: String, sort: String, page: Int, size: Int): SearchBookApi {
             delay(delayMs)
             error?.let { throw it }
-            val docs = listOf("A", "B").map { SearchBookResponse.Document(title = "$it$page", isbn = "97800000000${it.length}$page") }
-            return SearchBookResponse(SearchBookResponse.Meta(totalCount = 40, isEnd = false), docs)
+            val docs = listOf("A", "B").map { SearchBookApi.DocumentApi(title = "$it$page", isbn = "97800000000${it.length}$page") }
+            return SearchBookApi(SearchBookApi.MetaApi(totalCount = 40, isEnd = false), docs)
         }
     }
 
-    private class FakeBookDao : BookDao {
+    private class FakeBookDao : IBookDao {
         val saved = linkedMapOf<String, BookEntity>()
         override suspend fun upsert(books: List<BookEntity>) = books.forEach { saved[it.key] = it }
         override suspend fun get(key: String) = saved[key]
         override suspend fun deleteUnreferenced() = Unit
     }
 
-    private class FakeFavoriteDao : FavoriteDao {
+    private class FakeFavoriteDao : IFavoriteDao {
         override fun observeAll(): Flow<List<BookEntity>> = emptyFlow()
         override suspend fun upsert(favorite: FavoriteEntity) = Unit
         override suspend fun delete(key: String) = Unit
     }
 
-    private class FakeSearchCacheDao(private val books: FakeBookDao) : SearchCacheDao {
+    private class FakeSearchCacheDao(private val books: FakeBookDao) : ISearchCacheDao {
         val rows = mutableListOf<SearchCacheEntity>()
         override suspend fun getLatest() = rows.maxByOrNull { it.savedAt }
         override suspend fun getPage(query: String, sort: String, page: Int) =

@@ -1,21 +1,21 @@
 package com.leeseungjun.booksearch.data.repository
 
+import com.leeseungjun.booksearch.data.api.searchbook.ISearchBookService
 import com.leeseungjun.booksearch.data.api.searchbook.SearchBookApi
-import com.leeseungjun.booksearch.data.api.searchbook.SearchBookResponse
 import com.leeseungjun.booksearch.data.api.searchbook.toBook
-import com.leeseungjun.booksearch.data.db.book.BookDao
+import com.leeseungjun.booksearch.data.db.book.IBookDao
 import com.leeseungjun.booksearch.data.db.book.toBook
 import com.leeseungjun.booksearch.data.db.book.toEntity
-import com.leeseungjun.booksearch.data.db.favorite.FavoriteDao
+import com.leeseungjun.booksearch.data.db.favorite.IFavoriteDao
 import com.leeseungjun.booksearch.data.db.favorite.FavoriteEntity
-import com.leeseungjun.booksearch.data.db.searchcache.SearchCacheDao
+import com.leeseungjun.booksearch.data.db.searchcache.ISearchCacheDao
 import com.leeseungjun.booksearch.data.db.searchcache.SearchCacheEntity
-import com.leeseungjun.booksearch.domain.BookRepository
-import com.leeseungjun.booksearch.domain.model.Book
-import com.leeseungjun.booksearch.domain.model.SearchCondition
+import com.leeseungjun.booksearch.domain.IBookRepository
+import com.leeseungjun.booksearch.domain.model.BookDTO
+import com.leeseungjun.booksearch.domain.model.SearchConditionDTO
 import com.leeseungjun.booksearch.domain.model.BookException
 import com.leeseungjun.booksearch.domain.model.BookException.Reason
-import com.leeseungjun.booksearch.domain.model.SearchPage
+import com.leeseungjun.booksearch.domain.model.SearchPageDTO
 import com.leeseungjun.booksearch.domain.model.SearchSort
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
@@ -33,13 +33,13 @@ import javax.inject.Inject
  * Room 의 suspend DAO 는 자체 스레드에서 실행되므로 여기서 디스패처를 바꾸지 않는다.
  */
 class BookRepositoryImpl @Inject constructor(
-    private val api: SearchBookApi,
-    private val bookDao: BookDao,
-    private val favoriteDao: FavoriteDao,
-    private val searchCacheDao: SearchCacheDao,
-) : BookRepository {
+    private val api: ISearchBookService,
+    private val bookDao: IBookDao,
+    private val favoriteDao: IFavoriteDao,
+    private val searchCacheDao: ISearchCacheDao,
+) : IBookRepository {
 
-    override suspend fun searchBooks(query: String, sort: SearchSort, page: Int): Result<SearchPage> {
+    override suspend fun searchBooks(query: String, sort: SearchSort, page: Int): Result<SearchPageDTO> {
         val response = try {
             withTimeoutOrNull(TIMEOUT_MS) { api.search(query, sort.apiValue, page, PAGE_SIZE) }
                 ?: return fromCache(query, sort, page, BookException(Reason.NETWORK))
@@ -51,18 +51,18 @@ class BookRepositoryImpl @Inject constructor(
         }
         val books = response.documents.map { it.toBook() }
         save(query, sort, page, response.meta, books)
-        return Result.success(SearchPage(books, response.meta.totalCount, response.meta.isEnd))
+        return Result.success(SearchPageDTO(books, response.meta.totalCount, response.meta.isEnd))
     }
 
-    override suspend fun getBook(key: String): Book? = bookDao.get(key)?.toBook()
+    override suspend fun getBook(key: String): BookDTO? = bookDao.get(key)?.toBook()
 
-    override suspend fun getLastSearch(): SearchCondition? =
-        searchCacheDao.getLatest()?.let { SearchCondition(it.query, SearchSort.valueOf(it.sort)) }
+    override suspend fun getLastSearch(): SearchConditionDTO? =
+        searchCacheDao.getLatest()?.let { SearchConditionDTO(it.query, SearchSort.valueOf(it.sort)) }
 
-    override fun observeFavorites(): Flow<List<Book>> =
+    override fun observeFavorites(): Flow<List<BookDTO>> =
         favoriteDao.observeAll().map { entities -> entities.map { it.toBook() } }
 
-    override suspend fun addFavorite(book: Book) {
+    override suspend fun addFavorite(book: BookDTO) {
         bookDao.upsert(listOf(book.toEntity()))
         favoriteDao.upsert(FavoriteEntity(book.key, System.currentTimeMillis()))
     }
@@ -75,7 +75,7 @@ class BookRepositoryImpl @Inject constructor(
      * 책 정보는 페이지와 상관없이 저장한다 — 상세 화면이 키로 찾을 수 있어야 한다(D-08).
      * 캐시 목록은 조합당 5페이지까지만 남긴다. 결과가 0건인 페이지는 남길 것이 없어 저장하지 않는다.
      */
-    private suspend fun save(query: String, sort: SearchSort, page: Int, meta: SearchBookResponse.Meta, books: List<Book>) {
+    private suspend fun save(query: String, sort: SearchSort, page: Int, meta: SearchBookApi.MetaApi, books: List<BookDTO>) {
         bookDao.upsert(books.map { it.toEntity() })
         if (page > MAX_CACHED_PAGES || books.isEmpty()) return
         val now = System.currentTimeMillis()
@@ -86,12 +86,12 @@ class BookRepositoryImpl @Inject constructor(
         if (page == 1) bookDao.deleteUnreferenced()
     }
 
-    private suspend fun fromCache(query: String, sort: SearchSort, page: Int, error: BookException): Result<SearchPage> {
+    private suspend fun fromCache(query: String, sort: SearchSort, page: Int, error: BookException): Result<SearchPageDTO> {
         val rows = searchCacheDao.getPage(query, sort.name, page)
         if (rows.isEmpty()) return Result.failure(error)
         val books = searchCacheDao.getBooks(query, sort.name, page).map { it.toBook() }
         val first = rows.first()
-        return Result.success(SearchPage(books, first.totalCount, first.isEnd, cachedAt = first.savedAt))
+        return Result.success(SearchPageDTO(books, first.totalCount, first.isEnd, cachedAt = first.savedAt))
     }
 
     private fun Exception.toBookException(): BookException {

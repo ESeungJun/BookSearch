@@ -1,6 +1,6 @@
 package com.leeseungjun.booksearch.domain.usecase
 
-import com.leeseungjun.booksearch.domain.BookRepository
+import com.leeseungjun.booksearch.domain.IBookRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -10,7 +10,7 @@ import javax.inject.Inject
  * 검색 결과에는 즐겨찾기 여부를 저장하지 않고 이 값에서 계산한다 — 두 곳에 두면 서로 어긋날 수 있다.
  */
 class ObserveFavoriteKeysUseCase @Inject constructor(
-    private val repository: BookRepository,
+    private val repository: IBookRepository,
 ) {
     operator fun invoke(): Flow<Set<String>> =
         repository.observeFavorites().map { books -> books.mapTo(HashSet()) { it.key } }

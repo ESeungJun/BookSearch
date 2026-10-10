@@ -1,13 +1,13 @@
 package com.leeseungjun.booksearch.data
 
-import com.leeseungjun.booksearch.data.api.searchbook.SearchBookResponse.Document
+import com.leeseungjun.booksearch.data.api.searchbook.SearchBookApi
 import com.leeseungjun.booksearch.data.api.searchbook.toBook
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
 class SearchBookMapperTest {
-    private val doc = Document(title = "코틀린", authors = listOf("가", "나"), publisher = "출판", price = 20000)
+    private val doc = SearchBookApi.DocumentApi(title = "코틀린", authors = listOf("가", "나"), publisher = "출판", price = 20000)
 
     @Test
     fun `두 ISBN 이 모두 있으면 ISBN13 으로 키를 만든다`() {
