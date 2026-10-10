@@ -21,7 +21,7 @@ import presentation.feature.favorite.main.data.TitleSort
 
 /** 스크롤해도 남는 고정 줄: 왼쪽 "거른 수 / 전체 수", 오른쪽 금액 필터와 제목 정렬. */
 @Composable
-internal fun CountFilterRow(
+internal fun FavoriteCountFilterView(
     shownCount: Int,
     totalCount: Int,
     priceRange: PriceRange,
@@ -56,9 +56,9 @@ internal fun CountFilterRow(
 
 @Preview(showBackground = true)
 @Composable
-private fun CountFilterRowPreview() {
+private fun FavoriteCountFilterViewPreview() {
     BookSearchTheme {
-        CountFilterRow(
+        FavoriteCountFilterView(
             shownCount = 3,
             totalCount = 12,
             priceRange = PriceRange.FROM_10K_TO_20K,

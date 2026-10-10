@@ -27,9 +27,9 @@ import presentation.feature.favorite.main.data.FavoriteUiStatus
 import presentation.feature.favorite.main.data.FavoriteUiState
 import presentation.feature.favorite.main.data.PriceRange
 import presentation.feature.favorite.main.data.TitleSort
-import presentation.feature.favorite.main.view.component.BookList
-import presentation.feature.favorite.main.view.component.CountFilterRow
-import presentation.feature.favorite.main.view.component.FavoriteHeader
+import presentation.feature.favorite.main.view.component.FavoriteBookListView
+import presentation.feature.favorite.main.view.component.FavoriteCountFilterView
+import presentation.feature.favorite.main.view.component.FavoriteHeaderView
 import presentation.feature.favorite.main.vm.FavoriteViewModel
 
 @Composable
@@ -51,7 +51,7 @@ fun FavoriteScreen(
 }
 
 @Composable
-fun FavoriteContent(
+internal fun FavoriteContent(
     state: FavoriteUiState,
     onQueryChange: (String) -> Unit,
     onPriceRangeChange: (PriceRange) -> Unit,
@@ -64,11 +64,11 @@ fun FavoriteContent(
 ) {
     val headerState = rememberCollapsingHeaderState()
     CollapsingHeader(
-        collapsible = { FavoriteHeader(state.query, onQueryChange) },
+        collapsible = { FavoriteHeaderView(state.query, onQueryChange) },
         pinned = {
             // 조건에 맞는 책이 없을 때도 조건을 바꿀 수 있게 고정 줄을 둔다
             if (state.status == FavoriteUiStatus.Results || state.status == FavoriteUiStatus.NoMatch) {
-                CountFilterRow(
+                FavoriteCountFilterView(
                     shownCount = state.books.size,
                     totalCount = state.totalCount,
                     priceRange = state.priceRange,
@@ -94,7 +94,7 @@ fun FavoriteContent(
                 },
             )
             FavoriteUiStatus.Error -> ErrorView(stringResource(BaseR.string.result_failure), onRetry)
-            FavoriteUiStatus.Results -> BookList(state, onBookClick, onFavoriteClick, headerState::expand)
+            FavoriteUiStatus.Results -> FavoriteBookListView(state, onBookClick, onFavoriteClick, headerState::expand)
         }
     }
 }
