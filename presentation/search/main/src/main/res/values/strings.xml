@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="search_title">검색</string>
+    <string name="search_placeholder">제목 또는 저자를 입력하세요</string>
+    <string name="search_idle">책 제목이나 저자를 검색해 보세요</string>
+    <string name="search_empty">\'%s\' 결과가 없어요</string>
+    <string name="search_empty_hint">다른 검색어로 찾아보세요</string>
+    <string name="search_total_count">총 %s건</string>
+    <string name="search_cache_notice">저장된 결과 · 마지막 갱신 %s</string>
+    <string name="sort_accuracy">정확도순</string>
+    <string name="sort_latest">발간일순</string>
+</resources>
