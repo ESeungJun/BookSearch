@@ -1,5 +1,6 @@
 package presentation.feature.search.main.data
 
+import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import domain.search.data.SearchSort
 import kotlinx.collections.immutable.ImmutableList
@@ -17,7 +18,8 @@ data class SearchUiState(
     val page: Int = 0, // 받은 마지막 페이지
     val loadMore: LoadMoreState = LoadMoreState.END,
     val isRefreshing: Boolean = false,
-    val notice: SearchNotice? = null, // 네트워크가 실패해 대신 보여 주는 결과일 때만
+    val notice: SearchNotice? = null, // 네트워크가 실패해 대신 보여 주는 결과일 때만,
+    @StringRes val toastRes: Int? = null, // 화면이 한 번 보인 뒤 onToastShown() 으로 지운다
 )
 
 sealed interface SearchUiStatus {

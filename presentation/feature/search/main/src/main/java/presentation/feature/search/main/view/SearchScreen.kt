@@ -16,23 +16,24 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import core.designsystem.BookSearchTheme
 import core.designsystem.component.CollapsingHeader
-import core.designsystem.component.rememberCollapsingHeaderState
 import core.designsystem.component.EmptyView
 import core.designsystem.component.ErrorView
-import presentation.base.R as BaseR
+import core.designsystem.component.rememberCollapsingHeaderState
 import domain.search.data.SearchSort
 import kotlinx.collections.immutable.persistentListOf
 import presentation.base.data.BookViewData
+import presentation.base.view.ToastEffect
 import presentation.feature.search.main.R
 import presentation.feature.search.main.data.LoadMoreState
 import presentation.feature.search.main.data.SearchNotice
-import presentation.feature.search.main.data.SearchUiStatus
 import presentation.feature.search.main.data.SearchUiState
+import presentation.feature.search.main.data.SearchUiStatus
 import presentation.feature.search.main.view.component.SearchBookListView
 import presentation.feature.search.main.view.component.SearchCountSortView
 import presentation.feature.search.main.view.component.SearchHeaderView
 import presentation.feature.search.main.view.component.SearchSkeletonView
 import presentation.feature.search.main.vm.SearchViewModel
+import presentation.base.R as BaseR
 
 @Composable
 fun SearchScreen(
@@ -40,6 +41,7 @@ fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    ToastEffect(state.toastRes, viewModel::onToastShown)
     SearchContent(
         state = state,
         onQueryChange = viewModel::onQueryChange,

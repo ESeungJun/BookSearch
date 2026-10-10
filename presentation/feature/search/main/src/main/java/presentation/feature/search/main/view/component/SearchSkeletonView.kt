@@ -19,7 +19,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import core.designsystem.BookSearchTheme
 import core.designsystem.theme.Spacing
@@ -31,7 +30,7 @@ private const val SKELETON_CARD_COUNT = 6
 private const val SKELETON_MIN_ALPHA = 0.4f
 private const val SKELETON_PULSE_MS = 800
 
-/** 첫 검색 중에 보이는 카드 골격. 카드와 같은 자리에 같은 크기로 그려 결과가 왔을 때 화면이 덜 흔들린다. */
+/** 첫 검색 중에 보이는 카드 골격. 카드와 비슷한 모양으로 그려 결과가 왔을 때 화면이 덜 흔들린다. */
 @Composable
 internal fun SearchSkeletonView() {
     val alpha by rememberInfiniteTransition(label = "skeleton").animateFloat(
@@ -58,8 +57,8 @@ internal fun SearchSkeletonView() {
 }
 
 @Composable
-private fun SkeletonLine(fraction: Float, height: Dp = SkeletonLineHeight) {
-    SkeletonBlock(Modifier.fillMaxWidth(fraction).height(height))
+private fun SkeletonLine(fraction: Float) {
+    SkeletonBlock(Modifier.fillMaxWidth(fraction).height(SkeletonLineHeight))
 }
 
 @Preview(showBackground = true)

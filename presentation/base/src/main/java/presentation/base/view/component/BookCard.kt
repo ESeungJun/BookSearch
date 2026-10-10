@@ -11,10 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -76,13 +73,7 @@ fun BookCard(
             }
             Price(book.price, book.originalPrice, Modifier.padding(top = Spacing.small))
         }
-        IconButton(onClick = onFavoriteClick) {
-            Icon(
-                imageVector = if (book.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                contentDescription = stringResource(if (book.isFavorite) R.string.favorite_remove else R.string.favorite_add),
-                tint = if (book.isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
+        FavoriteIconButton(book.isFavorite, onFavoriteClick)
     }
 }
 

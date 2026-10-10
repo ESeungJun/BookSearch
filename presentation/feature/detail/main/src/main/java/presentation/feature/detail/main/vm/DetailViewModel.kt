@@ -18,9 +18,10 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import presentation.feature.detail.main.data.DetailUiStatus
 import presentation.feature.detail.main.data.DetailUiState
+import presentation.feature.detail.main.data.DetailUiStatus
 import presentation.feature.detail.main.mapper.toDetailViewData
+import presentation.base.R as BaseR
 
 /** [bookId] 는 내비게이션 항목(DetailRouter.PageData)이 주는 값이라 생성할 때 넘겨받는다. */
 @HiltViewModel(assistedFactory = DetailViewModel.IFactory::class)
@@ -56,8 +57,11 @@ class DetailViewModel @AssistedInject constructor(
 
     fun onFavoriteClick() {
         val book = book ?: return
-        // 결과는 즐겨찾기 키 관찰로 하트에 반영된다
-        viewModelScope.launch { toggleFavoriteUseCase(book, isFavorite = _uiState.value.isFavorite) }
+        viewModelScope.launch { onToggled(toggleFavoriteUseCase(book, isFavorite = _uiState.value.isFavorite)) }
+    }
+
+    fun onToastShown() {
+        _uiState.update { it.copy(toastRes = null) }
     }
 
     private fun load() {
@@ -77,6 +81,15 @@ class DetailViewModel @AssistedInject constructor(
         book = found
         _uiState.update {
             it.copy(status = if (found == null) DetailUiStatus.NotFound else DetailUiStatus.Loaded(found.toDetailViewData()))
+        }
+    }
+
+    private fun onToggled(result: DomainResult<Unit>) {
+        when (result) {
+            // 성공은 즐겨찾기 키 관찰로 하트에 반영된다
+            is DomainResult.Success -> Unit
+            // 저장하지 못하면 하트가 그대로라 눌러도 반응이 없어 보인다. 한 번 알린다
+            is DomainResult.Fail, is DomainResult.Error -> _uiState.update { it.copy(toastRes = BaseR.string.favorite_save_failed) }
         }
     }
 
