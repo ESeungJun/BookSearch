@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="favorite_title">즐겨찾기</string>
+    <string name="favorite_placeholder">저장한 책 검색</string>
+    <string name="favorite_count">%1$s / %2$s권</string>
+    <string name="favorite_none">마음에 드는 책에 하트를 눌러 보세요</string>
+    <string name="favorite_no_match">조건에 맞는 책이 없어요</string>
+    <string name="favorite_reset_filters">조건 초기화</string>
+    <string name="sort_title_ascending">제목 오름차순</string>
+    <string name="sort_title_descending">제목 내림차순</string>
+    <string name="price_all">금액 전체</string>
+    <string name="price_under_10k">1만 원 미만</string>
+    <string name="price_10k_20k">1만~2만 원</string>
+    <string name="price_20k_30k">2만~3만 원</string>
+    <string name="price_over_30k">3만 원 이상</string>
+</resources>

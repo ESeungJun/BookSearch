@@ -1,0 +1,13 @@
+{
+  "agent": "onboarding",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          { "type": "command", "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/first-session.sh", "timeout": 10 }
+        ]
+      }
+    ]
+  }
+}

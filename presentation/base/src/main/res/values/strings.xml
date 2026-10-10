@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="book_title_none">제목 정보 없음</string>
+    <string name="book_authors_more">%1$s 외 %2$d명</string>
+    <string name="book_price">%s원</string>
+    <string name="book_price_none">가격 정보 없음</string>
+    <string name="favorite_add">즐겨찾기에 추가</string>
+    <string name="favorite_remove">즐겨찾기에서 빼기</string>
+    <string name="favorite_save_failed">즐겨찾기를 저장하지 못했어요. 다시 시도해 주세요</string>
+    <string name="result_failure">네트워크 또는 서버가 원활하지 않아요. 잠시 후 다시 시도해 주세요</string>
+</resources>
