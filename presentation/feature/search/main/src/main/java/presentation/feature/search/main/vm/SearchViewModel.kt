@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -49,14 +50,19 @@ class SearchViewModel @Inject constructor(
     // 첫 페이지·다음 페이지 요청은 한 번에 하나다. 새 요청이 이전 요청을 취소해 늦게 온 옛 응답이 새 결과를 덮지 않는다
     private var requestJob: Job? = null
 
+    // 마지막으로 첫 페이지를 요청한 검색어(빈 검색어 포함)
+    private var lastQuery = ""
+
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
     init {
-        // 입력이 멈춘 뒤에만 검색한다. 앞뒤 공백만 다른 입력은 같은 검색이다
+        // 입력이 멈춘 뒤에만 검색한다. 앞뒤 공백만 다른 입력은 같은 검색이고, 멈췄을 때 마지막으로 검색한 검색어와 같으면
+        // (예: 고쳤다가 되돌림) 다시 받지 않는다
         _uiState.map { it.query.trim() }
             .distinctUntilChanged()
             .debounce(QUERY_DEBOUNCE_MS)
+            .filter { it != lastQuery }
             .onEach { search(it) }
             .launchIn(viewModelScope)
 
@@ -90,6 +96,10 @@ class SearchViewModel @Inject constructor(
         search(_uiState.value.query.trim(), isRefresh = true)
     }
 
+    fun retry() {
+        search(_uiState.value.query.trim())
+    }
+
     fun loadMore() {
         val state = _uiState.value
         if (state.status != SearchUiStatus.Results) return
@@ -99,6 +109,72 @@ class SearchViewModel @Inject constructor(
         _uiState.update { it.copy(loadMore = LoadMoreState.LOADING) }
         requestJob = viewModelScope.launch {
             onNextPage(searchBooksUseCase(state.searchedQuery, state.sort, nextPage), nextPage)
+        }
+    }
+
+    fun onFavoriteClick(key: String) {
+        val book = loadedBooks.find { it.key == key } ?: return
+        // 결과는 즐겨찾기 키 관찰로 하트에 반영된다
+        viewModelScope.launch { toggleFavoriteUseCase(book, isFavorite = key in favoriteKeys) }
+    }
+
+    /** 새 검색·정렬 변경·새로고침·다시 시도 모두 첫 페이지부터 다시 받는다. */
+    private fun search(query: String, isRefresh: Boolean = false) {
+        requestJob?.cancel()
+        lastQuery = query
+        if (query.isEmpty()) {
+            loadedBooks = emptyList()
+            _uiState.update {
+                it.copy(status = SearchUiStatus.Idle, books = persistentListOf(), notice = null, isRefreshing = false)
+            }
+            return
+        }
+        _uiState.update {
+            if (isRefresh) it.copy(isRefreshing = true) else it.copy(status = SearchUiStatus.Loading, notice = null)
+        }
+        val sort = _uiState.value.sort
+        requestJob = viewModelScope.launch { onFirstPage(query, searchBooksUseCase(query, sort, FIRST_PAGE), isRefresh) }
+    }
+
+    private fun onFirstPage(query: String, result: DomainResult<SearchPageDTO>, isRefresh: Boolean) {
+        when (result) {
+            is DomainResult.Success -> showFirstPage(query, result.data)
+            // 새로고침 실패는 저장된 결과도 없을 때만 온다. 보던 목록을 두고 새로고침 표시만 끝낸다
+            is DomainResult.Fail, is DomainResult.Error ->
+                if (isRefresh && _uiState.value.status == SearchUiStatus.Results) {
+                    _uiState.update { it.copy(isRefreshing = false) }
+                } else {
+                    showError(query)
+                }
+        }
+    }
+
+    private fun showFirstPage(query: String, data: SearchPageDTO) {
+        loadedBooks = data.books.distinctBy { it.key }
+        _uiState.update {
+            it.copy(
+                status = if (loadedBooks.isEmpty()) SearchUiStatus.Empty else SearchUiStatus.Results,
+                searchedQuery = query,
+                books = bookViewData(),
+                totalCount = data.totalCount,
+                page = FIRST_PAGE,
+                loadMore = if (data.isEnd) LoadMoreState.END else LoadMoreState.READY,
+                isRefreshing = false,
+                notice = noticeFor(data),
+            )
+        }
+    }
+
+    private fun showError(query: String) {
+        loadedBooks = emptyList()
+        _uiState.update {
+            it.copy(
+                status = SearchUiStatus.Error,
+                searchedQuery = query,
+                books = persistentListOf(),
+                notice = null,
+                isRefreshing = false,
+            )
         }
     }
 
@@ -126,69 +202,6 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    fun retry() {
-        search(_uiState.value.query.trim())
-    }
-
-    fun onFavoriteClick(key: String) {
-        val book = loadedBooks.find { it.key == key } ?: return
-        // 결과는 즐겨찾기 키 관찰로 하트에 반영된다
-        viewModelScope.launch { toggleFavoriteUseCase(book, isFavorite = key in favoriteKeys) }
-    }
-
-    /** 새 검색·정렬 변경·새로고침·다시 시도 모두 첫 페이지부터 다시 받는다. */
-    private fun search(query: String, isRefresh: Boolean = false) {
-        requestJob?.cancel()
-        if (query.isEmpty()) {
-            loadedBooks = emptyList()
-            _uiState.update {
-                it.copy(status = SearchUiStatus.Idle, books = persistentListOf(), notice = null, isRefreshing = false)
-            }
-            return
-        }
-        _uiState.update {
-            if (isRefresh) it.copy(isRefreshing = true) else it.copy(status = SearchUiStatus.Loading, notice = null)
-        }
-        val sort = _uiState.value.sort
-        requestJob = viewModelScope.launch { onFirstPage(query, searchBooksUseCase(query, sort, FIRST_PAGE)) }
-    }
-
-    private fun onFirstPage(query: String, result: DomainResult<SearchPageDTO>) {
-        when (result) {
-            is DomainResult.Success -> showFirstPage(query, result.data)
-            is DomainResult.Fail, is DomainResult.Error -> showError(query)
-        }
-    }
-
-    private fun showError(query: String) {
-        loadedBooks = emptyList()
-        _uiState.update {
-            it.copy(
-                status = SearchUiStatus.Error,
-                searchedQuery = query,
-                books = persistentListOf(),
-                notice = null,
-                isRefreshing = false,
-            )
-        }
-    }
-
-    private fun showFirstPage(query: String, data: SearchPageDTO) {
-        loadedBooks = data.books.distinctBy { it.key }
-        _uiState.update {
-            it.copy(
-                status = if (loadedBooks.isEmpty()) SearchUiStatus.Empty else SearchUiStatus.Results,
-                searchedQuery = query,
-                books = bookViewData(),
-                totalCount = data.totalCount,
-                page = FIRST_PAGE,
-                loadMore = if (data.isEnd) LoadMoreState.END else LoadMoreState.READY,
-                isRefreshing = false,
-                notice = noticeFor(data),
-            )
-        }
-    }
-
     private fun bookViewData(): ImmutableList<BookViewData> =
         loadedBooks.map { it.toViewData(isFavorite = it.key in favoriteKeys) }.toImmutableList()
 
@@ -203,7 +216,7 @@ class SearchViewModel @Inject constructor(
     }
 
     companion object {
-        const val QUERY_DEBOUNCE_MS = 400L
+        private const val QUERY_DEBOUNCE_MS = 400L
         private const val FIRST_PAGE = 1
     }
 }
