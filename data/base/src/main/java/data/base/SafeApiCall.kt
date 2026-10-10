@@ -12,7 +12,7 @@ import retrofit2.HttpException
  * - HTTP 오류는 상태 코드만 [DomainResult.Fail] 에 담는다. 401 응답 본문에 API 키 일부가 들어 있어 예외를 넘기지 않는다.
  * - 그 밖의 실패(연결 실패·형식 오류)는 원인 예외를 [DomainResult.Error] 에 담는다.
  */
-suspend fun <T> apiCall(block: suspend () -> T): DomainResult<T> =
+suspend fun <T> safeApiCall(block: suspend () -> T): DomainResult<T> =
     try {
         DomainResult.Success(block())
     } catch (e: CancellationException) {
