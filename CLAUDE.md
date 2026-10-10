@@ -18,7 +18,7 @@
 ## 구조
 
 ```
-:app                              MainActivity · navigation/(AppNavigator — INavigator 구현, 화면 등록을 모아 NavDisplay) · 탭·2칸 Scaffold
+:app                              MainActivity · navigation/(AppNavigator — INavigator 구현, 화면 등록을 모아 NavDisplay, 600dp 이상 목록-상세 2칸·전환 애니메이션) · 탭 Scaffold
 :core:designsystem                테마·두 화면 이상이 쓰는 UI. 공통 코드는 패키지 단위 모듈(:core:<이름>)로, 쓸 것이 생길 때 만든다
 :core:navigation                  INavigator · EntryProviderInstaller — 기능과 :app 이 함께 쓰는 화면 이동 계약
 :core:network                     OkHttp·Retrofit 제공(di/), API 키 BuildConfig — 키를 아는 유일한 모듈

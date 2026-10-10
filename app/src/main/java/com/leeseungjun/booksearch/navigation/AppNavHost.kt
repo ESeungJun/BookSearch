@@ -1,5 +1,6 @@
 package com.leeseungjun.booksearch.navigation
 
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
@@ -23,6 +24,7 @@ data class TabRoute(val tab: String, val route: NavKey)
  *
  * Navigation 3 를 고른 이유: 백스택이 우리가 가진 리스트라 탭별 백스택과 2칸 배치를 직접 다루기 쉽다.
  */
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun AppNavHost(
     backStacks: Map<String, NavBackStack<NavKey>>,
@@ -54,7 +56,15 @@ fun AppNavHost(
         ),
         entryProvider = { tabRoute ->
             val entry = routeEntries(tabRoute.route)
-            NavEntry(tabRoute, contentKey = "${tabRoute.tab}/${entry.contentKey}", metadata = entry.metadata) { entry.Content() }
+            NavEntry(
+                key = tabRoute,
+                contentKey = "${tabRoute.tab}/${entry.contentKey}",
+                metadata = entry.metadata + paneMetadata(tabRoute),
+            ) { entry.Content() }
         },
+        sceneStrategies = listOf(rememberAppSceneStrategy()),
+        transitionSpec = { forwardTransition(this) },
+        popTransitionSpec = { backTransition(this) },
+        predictivePopTransitionSpec = { backTransition(this) },
     )
 }
