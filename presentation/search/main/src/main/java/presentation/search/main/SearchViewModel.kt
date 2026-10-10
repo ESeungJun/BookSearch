@@ -9,7 +9,6 @@ import domain.favorite.usecase.ObserveFavoriteKeysUseCase
 import domain.favorite.usecase.ToggleFavoriteUseCase
 import domain.search.data.SearchPageDTO
 import domain.search.data.SearchSort
-import domain.search.usecase.GetLastSearchUseCase
 import domain.search.usecase.LoadMoreBooksUseCase
 import domain.search.usecase.SearchBooksUseCase
 import java.time.Instant
@@ -43,7 +42,6 @@ class SearchViewModel @Inject constructor(
     private val searchBooksUseCase: SearchBooksUseCase,
     private val loadMoreBooksUseCase: LoadMoreBooksUseCase,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
-    private val getLastSearchUseCase: GetLastSearchUseCase,
     private val observeFavoriteKeysUseCase: ObserveFavoriteKeysUseCase,
 ) : ViewModel() {
 
@@ -74,15 +72,6 @@ class SearchViewModel @Inject constructor(
                 }
             }
             .launchIn(viewModelScope)
-
-        // 마지막 검색을 입력창에 넣으면 위의 입력 흐름이 검색한다
-        viewModelScope.launch {
-            val last = (getLastSearchUseCase() as? DomainResult.Success)?.data ?: return@launch
-            _uiState.update {
-                // 복원 전에 사용자가 이미 입력했다면 그 입력을 덮지 않는다
-                if (it.query.isNotEmpty()) it else it.copy(query = last.query, sort = last.sort, status = SearchStatus.Loading)
-            }
-        }
     }
 
     fun onQueryChange(query: String) {
@@ -130,7 +119,7 @@ class SearchViewModel @Inject constructor(
                 page = page,
                 // 새 책이 하나도 없으면 더 받아도 같은 결과라 끝으로 본다
                 loadMore = if (data.isEnd || newBooks.isEmpty()) LoadMoreState.END else LoadMoreState.READY,
-                cachedTime = data.cachedAt?.let(::formatTime) ?: it.cachedTime,
+                notice = noticeFor(data) ?: it.notice,
                 toastRes = toastFor(data) ?: it.toastRes,
             )
         }
@@ -156,12 +145,12 @@ class SearchViewModel @Inject constructor(
         if (query.isEmpty()) {
             loadedBooks = emptyList()
             _uiState.update {
-                it.copy(status = SearchStatus.Idle, books = persistentListOf(), cachedTime = null, isRefreshing = false)
+                it.copy(status = SearchStatus.Idle, books = persistentListOf(), notice = null, isRefreshing = false)
             }
             return
         }
         _uiState.update {
-            if (isRefresh) it.copy(isRefreshing = true) else it.copy(status = SearchStatus.Loading, cachedTime = null)
+            if (isRefresh) it.copy(isRefreshing = true) else it.copy(status = SearchStatus.Loading, notice = null)
         }
         val sort = _uiState.value.sort
         requestJob = viewModelScope.launch { onFirstPage(query, searchBooksUseCase(query, sort)) }
@@ -175,7 +164,7 @@ class SearchViewModel @Inject constructor(
                     status = SearchStatus.Error(result.failureMessageRes()),
                     searchedQuery = query,
                     books = persistentListOf(),
-                    cachedTime = null,
+                    notice = null,
                     isRefreshing = false,
                 )
             }
@@ -192,7 +181,7 @@ class SearchViewModel @Inject constructor(
                 page = FIRST_PAGE,
                 loadMore = if (data.isEnd) LoadMoreState.END else LoadMoreState.READY,
                 isRefreshing = false,
-                cachedTime = data.cachedAt?.let(::formatTime),
+                notice = noticeFor(data),
                 toastRes = toastFor(data) ?: it.toastRes,
             )
         }
@@ -201,9 +190,19 @@ class SearchViewModel @Inject constructor(
     private fun bookViewData(): ImmutableList<BookViewData> =
         loadedBooks.map { it.toViewData(isFavorite = it.key in favoriteKeys) }.toImmutableList()
 
+    // 네트워크가 실패해 저장된 결과·저장된 책에서 찾은 결과를 보여 줄 때 그 사실을 안내 줄로 알린다
+    private fun noticeFor(page: SearchPageDTO): SearchNotice? {
+        val cachedAt = page.cachedAt
+        return when {
+            cachedAt != null -> SearchNotice.Cached(formatTime(cachedAt))
+            page.isLocalMatch -> SearchNotice.LocalMatch
+            else -> null
+        }
+    }
+
     // 키 오류인데 저장된 결과로 덮여 원인이 안 보이는 경우만 토스트로 알린다
     private fun toastFor(page: SearchPageDTO): Int? =
-        if (page.cachedAt != null && page.failure?.isServiceConfigError() == true) {
+        if (page.failure?.isServiceConfigError() == true) {
             R.string.result_service_config
         } else {
             null

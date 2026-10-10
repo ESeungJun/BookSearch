@@ -3,7 +3,6 @@ package data.search.repo
 import data.search.source.local.ISearchLocalDataSource
 import data.search.source.remote.ISearchRemoteDataSource
 import domain.base.data.DomainResult
-import domain.search.data.SearchConditionDTO
 import domain.search.data.SearchPageDTO
 import domain.search.data.SearchSort
 import kotlinx.coroutines.delay
@@ -44,6 +43,21 @@ class SearchRepositoryImplTest {
     }
 
     @Test
+    fun `같은 검색의 저장 결과가 없으면 저장된 책에서 찾은 결과를 돌려준다`() = runTest {
+        local.savedBooks = PAGE.copy(isLocalMatch = true)
+        remote.result = DomainResult.Error(java.io.IOException())
+        val result = repository.searchBooks("kotlin", SearchSort.ACCURACY, 1) as DomainResult.Success
+        assertTrue(result.data.isLocalMatch)
+    }
+
+    @Test
+    fun `다음 페이지는 저장된 책에서 찾지 않고 실패를 그대로 돌려준다`() = runTest {
+        local.savedBooks = PAGE.copy(isLocalMatch = true)
+        remote.result = DomainResult.Fail(500)
+        assertEquals(DomainResult.Fail(500), repository.searchBooks("kotlin", SearchSort.ACCURACY, 2))
+    }
+
+    @Test
     fun `실패하고 저장해 둔 결과도 없으면 원격의 결과를 그대로 돌려준다`() = runTest {
         remote.result = DomainResult.Fail(401)
         assertEquals(DomainResult.Fail(401), repository.searchBooks("kotlin", SearchSort.ACCURACY, 1))
@@ -71,7 +85,8 @@ class SearchRepositoryImplTest {
             saved["$query|$page"] = result
         }
         override suspend fun getSearchPage(query: String, sort: SearchSort, page: Int) = saved["$query|$page"]
-        override suspend fun getLastSearch(): SearchConditionDTO? = null
+        var savedBooks: SearchPageDTO? = null
+        override suspend fun findSavedBooks(query: String, sort: SearchSort) = savedBooks
     }
 
     private companion object {

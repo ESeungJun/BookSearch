@@ -130,7 +130,7 @@ fun SearchContent(
         modifier = modifier.fillMaxSize().statusBarsPadding(),
     ) {
         CollapsingHeader(
-            collapsible = { SearchHeader(state.query, state.cachedTime, onQueryChange) },
+            collapsible = { SearchHeader(state.query, state.notice, onQueryChange) },
             pinned = {
                 if (state.status == SearchStatus.Results) CountSortRow(state.totalCount, state.sort, onSortChange)
             },
@@ -152,19 +152,19 @@ fun SearchContent(
 }
 
 @Composable
-private fun SearchHeader(query: String, cachedTime: String?, onQueryChange: (String) -> Unit) {
+private fun SearchHeader(query: String, notice: SearchNotice?, onQueryChange: (String) -> Unit) {
     Column(
         modifier = Modifier.padding(ScreenPadding),
         verticalArrangement = Arrangement.spacedBy(HeaderSpacing),
     ) {
         Text(stringResource(R.string.search_title), style = MaterialTheme.typography.headlineMedium)
         SearchField(query, onQueryChange, stringResource(R.string.search_placeholder))
-        if (cachedTime != null) CacheNotice(cachedTime)
+        if (notice != null) OfflineNotice(notice)
     }
 }
 
 @Composable
-private fun CacheNotice(cachedTime: String) {
+private fun OfflineNotice(notice: SearchNotice) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -176,7 +176,10 @@ private fun CacheNotice(cachedTime: String) {
     ) {
         Icon(Icons.Outlined.CloudOff, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
         Text(
-            stringResource(R.string.search_cache_notice, cachedTime),
+            when (notice) {
+                is SearchNotice.Cached -> stringResource(R.string.search_cache_notice, notice.savedTime)
+                SearchNotice.LocalMatch -> stringResource(R.string.search_local_notice)
+            },
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -332,7 +335,7 @@ private fun SearchContentPreview() {
                 totalCount = 1_234,
                 page = 1,
                 loadMore = LoadMoreState.READY,
-                cachedTime = "2026-10-10 09:30",
+                notice = SearchNotice.Cached("2026-10-10 09:30"),
             ),
             onQueryChange = {},
             onSortChange = {},

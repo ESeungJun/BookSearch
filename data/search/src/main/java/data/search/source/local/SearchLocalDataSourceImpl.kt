@@ -5,7 +5,7 @@ import core.database.dao.ISearchCacheDao
 import core.database.entity.SearchCacheEntity
 import data.base.toBook
 import data.base.toEntity
-import domain.search.data.SearchConditionDTO
+import data.base.toLikePattern
 import domain.search.data.SearchPageDTO
 import domain.search.data.SearchSort
 import javax.inject.Inject
@@ -37,11 +37,16 @@ class SearchLocalDataSourceImpl @Inject constructor(
         return SearchPageDTO(books, first.totalCount, first.isEnd, cachedAt = first.savedAt)
     }
 
-    override suspend fun getLastSearch(): SearchConditionDTO? =
-        searchCacheDao.getLatest()?.let { SearchConditionDTO(it.query, SearchSort.valueOf(it.sort)) }
+    override suspend fun findSavedBooks(query: String, sort: SearchSort): SearchPageDTO? {
+        val books = bookDao.search(query.toLikePattern(), latest = sort == SearchSort.LATEST, limit = MAX_LOCAL_RESULTS)
+            .map { it.toBook() }
+        if (books.isEmpty()) return null
+        return SearchPageDTO(books, totalCount = books.size, isEnd = true, isLocalMatch = true)
+    }
 
     companion object {
         private const val MAX_CACHED_PAGES = 5
         private const val MAX_COMBINATIONS = 20
+        private const val MAX_LOCAL_RESULTS = 100 // 저장된 책은 많아야 약 2,000권이고 다음 페이지가 없어 한 번에 보여 줄 만큼만
     }
 }

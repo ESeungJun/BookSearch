@@ -5,7 +5,6 @@ import core.database.dao.ISearchCacheDao
 import core.database.entity.BookEntity
 import core.database.entity.SearchCacheEntity
 import domain.base.data.BookDTO
-import domain.search.data.SearchConditionDTO
 import domain.search.data.SearchPageDTO
 import domain.search.data.SearchSort
 import kotlinx.coroutines.test.runTest
@@ -43,9 +42,16 @@ class SearchLocalDataSourceImplTest {
     }
 
     @Test
-    fun `마지막으로 저장한 검색을 돌려준다`() = runTest {
-        local.saveSearchPage("kotlin", SearchSort.LATEST, 1, page("A"))
-        assertEquals(SearchConditionDTO("kotlin", SearchSort.LATEST), local.getLastSearch())
+    fun `저장된 책에서 찾은 결과는 다음 페이지가 없고 기기에서 찾은 것으로 표시한다`() = runTest {
+        local.saveSearchPage("kotlin", SearchSort.ACCURACY, 1, page("A", "B"))
+        val found = local.findSavedBooks("A", SearchSort.ACCURACY)
+        assertEquals(listOf("A"), found?.books?.map { it.key })
+        assertTrue(found!!.isLocalMatch && found.isEnd)
+    }
+
+    @Test
+    fun `저장된 책에서도 못 찾으면 null 이다`() = runTest {
+        assertNull(local.findSavedBooks("없는책", SearchSort.ACCURACY))
     }
 
     private fun page(vararg keys: String) = SearchPageDTO(keys.map(::book), totalCount = keys.size, isEnd = true)
@@ -57,12 +63,13 @@ class SearchLocalDataSourceImplTest {
         override suspend fun upsert(books: List<BookEntity>) = books.forEach { saved[it.key] = it }
         override suspend fun get(key: String) = saved[key]
         override suspend fun deleteUnreferenced() = Unit
+        override suspend fun search(pattern: String, latest: Boolean, limit: Int) =
+            saved.values.filter { it.title.orEmpty().contains(pattern.trim('%')) }.take(limit)
     }
 
 
     private class FakeSearchCacheDao(private val books: FakeBookDao) : ISearchCacheDao {
         val rows = mutableListOf<SearchCacheEntity>()
-        override suspend fun getLatest() = rows.maxByOrNull { it.savedAt }
         override suspend fun getPage(query: String, sort: String, page: Int) =
             rows.filter { it.query == query && it.sort == sort && it.page == page }.sortedBy { it.position }
         override suspend fun getBooks(query: String, sort: String, page: Int) =
