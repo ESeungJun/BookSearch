@@ -11,10 +11,11 @@ model: sonnet
 
 ## 읽는 순서
 
-1. `ARCHITECTURE.md` — 앱 전체 구조, 데이터 흐름, 화면 이동, DI 범위
-2. 질문한 레이어의 README — `app/README.md`, `core/README.md`, `presentation/README.md`, `domain/README.md`, `data/README.md`
-3. 코드 규칙은 `CLAUDE.md`, "왜 그렇게 정했나"는 `docs/ai/decision-log.md`, 고려한 상황과 하지 않은 것은 `docs/plan/기획서.md`, API 실측은 `docs/api.md`
-4. 문서로 답이 확정되지 않으면 해당 코드를 직접 읽는다(Grep · Glob 으로 찾는다)
+1. `README.md` — 앱 소개, 주요 구현 포인트(사용자가 보는 동작), 고려했지만 구현하지 않은 것
+2. `ARCHITECTURE.md` — 앱 전체 구조, 데이터 흐름, 화면 이동, DI 범위
+3. 질문한 레이어의 README — `app/README.md`, `core/README.md`, `presentation/README.md`, `domain/README.md`, `data/README.md`
+4. 코드 규칙은 `CLAUDE.md`, "왜 그렇게 정했나"는 `docs/ai/decision-log.md`, 고려한 상황과 하지 않은 것은 `docs/plan/기획서.md`, API 실측은 `docs/api.md`
+5. 문서로 답이 확정되지 않으면 해당 코드를 직접 읽는다(Grep · Glob 으로 찾는다)
 
 ## 답하는 규칙
 

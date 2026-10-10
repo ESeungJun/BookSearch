@@ -26,12 +26,12 @@
 | `docs/guide/기능-추가.md` | 새 기능을 더하는 순서와 확인 목록 |
 | `.claude/agents/onboarding.md` · `.claude/agents/feature-dev.md` | 문답용 온보딩 에이전트, 기능 개발 에이전트 |
 
-- **구조를 바꾸면 같은 커밋에서 `ARCHITECTURE.md` 와 해당 레이어 README 를 고친다.** 온보딩 에이전트가 이 문서를 근거로 답하므로 문서가 코드와 어긋나면 안 된다.
+- **구조를 바꾸면 같은 커밋에서 `ARCHITECTURE.md` 와 해당 레이어 README 를 고친다.** 온보딩 에이전트가 이 문서를 근거로 답하므로 문서가 코드와 어긋나면 안 된다. 숫자로 적은 곳(`ARCHITECTURE.md` 의 모듈 수·테이블 수, 레이어 README 의 모듈·UseCase·테이블 표)도 함께 맞춘다.
 
 ### 구조 규칙
 
 - 의존 방향: `presentation → domain ← data`. 기능 data 모듈(`:data:api:*`·`:data:local:*`)과 `:core:network` 를 의존하는 곳은 `:app` 하나다(Hilt 가 `:app` 에서 그래프를 만든다). `:data:base` 는 data 모듈과 `:app` 이 의존한다. presentation 은 data 를 볼 수 없다.
-- presentation 패키지: `vm`(ViewModel) / `view`(Screen + Content) / `view.component`(화면을 이루는 조각, 파일 하나에 컴포넌트 하나와 그 `@Preview`) / `data`(UiState·화면용 타입) / `mapper`(DTO → ViewData 같은 변환 확장 함수 — ViewModel 안에 두지 않는다). `:presentation:base` 도 같은 구성이다: `data`(BookViewData) / `mapper`(카드 표시 값·표시 규칙·숫자 문구) / `view`(ToastEffect) / `view.component`(BookCard·FavoriteIconButton).
+- presentation 패키지: `vm`(ViewModel) / `view`(Screen + Content) / `view.component`(화면을 이루는 조각, 파일 하나에 컴포넌트 하나와 그 `@Preview`) / `data`(UiState·화면용 타입) / `mapper`(DTO → ViewData 같은 변환 확장 함수 — ViewModel 안에 두지 않는다) / `router`(이 화면의 Router 구현) / `di`(Router 바인딩·화면 등록). `:presentation:base` 도 같은 구성이다: `data`(BookViewData) / `mapper`(카드 표시 값·표시 규칙·숫자 문구) / `view`(ToastEffect) / `view.component`(BookCard·FavoriteIconButton).
 - 기능 main 모듈끼리 서로 의존하지 않는다. 다른 기능 화면으로 갈 때는 `:presentation:router` 의 `XxxRouter` 를 주입받아 `open(PageData)` 를 부른다. 구현 `XxxRouterImpl` 은 그 화면의 main 모듈이 `INavigator` 로 만들고 Hilt 로 바인딩한다. PageData → 화면 연결도 각 main 모듈이 Hilt(`@IntoSet EntryProviderInstaller`)로 내놓고 `:app` 이 모아 그린다.
 - 모듈 공통 빌드 설정은 `build-logic`(포함 빌드)의 컨벤션 플러그인에 둔다. 패키지: `convention.config`(SDK·카탈로그 접근·Android 공통 설정) / `convention.base`(application·library·kotlin.jvm·compose·hilt) / `convention.layer`(presentation·domain·data).
 - 의존은 모두 `implementation` 으로 쓴다. `api` 로 다른 모듈을 내보내지 않는다. 레이어 공통 의존(코루틴·`javax.inject`·레이어 base 모듈)은 레이어 컨벤션 플러그인(`convention.domain`·`convention.data`·`convention.presentation`)이 붙이고, 모듈의 build.gradle.kts 에는 그 모듈만 쓰는 의존만 적는다.
@@ -51,7 +51,7 @@
   - 데이터 소스는 자기 원본 타입(`~Api`·`~Entity`)만 주고받고, DTO 로 바꾸는 것은 `repo` 다. DTO 는 `repo` 부터 나타나고, `~Api`·`~Entity` 는 그 data 모듈 밖으로 나가지 않는다.
   - `~Api` 필드는 모두 nullable 이고 기본값을 두지 않는다. 서버가 안 보낸 값은 null 그대로 DTO 까지 가고, 어떻게 보일지는 화면이 정한다.
 - Hilt 모듈은 바인딩을 구현한 모듈의 `di/` 패키지에 둔다. 별도 di 모듈은 두지 않는다.
-- Hilt 범위: 저장소와 데이터 소스는 `ViewModelComponent` + `@ViewModelScoped`. `SingletonComponent` 는 앱에 하나여야만 동작하는 것(Room DB, OkHttp·Retrofit)에만 쓰고 이유를 주석으로 남긴다.
+- Hilt 범위: 저장소와 데이터 소스는 `ViewModelComponent` + `@ViewModelScoped`. 화면 이동(`AppNavigator`·Router 구현·화면 등록)은 `ActivityRetainedComponent`. `SingletonComponent` 는 앱에 하나여야만 동작하는 것(Room DB, OkHttp·Retrofit)에만 쓰고 이유를 주석으로 남긴다.
 
 ## 이름
 
