@@ -16,8 +16,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.rememberNavBackStack
 import com.leeseungjun.booksearch.navigation.AppNavHost
-import com.leeseungjun.booksearch.navigation.FavoriteRoute
-import com.leeseungjun.booksearch.navigation.SearchRoute
+import core.navigation.EntryProviderInstaller
+import presentation.favorite.route.FavoriteRoute
+import presentation.search.route.SearchRoute
 
 private enum class Tab(@StringRes val label: Int, val icon: ImageVector) {
     SEARCH(R.string.tab_search, Icons.Filled.Search),
@@ -29,7 +30,7 @@ private enum class Tab(@StringRes val label: Int, val icon: ImageVector) {
  * NavigationSuiteScaffold 는 창 너비에 따라 하단 탭바와 측면 레일을 알아서 바꾼다.
  */
 @Composable
-fun MainScaffold() {
+fun MainScaffold(entryInstallers: Set<EntryProviderInstaller>) {
     var currentTab by rememberSaveable { mutableStateOf(Tab.SEARCH) }
     val backStacks = mapOf(
         Tab.SEARCH to rememberNavBackStack(SearchRoute),
@@ -48,6 +49,6 @@ fun MainScaffold() {
             }
         },
     ) {
-        AppNavHost(backStack = backStacks.getValue(currentTab))
+        AppNavHost(backStack = backStacks.getValue(currentTab), entryInstallers = entryInstallers)
     }
 }
