@@ -16,7 +16,8 @@ fun BookDTO.toViewData(isFavorite: Boolean): BookViewData {
         otherAuthorCount = (names.size - SHOWN_AUTHOR_COUNT).coerceAtLeast(0),
         publisher = publisher.blankToNull(),
         price = discounted ?: listPrice,
-        originalPrice = listPrice?.takeIf { discounted != null && it != discounted },
+        // 정가가 할인가보다 클 때만 취소선으로 함께 보인다(정가 0·할인가와 같거나 작은 값은 할인으로 보이지 않는다)
+        originalPrice = listPrice?.takeIf { discounted != null && it > discounted },
         thumbnailUrl = thumbnailUrl.blankToNull(),
         isFavorite = isFavorite,
     )
