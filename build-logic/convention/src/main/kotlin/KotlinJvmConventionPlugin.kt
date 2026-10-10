@@ -6,7 +6,7 @@ import org.gradle.kotlin.dsl.configure
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 
-/** :domain 용. Android 의존 없이 순수 Kotlin 으로 두어 도메인이 플랫폼을 모르게 한다. */
+/** Android 가 필요 없는 모듈(:domain:*, :data:base)용. 순수 Kotlin 으로 두어 플랫폼을 모르게 한다. */
 class KotlinJvmConventionPlugin : Plugin<Project> {
     override fun apply(target: Project): Unit = with(target) {
         pluginManager.apply("org.jetbrains.kotlin.jvm")

@@ -27,4 +27,4 @@ include(":di:network", ":di:database", ":di:search", ":di:favorite", ":di:detail
 include(":core:designsystem")
 include(":presentation:search", ":presentation:favorite", ":presentation:detail")
 include(":domain:base", ":domain:search", ":domain:favorite", ":domain:detail")
-include(":data:database", ":data:search", ":data:favorite", ":data:detail")
+include(":data:base", ":data:database", ":data:search", ":data:favorite", ":data:detail")
