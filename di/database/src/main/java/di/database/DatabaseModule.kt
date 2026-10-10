@@ -2,10 +2,10 @@ package di.database
 
 import android.content.Context
 import androidx.room.Room
-import data.database.AbsBookDatabase
-import data.database.dao.IBookDao
-import data.database.dao.IFavoriteDao
-import data.database.dao.ISearchCacheDao
+import core.database.AbsBookDatabase
+import core.database.dao.IBookDao
+import core.database.dao.IFavoriteDao
+import core.database.dao.ISearchCacheDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

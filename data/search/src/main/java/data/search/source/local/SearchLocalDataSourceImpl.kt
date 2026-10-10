@@ -1,10 +1,10 @@
 package data.search.source.local
 
-import data.database.dao.IBookDao
-import data.database.dao.ISearchCacheDao
-import data.database.entity.SearchCacheEntity
-import data.database.entity.toBook
-import data.database.entity.toEntity
+import core.database.dao.IBookDao
+import core.database.dao.ISearchCacheDao
+import core.database.entity.SearchCacheEntity
+import data.base.toBook
+import data.base.toEntity
 import domain.search.data.SearchConditionDTO
 import domain.search.data.SearchPageDTO
 import domain.search.data.SearchSort

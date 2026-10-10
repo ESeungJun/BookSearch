@@ -1,8 +1,10 @@
 package domain.favorite.usecase
 
+import domain.base.data.DomainResult
+import domain.base.usecase.asUseCaseResult
 import domain.favorite.repo.IFavoriteRepository
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
 
 /**
  * 어떤 책이 즐겨찾기인지 본다. 다른 화면에서 하트를 바꿔도 바로 반영되도록 계속 관찰한다.
@@ -11,5 +13,5 @@ import javax.inject.Inject
 class ObserveFavoriteKeysUseCase @Inject constructor(
     private val repository: IFavoriteRepository,
 ) {
-    operator fun invoke(): Flow<Set<String>> = repository.observeFavoriteKeys()
+    operator fun invoke(): Flow<DomainResult<Set<String>>> = repository.observeFavoriteKeys().asUseCaseResult()
 }
