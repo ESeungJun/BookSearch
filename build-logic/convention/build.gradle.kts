@@ -31,6 +31,5 @@ gradlePlugin {
         register("presentation") { id = "convention.presentation"; implementationClass = "convention.layer.PresentationConventionPlugin" }
         register("domain") { id = "convention.domain"; implementationClass = "convention.layer.DomainConventionPlugin" }
         register("data") { id = "convention.data"; implementationClass = "convention.layer.DataConventionPlugin" }
-        register("route") { id = "convention.route"; implementationClass = "convention.layer.RouteConventionPlugin" }
     }
 }

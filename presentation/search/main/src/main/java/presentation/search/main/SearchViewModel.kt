@@ -43,8 +43,8 @@ class SearchViewModel @Inject constructor(
     private val searchBooksUseCase: SearchBooksUseCase,
     private val loadMoreBooksUseCase: LoadMoreBooksUseCase,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
-    getLastSearchUseCase: GetLastSearchUseCase,
-    observeFavoriteKeysUseCase: ObserveFavoriteKeysUseCase,
+    private val getLastSearchUseCase: GetLastSearchUseCase,
+    private val observeFavoriteKeysUseCase: ObserveFavoriteKeysUseCase,
 ) : ViewModel() {
 
     // 카드(BookViewData)는 받은 책과 즐겨찾기 키를 합쳐 만든다. 검색 결과에 즐겨찾기 여부를 저장하지 않으려고 둘을 따로 둔다

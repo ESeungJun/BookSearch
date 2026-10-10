@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import core.designsystem.BookSearchTheme
+import com.leeseungjun.booksearch.navigation.AppNavigator
 import core.navigation.EntryProviderInstaller
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -16,7 +17,10 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    // 각 기능 main 모듈이 Hilt 로 내놓은 경로 → 화면 연결
+    @Inject
+    lateinit var navigator: AppNavigator
+
+    // 각 기능 main 모듈이 Hilt 로 내놓은 PageData → 화면 연결
     @Inject
     lateinit var entryInstallers: Set<@JvmSuppressWildcards EntryProviderInstaller>
 
@@ -25,7 +29,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             BookSearchTheme {
-                MainScaffold(entryInstallers)
+                MainScaffold(navigator, entryInstallers)
             }
         }
     }
