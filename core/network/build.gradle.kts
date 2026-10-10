@@ -20,9 +20,5 @@ android {
 
 // OkHttp·Retrofit 제공(앱에 하나). API 서비스는 그것을 쓰는 data 모듈이 이 Retrofit 으로 만든다.
 dependencies {
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.kotlinx.serialization)
-    implementation(libs.okhttp)
-    implementation(libs.okhttp.logging)
+    implementation(libs.bundles.network)
 }
