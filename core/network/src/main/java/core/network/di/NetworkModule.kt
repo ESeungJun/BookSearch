@@ -1,11 +1,13 @@
 package core.network.di
 
+import android.util.Log
 import core.network.BuildConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -22,6 +24,10 @@ import javax.inject.Singleton
 object NetworkModule {
     private const val BASE_URL = "https://dapi.kakao.com/"
     private const val AUTHORIZATION = "Authorization"
+    private const val LOG_TAG = "OkHttp"
+
+    // 로그에만 쓰는 JSON 들여쓰기 출력기
+    private val prettyPrinter = Json { prettyPrint = true }
 
     @Provides
     @Singleton
@@ -35,7 +41,7 @@ object NetworkModule {
         .addInterceptor(
             // debug 빌드만 요청·응답 본문까지 남기고 release 는 남기지 않는다. 인증 헤더(API 키)는 가린다.
             // 401 응답 본문에는 키 일부가 들어 있어 debug 로그캣에는 남는다(화면에는 보이지 않는다)
-            HttpLoggingInterceptor().apply {
+            HttpLoggingInterceptor(::logHttp).apply {
                 level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
                 redactHeader(AUTHORIZATION)
             },
@@ -57,4 +63,18 @@ object NetworkModule {
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
     }
+
+    /**
+     * OkHttp 로그 한 덩어리를 로그캣에 남긴다. 응답 JSON 은 한 줄로 와서 로그캣 한 줄 길이(약 4,000자)에서 잘리므로
+     * 들여쓰기한 여러 줄로 펴서 줄마다 남긴다. JSON 이 아니면 그대로 남긴다.
+     */
+    private fun logHttp(message: String) {
+        val text = if (message.startsWith("{") || message.startsWith("[")) prettyJson(message) else message
+        text.lineSequence().forEach { Log.d(LOG_TAG, it) }
+    }
+
+    private fun prettyJson(raw: String): String =
+        runCatching { prettyPrinter.encodeToString(JsonElement.serializer(), prettyPrinter.parseToJsonElement(raw)) }
+            .getOrDefault(raw)
+
 }
