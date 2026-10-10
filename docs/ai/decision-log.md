@@ -35,6 +35,7 @@ README 의 「AI 활용」 절(어떤 작업에 썼는지 / 어떻게 검증했�
 | D-56 | 2026-10-10 | 3단계 전 | data 계층에 데이터 소스 두기 | 저장소가 API·DAO 를 직접 부른다(데이터 소스 계층 없음, v1 지적 9 대응). 작성자 요청 후 AI 가 repo / source(remote·local) 설계안을 올림 | 작성자 지시: **클린 아키텍처 기반으로 `repo` 와 `source/remote`(API 호출)·`source/local`(DB·캐시)로 나눈다**. 로컬 데이터 소스는 하나(R-12) | AI 제안과 다름 | `:data/repo`, `:data/source` |
 | D-57 | 2026-10-10 | 3단계 전 | 저장소 Hilt 범위 | `SingletonComponent` + `@Singleton` | 작성자 지시: **저장소는 ViewModel 범위로 한정하고, 싱글톤은 정말 필요할 때만 쓴다.** AI 가 Room DB·OkHttp·Retrofit 은 앱에 하나여야 동작한다(Room 변경 감지는 인스턴스 단위, OkHttp 연결 풀)는 이유로 싱글톤 유지를 제안했고 작성자가 그대로 진행 | AI 제안과 다름 | `IRepositoryModule`, `IDataSourceModule`, `DatabaseModule`·`NetworkModule` 주석 |
 | D-58 | 2026-10-10 | 3단계 전 | data 패키지 구성 | `api/<경로>/`(Service·Api·Mapper) · `db/<테이블>/`(Dao·Entity) · `repository/`. Room 은 `source/local/db` 아래(AI 권장) | 작성자 지시: **`repo` · `source/remote|local` · `service`(I~Service) · `data`(~Api) · `db/dao` · `db/entity`**. Room 은 AI 가 올린 세 위치 중 별도 루트 `db` 를 택함 | AI 제안과 다름 | `:data` |
+| D-59 | 2026-10-10 | 3단계 전 | domain 기능별 모듈 분리 | 레이어당 모듈 하나(D-40) | 작성자 지시: **domain 을 search·favorite 모듈로 나눈다.** 함께 쓰는 책 DTO·예외·상세 조회는 AI 권장대로 `:domain:book` 에 두고, 저장소도 셋으로 나눔. 데이터 소스도 `@ViewModelScoped` 로 묶자는 작성자 제안 반영(저장소 셋이 같은 인스턴스를 씀) | AI 제안과 다름 | `:domain:*`, `:data/repo`, `:di` |
 ## 2. 논의 중 (미결)
 
 | ID | 일시 | 주제 | 쟁점 | 현재 상태 |
@@ -59,6 +60,7 @@ README 의 「AI 활용」 절(어떤 작업에 썼는지 / 어떻게 검증했�
 | 2026-10-10 | 저장소 싱글톤 | AI | 작성자가 ViewModel 범위로 한정함 | D-57 |
 | 2026-10-10 | Room 을 `source/local/db` 아래에 두기 | AI(권장 선택지) | 작성자가 별도 루트 `db/dao`·`db/entity` 를 택함 | D-58 |
 | 2026-10-10 | `api/<API 경로>/` 아래 Service·Api·Mapper 묶음 | AI | 작성자가 종류별 패키지(`service`·`data`)를 택함 | D-58 |
+| 2026-10-10 | domain 모듈 둘만 두고 favorite 이 search 를 의존 | AI(선택지) | 즐겨찾기가 검색에 묶임. 공통 `:domain:book` 을 택함 | D-59 |
 
 ## 4. AI 활용 기록 (v2)
 
@@ -73,6 +75,7 @@ README 의 「AI 활용」 절(어떤 작업에 썼는지 / 어떻게 검증했�
 | 2026-10-10 | 이름 규칙 적용 | Claude Code(메인 세션) | 파일 11개 이름 변경, 식별자 일괄 치환(25개 파일), 커밋 머리말 재작성 스크립트 | `assembleDebug` 성공, 단위 테스트 14건 통과. 문서의 옛 이름 검색. 애매한 세 곳은 작성자에게 물어 정함(D-53). 작성자가 diff 확인 |
 | 2026-10-10 | 패키지 재배치 | Claude Code(메인 세션) | 소스 폴더를 모듈 경로 패키지로 이동, package·import 치환, namespace 규칙 변경, domain `data`/`repo`/`usecase` 분리 | `assembleDebug` 성공, 단위 테스트 14건 통과, Room·BuildConfig 생성 코드가 `data`·`di` 패키지에 생김. 작성자 diff 검토 대기 |
 | 2026-10-10 | data 데이터 소스 분리 | Claude Code(메인 세션) | 데이터 소스 인터페이스·구현 4개, 저장소를 정책만 남게 축소(약 110줄 → 55줄), DI 범위 변경(`IDataSourceModule` 추가), 패키지 이동, 테스트 재구성(저장소 4·로컬 4·원격 3건) | `assembleDebug` 성공, 단위 테스트 20건 통과(data 17, domain 3). Room·싱글톤 위치는 작성자에게 물어 정함. 작성자 diff 검토 대기 |
+| 2026-10-10 | domain 모듈 분리 | Claude Code(메인 세션) | 모듈 3개로 이동, 저장소 인터페이스·구현 셋으로 분리, 빌드 설정·DI 수정 | `assembleDebug` 성공, 단위 테스트 20건 통과. 작성자 diff 검토 대기 |
 ---
 
 ## 부록 A. v1 결정 기록 (D-01~D-38, 원문 그대로)
