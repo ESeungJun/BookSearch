@@ -1,6 +1,5 @@
 package data.favorite.source.local
 
-import core.database.dao.IBookDao
 import core.database.dao.IFavoriteDao
 import core.database.entity.FavoriteEntity
 import data.base.toBook
@@ -11,7 +10,6 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class FavoriteLocalDataSourceImpl @Inject constructor(
-    private val bookDao: IBookDao,
     private val favoriteDao: IFavoriteDao,
 ) : IFavoriteLocalDataSource {
 
@@ -25,8 +23,7 @@ class FavoriteLocalDataSourceImpl @Inject constructor(
     override fun observeFavoriteKeys(): Flow<Set<String>> = favoriteDao.observeKeys().map { it.toSet() }
 
     override suspend fun addFavorite(book: BookDTO) {
-        bookDao.upsert(listOf(book.toEntity()))
-        favoriteDao.upsert(FavoriteEntity(book.key, System.currentTimeMillis()))
+        favoriteDao.add(book.toEntity(), FavoriteEntity(book.key, System.currentTimeMillis()))
     }
 
     override suspend fun removeFavorite(key: String) {

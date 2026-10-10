@@ -27,14 +27,19 @@ class SearchRepositoryImpl @Inject constructor(
         // 시간 초과는 연결 문제와 같게 보이도록 IOException 의 한 종류로 넘긴다
         val result = withTimeoutOrNull(TIMEOUT_MS) { remote.searchBooks(query, sort, page) }
             ?: DomainResult.Error(SocketTimeoutException("${TIMEOUT_MS}ms 초과"))
-        if (result is DomainResult.Success) {
-            // 저장에 실패해도 받은 결과는 그대로 보여 준다(다음에 캐시로 볼 수 없을 뿐이다)
-            safeDbCall { local.saveSearchPage(query, sort, page, result.data) }
-            return result
+        val failure: DomainResult<Nothing> = when (result) {
+            is DomainResult.Success -> {
+                // 저장에 실패해도 받은 결과는 그대로 보여 준다(다음에 캐시로 볼 수 없을 뿐이다)
+                safeDbCall { local.saveSearchPage(query, sort, page, result.data) }
+                return result
+            }
+            is DomainResult.Fail -> result
+            is DomainResult.Error -> result
         }
-        // 실패·에러면 저장해 둔 결과로 대신한다. 저장해 둔 것이 없거나 읽지 못하면 원래 결과를 그대로 돌려준다
+        // 저장해 둔 결과로 대신하고 원래 실패를 함께 넘긴다. 저장해 둔 것이 없거나 읽지 못하면 실패를 그대로 돌려준다
         val cached = (safeDbCall { local.getSearchPage(query, sort, page) } as? DomainResult.Success)?.data
-        return cached?.let { DomainResult.Success(it) } ?: result
+            ?: return failure
+        return DomainResult.Success(cached.copy(failure = failure))
     }
 
     override suspend fun getLastSearch(): DomainResult<SearchConditionDTO?> = safeDbCall { local.getLastSearch() }
