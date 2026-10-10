@@ -17,7 +17,4 @@ data class BookDTO(
     val isbn: String?, // ISBN13, 없으면 ISBN10
     val description: String?,
     val url: String?,
-) {
-    /** 실제로 내는 가격. 즐겨찾기 금액 필터의 기준이다. */
-    val displayPrice: Int? get() = salePrice ?: price
-}
+)
