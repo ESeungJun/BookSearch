@@ -1,4 +1,7 @@
+package convention.base
+
 import com.android.build.api.dsl.LibraryExtension
+import convention.config.configureAndroid
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
