@@ -42,7 +42,7 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(client: OkHttpClient): Retrofit {
         // 응답에 이 앱이 쓰지 않는 필드(translators·status 등)가 있어 모르는 키는 무시한다.
-        // explicitNulls = false: 응답에 필드가 아예 없으면 기본값 대신 null 로 받는다(D-60)
+        // explicitNulls = false: 응답에 필드가 아예 없으면 기본값 대신 null 로 받는다
         val json = Json {
             ignoreUnknownKeys = true
             explicitNulls = false
