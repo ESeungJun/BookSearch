@@ -31,9 +31,8 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import core.designsystem.BookSearchTheme
 import core.designsystem.theme.Spacing
-import java.text.NumberFormat
-import java.util.Locale
 import presentation.base.R
+import presentation.base.mapper.toNumberText
 import presentation.base.data.BookViewData
 
 private val ThumbnailWidth = 64.dp
@@ -138,13 +137,13 @@ private fun Price(price: Int?, originalPrice: Int?, modifier: Modifier = Modifie
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            stringResource(R.string.book_price, formatNumber(price)),
+            stringResource(R.string.book_price, price.toNumberText()),
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Bold,
         )
         if (originalPrice != null) {
             Text(
-                stringResource(R.string.book_price, formatNumber(originalPrice)),
+                stringResource(R.string.book_price, originalPrice.toNumberText()),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textDecoration = TextDecoration.LineThrough,
@@ -152,8 +151,6 @@ private fun Price(price: Int?, originalPrice: Int?, modifier: Modifier = Modifie
         }
     }
 }
-
-private fun formatNumber(value: Int): String = NumberFormat.getNumberInstance(Locale.KOREA).format(value)
 
 @Preview(showBackground = true)
 @Composable
