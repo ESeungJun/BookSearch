@@ -1,7 +1,8 @@
 package presentation.base.view.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,18 +39,23 @@ private const val TITLE_MAX_LINES = 2
 private const val SUBTITLE_MAX_LINES = 1
 private const val SUBTITLE_SEPARATOR = " - "
 
-/** 검색·즐겨찾기 목록이 함께 쓰는 책 카드. 위계는 제목 > 가격 > 보조 줄(날짜 - 저자 - 출판사)이다. */
+/**
+ * 검색·즐겨찾기 목록이 함께 쓰는 책 카드. 위계는 제목 > 가격 > 보조 줄(날짜 - 저자 - 출판사)이다.
+ * [isSelected] 는 넓은 창에서 오른쪽 상세에 열린 책이다. 배경으로 표시한다.
+ */
 @Composable
 fun BookCard(
     book: BookViewData,
     onClick: () -> Unit,
     onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isSelected: Boolean = false,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .background(if (isSelected) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent)
+            .selectable(selected = isSelected, onClick = onClick)
             .padding(horizontal = Spacing.large, vertical = Spacing.medium),
         horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
     ) {

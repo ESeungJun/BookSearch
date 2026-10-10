@@ -12,7 +12,6 @@ import java.net.SocketTimeoutException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -30,11 +29,32 @@ class SearchRepositoryImplTest {
     }
 
     @Test
-    fun `실패해도 저장해 둔 결과가 있으면 그것을 성공으로 돌려준다`() = runTest {
-        local.cachedRows = listOf(SearchCacheEntity("kotlin", "ACCURACY", 1, 0, "A", 1, true, savedAt = 1L))
+    fun `실패해도 저장해 둔 결과가 있으면 그 책·총 개수·끝 여부·저장 시각을 성공으로 돌려준다`() = runTest {
+        local.cacheOf(BOOK, totalCount = 30, isEnd = false, savedAt = 7L)
         remote.result = DomainResult.Fail(500)
-        val result = repository.searchBooks("kotlin", SearchSort.ACCURACY, 1) as DomainResult.Success
-        assertNotNull(result.data.cachedAt)
+        val page = (repository.searchBooks("kotlin", SearchSort.ACCURACY, 1) as DomainResult.Success).data
+        assertEquals(listOf("A"), page.books.map { it.key })
+        assertEquals(30, page.totalCount)
+        assertEquals(false, page.isEnd)
+        assertEquals(7L, page.cachedAt)
+    }
+
+    @Test
+    fun `같은 검색의 저장 결과가 저장된 책 검색보다 먼저다`() = runTest {
+        local.cacheOf(BOOK, totalCount = 1, isEnd = true, savedAt = 7L)
+        local.savedBooks = listOf(BOOK.copy(key = "B"))
+        remote.result = DomainResult.Error(java.io.IOException())
+        val page = (repository.searchBooks("kotlin", SearchSort.ACCURACY, 1) as DomainResult.Success).data
+        assertEquals(listOf("A"), page.books.map { it.key })
+        assertEquals(false, page.isLocalMatch)
+    }
+
+    @Test
+    fun `3초를 넘겨도 저장해 둔 결과가 있으면 그것을 돌려준다`() = runTest {
+        local.cacheOf(BOOK, totalCount = 1, isEnd = true, savedAt = 7L)
+        remote.delayMs = 5_000
+        val page = (repository.searchBooks("kotlin", SearchSort.ACCURACY, 1) as DomainResult.Success).data
+        assertEquals(7L, page.cachedAt)
     }
 
     @Test
@@ -83,6 +103,7 @@ class SearchRepositoryImplTest {
     private class FakeLocal : ISearchLocalDataSource {
         val savedPages = mutableSetOf<String>()
         var cachedRows = emptyList<SearchCacheEntity>()
+        var cachedBooks = emptyList<BookEntity>()
         var savedBooks = emptyList<BookEntity>()
         override suspend fun saveSearchPage(
             query: String,
@@ -95,7 +116,12 @@ class SearchRepositoryImplTest {
             savedPages += "$query|$page"
         }
         override suspend fun getCachedRows(query: String, sort: SearchSort, page: Int) = cachedRows
-        override suspend fun getCachedBooks(query: String, sort: SearchSort, page: Int) = emptyList<BookEntity>()
+        override suspend fun getCachedBooks(query: String, sort: SearchSort, page: Int) = cachedBooks
+
+        fun cacheOf(book: BookEntity, totalCount: Int, isEnd: Boolean, savedAt: Long) {
+            cachedRows = listOf(SearchCacheEntity("kotlin", "ACCURACY", 1, 0, book.key, totalCount, isEnd, savedAt))
+            cachedBooks = listOf(book)
+        }
         override suspend fun findSavedBooks(query: String, sort: SearchSort) = savedBooks
     }
 
