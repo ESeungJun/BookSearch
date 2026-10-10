@@ -1,4 +1,4 @@
-package presentation.search.main
+package presentation.search.main.vm
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,9 +11,6 @@ import domain.search.data.SearchPageDTO
 import domain.search.data.SearchSort
 import domain.search.usecase.LoadMoreBooksUseCase
 import domain.search.usecase.SearchBooksUseCase
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -30,11 +27,16 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import presentation.base.BookViewData
 import presentation.base.R
-import presentation.base.failureMessageRes
-import presentation.base.isServiceConfigError
-import presentation.base.toViewData
+import presentation.base.data.BookViewData
+import presentation.base.data.failureMessageRes
+import presentation.base.data.isServiceConfigError
+import presentation.base.mapper.toViewData
+import presentation.search.main.data.LoadMoreState
+import presentation.search.main.data.SearchNotice
+import presentation.search.main.data.SearchUiStatus
+import presentation.search.main.data.SearchUiState
+import presentation.search.main.mapper.toCacheTimeText
 
 @OptIn(FlowPreview::class)
 @HiltViewModel
@@ -42,7 +44,7 @@ class SearchViewModel @Inject constructor(
     private val searchBooksUseCase: SearchBooksUseCase,
     private val loadMoreBooksUseCase: LoadMoreBooksUseCase,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
-    private val observeFavoriteKeysUseCase: ObserveFavoriteKeysUseCase,
+    observeFavoriteKeysUseCase: ObserveFavoriteKeysUseCase,
 ) : ViewModel() {
 
     // 카드(BookViewData)는 받은 책과 즐겨찾기 키를 합쳐 만든다. 검색 결과에 즐겨찾기 여부를 저장하지 않으려고 둘을 따로 둔다
@@ -92,7 +94,7 @@ class SearchViewModel @Inject constructor(
 
     fun loadMore() {
         val state = _uiState.value
-        if (state.status != SearchStatus.Results) return
+        if (state.status != SearchUiStatus.Results) return
         if (state.loadMore != LoadMoreState.READY && state.loadMore != LoadMoreState.FAILED) return
         if (requestJob?.isActive == true) return // 새로고침 중
         val nextPage = state.page + 1
@@ -145,12 +147,12 @@ class SearchViewModel @Inject constructor(
         if (query.isEmpty()) {
             loadedBooks = emptyList()
             _uiState.update {
-                it.copy(status = SearchStatus.Idle, books = persistentListOf(), notice = null, isRefreshing = false)
+                it.copy(status = SearchUiStatus.Idle, books = persistentListOf(), notice = null, isRefreshing = false)
             }
             return
         }
         _uiState.update {
-            if (isRefresh) it.copy(isRefreshing = true) else it.copy(status = SearchStatus.Loading, notice = null)
+            if (isRefresh) it.copy(isRefreshing = true) else it.copy(status = SearchUiStatus.Loading, notice = null)
         }
         val sort = _uiState.value.sort
         requestJob = viewModelScope.launch { onFirstPage(query, searchBooksUseCase(query, sort)) }
@@ -161,7 +163,7 @@ class SearchViewModel @Inject constructor(
             loadedBooks = emptyList()
             _uiState.update {
                 it.copy(
-                    status = SearchStatus.Error(result.failureMessageRes()),
+                    status = SearchUiStatus.Error(result.failureMessageRes()),
                     searchedQuery = query,
                     books = persistentListOf(),
                     notice = null,
@@ -174,7 +176,7 @@ class SearchViewModel @Inject constructor(
         loadedBooks = data.books.distinctBy { it.key }
         _uiState.update {
             it.copy(
-                status = if (loadedBooks.isEmpty()) SearchStatus.Empty else SearchStatus.Results,
+                status = if (loadedBooks.isEmpty()) SearchUiStatus.Empty else SearchUiStatus.Results,
                 searchedQuery = query,
                 books = bookViewData(),
                 totalCount = data.totalCount,
@@ -194,7 +196,7 @@ class SearchViewModel @Inject constructor(
     private fun noticeFor(page: SearchPageDTO): SearchNotice? {
         val cachedAt = page.cachedAt
         return when {
-            cachedAt != null -> SearchNotice.Cached(formatTime(cachedAt))
+            cachedAt != null -> SearchNotice.Cached(cachedAt.toCacheTimeText())
             page.isLocalMatch -> SearchNotice.LocalMatch
             else -> null
         }
@@ -208,14 +210,8 @@ class SearchViewModel @Inject constructor(
             null
         }
 
-    private fun formatTime(epochMillis: Long): String =
-        DateTimeFormatter.ofPattern(CACHE_TIME_PATTERN)
-            .withZone(ZoneId.systemDefault())
-            .format(Instant.ofEpochMilli(epochMillis))
-
     companion object {
         const val QUERY_DEBOUNCE_MS = 400L
         private const val FIRST_PAGE = 1
-        private const val CACHE_TIME_PATTERN = "yyyy-MM-dd HH:mm"
     }
 }

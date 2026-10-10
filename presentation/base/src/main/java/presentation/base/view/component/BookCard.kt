@@ -1,4 +1,4 @@
-package presentation.base
+package presentation.base.view.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,14 +26,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import core.designsystem.BookSearchTheme
+import core.designsystem.theme.Spacing
 import java.text.NumberFormat
 import java.util.Locale
+import presentation.base.R
+import presentation.base.data.BookViewData
 
-private val CardPadding = 16.dp
-private val CardSpacing = 12.dp
-private val PriceSpacing = 6.dp
 private val ThumbnailWidth = 64.dp
 private val ThumbnailHeight = 92.dp
 private const val TITLE_MAX_LINES = 2
@@ -52,8 +54,8 @@ fun BookCard(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = CardPadding, vertical = CardSpacing),
-        horizontalArrangement = Arrangement.spacedBy(CardSpacing),
+            .padding(horizontal = Spacing.large, vertical = Spacing.medium),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
     ) {
         Thumbnail(book.thumbnailUrl)
         Column(Modifier.weight(1f)) {
@@ -73,7 +75,7 @@ fun BookCard(
                     overflow = TextOverflow.Ellipsis,
                 )
             }
-            Price(book.price, book.originalPrice, Modifier.padding(top = PriceSpacing))
+            Price(book.price, book.originalPrice, Modifier.padding(top = Spacing.small))
         }
         IconButton(onClick = onFavoriteClick) {
             Icon(
@@ -132,7 +134,7 @@ private fun Price(price: Int?, originalPrice: Int?, modifier: Modifier = Modifie
     }
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(PriceSpacing),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.small),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -152,3 +154,26 @@ private fun Price(price: Int?, originalPrice: Int?, modifier: Modifier = Modifie
 }
 
 private fun formatNumber(value: Int): String = NumberFormat.getNumberInstance(Locale.KOREA).format(value)
+
+@Preview(showBackground = true)
+@Composable
+private fun BookCardPreview() {
+    BookSearchTheme {
+        BookCard(
+            book = BookViewData(
+                key = "1",
+                title = "코틀린 인 액션",
+                publishedDate = "2017-10-01",
+                authors = "드미트리 제메로프, 스베트라나 이사코바",
+                otherAuthorCount = 1,
+                publisher = "에이콘출판",
+                price = 32_400,
+                originalPrice = 36_000,
+                thumbnailUrl = null,
+                isFavorite = true,
+            ),
+            onClick = {},
+            onFavoriteClick = {},
+        )
+    }
+}

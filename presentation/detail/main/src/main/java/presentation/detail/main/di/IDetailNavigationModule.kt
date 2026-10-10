@@ -1,14 +1,15 @@
 package presentation.detail.main.di
 
 import core.navigation.EntryProviderInstaller
+import core.navigation.INavigator
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.multibindings.IntoSet
-import presentation.detail.main.DetailScreen
 import presentation.detail.main.router.DetailRouterImpl
+import presentation.detail.main.view.DetailScreen
 import presentation.router.DetailRouter
 
 /**
@@ -24,8 +25,10 @@ interface IDetailNavigationModule {
     companion object {
         @Provides
         @IntoSet
-        fun provideEntry(): EntryProviderInstaller = {
-            entry<DetailRouter.PageData> { pageData -> DetailScreen(bookId = pageData.bookId) }
+        fun provideEntry(navigator: INavigator): EntryProviderInstaller = {
+            entry<DetailRouter.PageData> { pageData ->
+                DetailScreen(bookId = pageData.bookId, onBack = navigator::back)
+            }
         }
     }
 }

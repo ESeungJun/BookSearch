@@ -12,4 +12,8 @@ dependencies {
     ksp(libs.room.compiler)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.serialization.json) // 저자 목록 TypeConverter
+
+    // DAO 쿼리를 메모리 DB 로 JVM 에서 확인한다(Robolectric 이 Android SQLite 를 제공)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.test.core)
 }

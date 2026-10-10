@@ -22,21 +22,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import core.designsystem.R
+import core.designsystem.theme.Spacing
 
 private val StateIconSize = 48.dp
-private val StatePadding = 32.dp
-private val StateSpacing = 12.dp
-private val FooterPadding = 16.dp
 
-/** 보여 줄 목록이 없을 때(첫 진입·빈 결과) 화면 가운데에 두는 안내. */
+/** 보여 줄 내용이 없을 때(첫 진입·빈 결과) 화면 가운데에 두는 안내. [action] 은 빈 상태를 벗어나는 버튼이다. */
 @Composable
 fun EmptyView(
     icon: ImageVector,
     title: String,
     modifier: Modifier = Modifier,
     description: String? = null,
+    action: (@Composable () -> Unit)? = null,
 ) {
-    CenteredMessage(icon = icon, title = title, modifier = modifier, description = description)
+    CenteredMessage(icon = icon, title = title, modifier = modifier, description = description, action = action)
 }
 
 /** 화면 단위 실패. 원인별 문구는 부르는 쪽이 정한다. */
@@ -60,8 +59,8 @@ private fun CenteredMessage(
     action: (@Composable () -> Unit)? = null,
 ) {
     Column(
-        modifier = modifier.fillMaxSize().padding(StatePadding),
-        verticalArrangement = Arrangement.spacedBy(StateSpacing, Alignment.CenterVertically),
+        modifier = modifier.fillMaxSize().padding(Spacing.extraLarge),
+        verticalArrangement = Arrangement.spacedBy(Spacing.medium, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Icon(
@@ -94,7 +93,7 @@ fun LoadMoreFooter(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.fillMaxWidth().padding(FooterPadding),
+        modifier = modifier.fillMaxWidth().padding(Spacing.large),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         if (isFailed) {

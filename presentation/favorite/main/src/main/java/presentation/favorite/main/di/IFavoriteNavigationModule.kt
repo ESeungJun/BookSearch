@@ -6,7 +6,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.multibindings.IntoSet
-import presentation.favorite.main.FavoriteScreen
+import presentation.favorite.main.view.FavoriteScreen
 import presentation.router.DetailRouter
 import presentation.router.FavoriteRouter
 
