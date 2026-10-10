@@ -28,8 +28,8 @@ import presentation.feature.detail.main.mapper.toDetailViewData
 class DetailViewModel @AssistedInject constructor(
     @Assisted private val bookId: String,
     private val getBookUseCase: GetBookUseCase,
-    private val observeFavoriteKeysUseCase: ObserveFavoriteKeysUseCase,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
+    observeFavoriteKeysUseCase: ObserveFavoriteKeysUseCase,
 ) : ViewModel() {
 
     // 하트를 누르면 이 책을 그대로 넘긴다
@@ -42,8 +42,11 @@ class DetailViewModel @AssistedInject constructor(
         load()
         observeFavoriteKeysUseCase()
             .onEach { result ->
-                // 키를 못 읽으면 하트만 이전 상태로 남는다. 책 정보는 그대로 볼 수 있어 화면 상태를 바꾸지 않는다
-                if (result is DomainResult.Success) _uiState.update { it.copy(isFavorite = bookId in result.data) }
+                when (result) {
+                    is DomainResult.Success -> _uiState.update { it.copy(isFavorite = bookId in result.data) }
+                    // 키를 못 읽으면 하트만 이전 상태로 남는다. 책 정보는 그대로 볼 수 있어 화면 상태를 바꾸지 않는다
+                    is DomainResult.Fail, is DomainResult.Error -> Unit
+                }
             }
             .launchIn(viewModelScope)
     }
@@ -64,11 +67,14 @@ class DetailViewModel @AssistedInject constructor(
     }
 
     private fun onBook(result: DomainResult<BookDTO?>) {
-        if (result !is DomainResult.Success) {
-            _uiState.update { it.copy(status = DetailUiStatus.Error(result.failureMessageRes())) }
-            return
+        when (result) {
+            is DomainResult.Success -> showBook(result.data)
+            is DomainResult.Fail, is DomainResult.Error ->
+                _uiState.update { it.copy(status = DetailUiStatus.Error(result.failureMessageRes())) }
         }
-        val found = result.data
+    }
+
+    private fun showBook(found: BookDTO?) {
         book = found
         _uiState.update {
             it.copy(status = if (found == null) DetailUiStatus.NotFound else DetailUiStatus.Loaded(found.toDetailViewData()))

@@ -92,23 +92,31 @@ class FavoriteViewModel @Inject constructor(
     }
 
     private fun onFavorites(filtered: DomainResult<List<BookDTO>>, all: DomainResult<List<BookDTO>>) {
-        if (filtered !is DomainResult.Success) return onFailure(filtered)
-        if (all !is DomainResult.Success) return onFailure(all)
-        filteredBooks = filtered.data
+        when (filtered) {
+            is DomainResult.Fail, is DomainResult.Error -> onFailure(filtered)
+            is DomainResult.Success -> when (all) {
+                is DomainResult.Fail, is DomainResult.Error -> onFailure(all)
+                is DomainResult.Success -> showFavorites(filtered.data, all.data)
+            }
+        }
+    }
+
+    private fun showFavorites(filtered: List<BookDTO>, all: List<BookDTO>) {
+        filteredBooks = filtered
         _uiState.update {
             it.copy(
                 status = when {
-                    all.data.isEmpty() -> FavoriteUiStatus.NoFavorites
-                    filtered.data.isEmpty() -> FavoriteUiStatus.NoMatch
+                    all.isEmpty() -> FavoriteUiStatus.NoFavorites
+                    filtered.isEmpty() -> FavoriteUiStatus.NoMatch
                     else -> FavoriteUiStatus.Results
                 },
                 books = sortedViewData(it.sort),
-                totalCount = all.data.size,
+                totalCount = all.size,
             )
         }
     }
 
-    private fun onFailure(result: DomainResult<*>) {
+    private fun onFailure(result: DomainResult<Nothing>) {
         filteredBooks = emptyList()
         _uiState.update { it.copy(status = FavoriteUiStatus.Error(result.failureMessageRes()), books = persistentListOf()) }
     }
