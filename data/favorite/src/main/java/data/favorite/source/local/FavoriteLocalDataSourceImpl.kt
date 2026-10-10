@@ -1,12 +1,11 @@
 package data.favorite.source.local
 
-import data.book.db.dao.IBookDao
-import data.book.db.dao.IFavoriteDao
-import data.book.db.entity.FavoriteEntity
-import data.book.db.entity.toBook
-import data.book.db.entity.toEntity
-import domain.book.data.BookDTO
-import domain.favorite.data.FavoriteSort
+import data.database.dao.IBookDao
+import data.database.dao.IFavoriteDao
+import data.database.entity.FavoriteEntity
+import data.database.entity.toBook
+import data.database.entity.toEntity
+import domain.base.data.BookDTO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -16,12 +15,11 @@ class FavoriteLocalDataSourceImpl @Inject constructor(
     private val favoriteDao: IFavoriteDao,
 ) : IFavoriteLocalDataSource {
 
-    override fun observeFavorites(query: String, sort: FavoriteSort, priceRange: IntRange?): Flow<List<BookDTO>> =
+    override fun observeFavorites(query: String, priceRange: IntRange?): Flow<List<BookDTO>> =
         favoriteDao.observe(
             pattern = query.takeIf { it.isNotEmpty() }?.let { "%${it.escapeLike()}%" },
             minPrice = priceRange?.first,
             maxPrice = priceRange?.last,
-            ascending = sort == FavoriteSort.TITLE_ASC,
         ).map { entities -> entities.map { it.toBook() } }
 
     override fun observeFavoriteKeys(): Flow<Set<String>> = favoriteDao.observeKeys().map { it.toSet() }
