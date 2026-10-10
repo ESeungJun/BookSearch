@@ -18,13 +18,13 @@
 ## 구조
 
 ```
-:app                              MainActivity · navigation/(INavigator 구현, 화면 등록을 모아 NavDisplay) · 탭·2칸 Scaffold
+:app                              MainActivity · navigation/(AppNavigator — INavigator 구현, 화면 등록을 모아 NavDisplay) · 탭·2칸 Scaffold
 :core:designsystem                테마·두 화면 이상이 쓰는 UI. 공통 코드는 패키지 단위 모듈(:core:<이름>)로, 쓸 것이 생길 때 만든다
 :core:navigation                  INavigator · EntryProviderInstaller — 기능과 :app 이 함께 쓰는 화면 이동 계약
 :core:network                     OkHttp·Retrofit 제공(di/), API 키 BuildConfig — 키를 아는 유일한 모듈
 :core:database                    Room DB · dao/ · entity/ · di/(DB·DAO 제공) — Room 이 한곳에서 모든 테이블을 알아야 해서 core 에 둔다. domain 타입은 모른다
-:presentation:<기능>:route         경로(NavKey)만 — 다른 기능은 이것만 의존해 이동한다
-:presentation:<기능>:main          Screen · ViewModel · UiState · di/(경로 → 화면 등록)
+:presentation:router              화면마다 XxxRouter(PageData + open) — 다른 기능 화면으로 갈 때는 이것만 쓴다
+:presentation:<기능>:main          Screen · ViewModel · UiState · router/(XxxRouterImpl) · di/(Router 바인딩, PageData → 화면 등록)
 :domain:base                      공통 타입만 — BookDTO · DomainResult
 :domain:search / favorite / detail   기능별 data/ · repo/ · usecase/ (순수 Kotlin). 서로 의존하지 않는다
 :data:base                        data 공통 — safeApiCall {}(서버 호출 → DomainResult), safeDbCall {} · safeDbFlow()(DB 호출 → DomainResult), Entity ↔ DTO 변환
@@ -32,9 +32,9 @@
 ```
 
 - 의존 방향: `presentation → domain ← data`. `:data:*`·`:core:network`·`:core:database` 를 의존하는 곳은 `:app` 하나다(Hilt 가 `:app` 에서 그래프를 만든다). presentation 은 data 를 볼 수 없다.
-- 기능 모듈끼리 서로 의존하지 않는다. 다른 기능 화면으로 갈 때는 그 기능의 `route` 모듈만 의존하고 `INavigator.navigate(경로)` 로 이동한다. 각 `main` 모듈은 경로 → 화면 연결을 Hilt(`@IntoSet EntryProviderInstaller`)로 내놓고 `:app` 이 모아 그린다.
-- 모듈 공통 빌드 설정은 `build-logic`(포함 빌드)의 컨벤션 플러그인에 둔다. 패키지: `convention.config`(SDK·카탈로그 접근·Android 공통 설정) / `convention.base`(application·library·kotlin.jvm·compose·hilt) / `convention.layer`(presentation·route·domain·data).
-- 의존은 모두 `implementation` 으로 쓴다. `api` 로 다른 모듈을 내보내지 않는다. 레이어 공통 의존(코루틴·`javax.inject`·레이어 base 모듈)은 레이어 컨벤션 플러그인(`convention.domain`·`convention.data`·`convention.presentation`·`convention.route`)이 붙이고, 모듈의 build.gradle.kts 에는 그 모듈만 쓰는 의존만 적는다.
+- 기능 main 모듈끼리 서로 의존하지 않는다. 다른 기능 화면으로 갈 때는 `:presentation:router` 의 `XxxRouter` 를 주입받아 `open(PageData)` 를 부른다. 구현 `XxxRouterImpl` 은 그 화면의 main 모듈이 `INavigator` 로 만들고 Hilt 로 바인딩한다. PageData → 화면 연결도 각 main 모듈이 Hilt(`@IntoSet EntryProviderInstaller`)로 내놓고 `:app` 이 모아 그린다.
+- 모듈 공통 빌드 설정은 `build-logic`(포함 빌드)의 컨벤션 플러그인에 둔다. 패키지: `convention.config`(SDK·카탈로그 접근·Android 공통 설정) / `convention.base`(application·library·kotlin.jvm·compose·hilt) / `convention.layer`(presentation·domain·data).
+- 의존은 모두 `implementation` 으로 쓴다. `api` 로 다른 모듈을 내보내지 않는다. 레이어 공통 의존(코루틴·`javax.inject`·레이어 base 모듈)은 레이어 컨벤션 플러그인(`convention.domain`·`convention.data`·`convention.presentation`)이 붙이고, 모듈의 build.gradle.kts 에는 그 모듈만 쓰는 의존만 적는다.
 - domain 저장소 인터페이스의 모든 함수는 `DomainResult`(관찰은 `Flow<DomainResult<T>>`)를 돌려준다.
 - 결과의 공통 처리는 레이어마다 따로 둔다: data 저장소는 `safeApiCall {}`(서버)·`safeDbCall {}`·`safeDbFlow()`(DB)로 결과를 만들고(취소는 다시 던짐), domain UseCase 는 저장소가 준 결과를 그대로 돌려준다. presentation 은 3단계에서 정한다.
 - **`:domain:<기능>` 의 `usecase` 는 사용자 행동 정의서다.** 사용자 행동 하나에 UseCase 하나를 두고 `operator fun invoke`로 부른다. `usecase/` 목록만 읽어도 이 앱으로 무엇을 할 수 있는지 알 수 있어야 한다. 저장소를 그대로 부르기만 하는 UseCase도 이 목적이면 만든다. ViewModel은 Repository가 아니라 UseCase만 부른다.
@@ -70,6 +70,8 @@
 3. `init`
 4. 공개 함수(화면 이벤트 순서대로)
 5. private 함수(호출하는 쪽 바로 아래에 둔다)
+
+생성자로 주입받는 값은 한 번만 쓰더라도 모두 `private val` 로 받는다. 생성자 모양을 하나로 맞춘다.
 
 ## 상태
 - ViewModel은 `MutableStateFlow<XxxUiState>` 하나를 갖고 `update {}`로만 바꾼다.

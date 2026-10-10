@@ -25,5 +25,6 @@ class PresentationConventionPlugin : Plugin<Project> {
         dependencies.add("implementation", project(":domain:base"))
         dependencies.add("implementation", project(":presentation:base"))
         dependencies.add("implementation", project(":core:navigation"))
+        dependencies.add("implementation", project(":presentation:router"))
     }
 }
