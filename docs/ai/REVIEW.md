@@ -16,3 +16,4 @@ AI 가 작성자 확인 없이 정한 것(`추천안 기본 채택`)을 모은�
 | 이름 규칙 | 변환 함수 이름 | `toBookDTO()` / **`toBook()` 유지** | 함수 이름은 무엇으로 바꾸는지만 말하면 충분하다 | — | `SearchBookMapper`, `BookEntity` |
 | data 재구성 | HTTP 오류를 domain 결과로 바꾸는 자리 (`DomainResult`) | 저장소 / **원격 데이터 소스** | 저장소가 Retrofit(`HttpException`)을 몰라도 된다 | — | `SearchRemoteDataSourceImpl` |
 | data 재구성 | 요청 크기(20)·정렬 값 변환·캐시 보관 수 위치 | 저장소 / **각 데이터 소스** | 페이지 크기·정렬 문자열은 API 사정, 5페이지·20조합은 저장 사정이다. 시간 제한 3초만 저장소에 둔다 | — | 각 `~Impl` 의 `companion object` |
+| 골격 | 모듈 공통 빌드 설정 방식 | 모듈마다 직접 적기 / 루트 allprojects·subprojects / buildSrc / **포함 빌드(build-logic)의 컨벤션 플러그인** | 바꿀 곳이 한 파일, 모듈 파일엔 레이어 플러그인 한 줄. allprojects 는 무엇이 적용되는지 모듈에서 안 보이고, buildSrc 는 바뀌면 모든 빌드 스크립트가 다시 컴파일된다 | 플러그인 코드를 읽어야 모듈 설정 전체가 보인다 | `build-logic/convention` |
