@@ -20,20 +20,18 @@
 ```
 :app                              MainActivity · navigation/ · 탭·2칸 Scaffold
 :core:designsystem                테마·두 화면 이상이 쓰는 UI. 공통 코드는 패키지 단위 모듈(:core:<이름>)로, 쓸 것이 생길 때 만든다
-:core:database                    Room DB · dao/ · entity/ — Room 이 한곳에서 모든 테이블을 알아야 해서 core 에 둔다. domain 타입은 모른다
-:di:network                       OkHttp·Retrofit·API 서비스 제공(싱글톤), API 키 BuildConfig — 키를 아는 유일한 모듈
-:di:database                      Room DB·DAO 제공(싱글톤)
-:di:search / favorite / detail    Hilt 모듈 — 기능별 바인딩
+:core:network                     OkHttp·Retrofit 제공(di/), API 키 BuildConfig — 키를 아는 유일한 모듈
+:core:database                    Room DB · dao/ · entity/ · di/(DB·DAO 제공) — Room 이 한곳에서 모든 테이블을 알아야 해서 core 에 둔다. domain 타입은 모른다
 :presentation:search / favorite / detail    Screen · ViewModel · UiState
 :domain:base                      공통 타입만 — BookDTO · DomainResult
 :domain:search / favorite / detail   기능별 data/ · repo/ · usecase/ (순수 Kotlin). 서로 의존하지 않는다
 :data:base                        data 공통 — safeApiCall {}(서버 호출 → DomainResult), safeDbCall {} · safeDbFlow()(DB 호출 → DomainResult), Entity ↔ DTO 변환
-:data:search / favorite / detail  repo/ · source/(remote·local) · service/ · data/ — 기능별, :core:database 의 DAO 를 쓴다
+:data:search / favorite / detail  repo/ · source/(remote·local) · service/ · data/ · di/(그 기능의 Hilt 바인딩) — 기능별, :core:database 의 DAO 를 쓴다
 ```
 
-- 의존 방향: `presentation → domain ← data`. `:di:*`만 `:data:*`를 의존한다. presentation 은 data 를 볼 수 없다.
+- 의존 방향: `presentation → domain ← data`. `:data:*`·`:core:network`·`:core:database` 를 의존하는 곳은 `:app` 하나다(Hilt 가 `:app` 에서 그래프를 만든다). presentation 은 data 를 볼 수 없다.
 - 기능 모듈끼리 서로 의존하지 않는다. 화면 이동은 `:app`이 연결한다.
-- 의존은 모두 `implementation` 으로 쓴다. `api` 로 다른 모듈을 내보내지 않는다. 레이어 공통 의존(코루틴·`javax.inject`·레이어 base 모듈)은 레이어 컨벤션 플러그인(`convention.domain`·`convention.data`·`convention.di`·`convention.presentation`)이 붙이고, 모듈의 build.gradle.kts 에는 그 모듈만 쓰는 의존만 적는다.
+- 의존은 모두 `implementation` 으로 쓴다. `api` 로 다른 모듈을 내보내지 않는다. 레이어 공통 의존(코루틴·`javax.inject`·레이어 base 모듈)은 레이어 컨벤션 플러그인(`convention.domain`·`convention.data`·`convention.presentation`)이 붙이고, 모듈의 build.gradle.kts 에는 그 모듈만 쓰는 의존만 적는다.
 - domain 저장소 인터페이스의 모든 함수는 `DomainResult`(관찰은 `Flow<DomainResult<T>>`)를 돌려준다.
 - 결과의 공통 처리는 레이어마다 따로 둔다: data 저장소는 `safeApiCall {}`(서버)·`safeDbCall {}`·`safeDbFlow()`(DB)로 결과를 만들고(취소는 다시 던짐), domain UseCase 는 저장소가 준 결과를 그대로 돌려준다. presentation 은 3단계에서 정한다.
 - **`:domain:<기능>` 의 `usecase` 는 사용자 행동 정의서다.** 사용자 행동 하나에 UseCase 하나를 두고 `operator fun invoke`로 부른다. `usecase/` 목록만 읽어도 이 앱으로 무엇을 할 수 있는지 알 수 있어야 한다. 저장소를 그대로 부르기만 하는 UseCase도 이 목적이면 만든다. ViewModel은 Repository가 아니라 UseCase만 부른다.
@@ -47,6 +45,7 @@
   - `service`: Retrofit 인터페이스(`I~Service`). `data`: 서버 응답 데이터(`~Api`)와 그 변환 함수.
   - `~Api` 는 `source/remote` 밖으로, `~Entity` 는 `source/local` 밖으로 나가지 않는다. 데이터 소스는 DTO 로 주고받는다.
   - `~Api` 필드는 모두 nullable 이고 기본값을 두지 않는다. 서버가 안 보낸 값은 null 그대로 DTO 까지 가고, 어떻게 보일지는 화면이 정한다.
+- Hilt 모듈은 바인딩을 구현한 모듈의 `di/` 패키지에 둔다. 별도 di 모듈은 두지 않는다.
 - Hilt 범위: 저장소와 데이터 소스는 `ViewModelComponent` + `@ViewModelScoped`. `SingletonComponent` 는 앱에 하나여야만 동작하는 것(Room DB, OkHttp·Retrofit)에만 쓰고 이유를 주석으로 남긴다.
 
 ## 이름

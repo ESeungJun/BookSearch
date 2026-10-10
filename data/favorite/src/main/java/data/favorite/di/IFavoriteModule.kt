@@ -1,4 +1,4 @@
-package di.favorite
+package data.favorite.di
 
 import data.favorite.repo.FavoriteRepositoryImpl
 import data.favorite.source.local.FavoriteLocalDataSourceImpl

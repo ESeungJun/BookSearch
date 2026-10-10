@@ -1,4 +1,4 @@
-package di.search
+package data.search.di
 
 import data.search.repo.SearchRepositoryImpl
 import data.search.source.local.ISearchLocalDataSource

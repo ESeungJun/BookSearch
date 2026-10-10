@@ -1,5 +1,6 @@
-package di.network
+package core.network.di
 
+import core.network.BuildConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,7 +15,7 @@ import javax.inject.Singleton
 
 /**
  * 네트워크 공통 설정. OkHttp 는 연결 풀·스레드를 클라이언트마다 따로 가지므로 앱에 하나만 둔다.
- * API 서비스는 같은 모듈의 [ServiceModule] 이 이 Retrofit 으로 만든다.
+ * API 서비스(Retrofit 인터페이스)는 그것을 쓰는 data 모듈이 이 Retrofit 으로 만든다.
  */
 @Module
 @InstallIn(SingletonComponent::class)
