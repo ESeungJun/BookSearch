@@ -4,6 +4,7 @@ import core.database.dao.IFavoriteDao
 import core.database.entity.FavoriteEntity
 import data.base.toBook
 import data.base.toEntity
+import data.base.toLikePattern
 import domain.base.data.BookDTO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -15,7 +16,7 @@ class FavoriteLocalDataSourceImpl @Inject constructor(
 
     override fun observeFavorites(query: String, priceRange: IntRange?): Flow<List<BookDTO>> =
         favoriteDao.observe(
-            pattern = query.takeIf { it.isNotEmpty() }?.let { "%${it.escapeLike()}%" },
+            pattern = query.takeIf { it.isNotEmpty() }?.toLikePattern(),
             minPrice = priceRange?.first,
             maxPrice = priceRange?.last,
         ).map { entities -> entities.map { it.toBook() } }
@@ -29,7 +30,4 @@ class FavoriteLocalDataSourceImpl @Inject constructor(
     override suspend fun removeFavorite(key: String) {
         favoriteDao.delete(key)
     }
-
-    // 사용자가 입력한 % · _ 가 LIKE 의 와일드카드로 동작하지 않게 한다
-    private fun String.escapeLike(): String = replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
 }

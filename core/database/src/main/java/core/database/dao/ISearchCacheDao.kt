@@ -12,10 +12,6 @@ interface ISearchCacheDao {
     @Query("SELECT * FROM search_cache WHERE `query` = :query AND sort = :sort AND page = :page ORDER BY position")
     suspend fun getPage(query: String, sort: String, page: Int): List<SearchCacheEntity>
 
-    /** 마지막으로 저장한 검색. 따로 테이블을 두지 않고 캐시의 저장 시각에서 찾는다. */
-    @Query("SELECT * FROM search_cache ORDER BY savedAt DESC LIMIT 1")
-    suspend fun getLatest(): SearchCacheEntity?
-
     @Query(
         """
         SELECT book.* FROM search_cache JOIN book ON book.`key` = search_cache.bookKey
