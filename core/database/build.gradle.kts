@@ -1,5 +1,6 @@
 plugins {
     id("convention.library")
+    id("convention.hilt") // DB·DAO 제공(di/DatabaseModule)
     alias(libs.plugins.ksp) // Room 코드 생성
 }
 
