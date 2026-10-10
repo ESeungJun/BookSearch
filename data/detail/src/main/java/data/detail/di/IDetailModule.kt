@@ -1,4 +1,4 @@
-package di.detail
+package data.detail.di
 
 import data.detail.repo.DetailRepositoryImpl
 import data.detail.source.local.DetailLocalDataSourceImpl
