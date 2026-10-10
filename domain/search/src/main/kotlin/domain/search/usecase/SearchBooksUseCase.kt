@@ -1,5 +1,6 @@
 package domain.search.usecase
 
+import domain.book.data.DomainResult
 import domain.search.repo.ISearchRepository
 import domain.search.data.SearchPageDTO
 import domain.search.data.SearchSort
@@ -9,6 +10,6 @@ import javax.inject.Inject
 class SearchBooksUseCase @Inject constructor(
     private val repository: ISearchRepository,
 ) {
-    suspend operator fun invoke(query: String, sort: SearchSort, page: Int): Result<SearchPageDTO> =
+    suspend operator fun invoke(query: String, sort: SearchSort, page: Int): DomainResult<SearchPageDTO> =
         repository.searchBooks(query, sort, page)
 }

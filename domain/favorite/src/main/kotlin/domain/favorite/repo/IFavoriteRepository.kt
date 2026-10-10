@@ -1,12 +1,11 @@
 package domain.favorite.repo
 
 import domain.book.data.BookDTO
-import domain.favorite.data.FavoriteSort
 import kotlinx.coroutines.flow.Flow
 
 interface IFavoriteRepository {
-    /** 검색어(제목·저자)·금액 범위(실제로 내는 가격)로 고르고 제목순으로 정렬한 즐겨찾기. */
-    fun observeFavorites(query: String, sort: FavoriteSort, priceRange: IntRange?): Flow<List<BookDTO>>
+    /** 검색어(제목·저자)·금액 범위(실제로 내는 가격)로 고른 즐겨찾기. 최근에 넣은 것이 앞이다. 다른 순서는 화면이 정한다. */
+    fun observeFavorites(query: String, priceRange: IntRange?): Flow<List<BookDTO>>
 
     fun observeFavoriteKeys(): Flow<Set<String>>
 

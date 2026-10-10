@@ -24,7 +24,7 @@ rootProject.name = "BookSearch"
 
 include(":app")
 include(":di:book", ":di:search", ":di:favorite")
-include(":core")
+include(":core:designsystem")
 include(":presentation:search", ":presentation:favorite", ":presentation:detail")
 include(":domain:book", ":domain:search", ":domain:favorite")
 include(":data:book", ":data:search", ":data:favorite")
