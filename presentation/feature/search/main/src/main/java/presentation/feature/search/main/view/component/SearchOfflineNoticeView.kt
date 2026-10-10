@@ -23,7 +23,7 @@ import presentation.feature.search.main.data.SearchNotice
 
 /** 네트워크가 실패해 대신 보여 주는 결과라는 안내 줄. */
 @Composable
-internal fun OfflineNotice(notice: SearchNotice) {
+internal fun SearchOfflineNoticeView(notice: SearchNotice) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -47,8 +47,8 @@ internal fun OfflineNotice(notice: SearchNotice) {
 
 @Preview(showBackground = true)
 @Composable
-private fun OfflineNoticePreview() {
+private fun SearchOfflineNoticeViewPreview() {
     BookSearchTheme {
-        OfflineNotice(SearchNotice.Cached("2026-10-10 09:30"))
+        SearchOfflineNoticeView(SearchNotice.Cached("2026-10-10 09:30"))
     }
 }

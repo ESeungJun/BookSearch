@@ -16,7 +16,7 @@ import presentation.feature.favorite.main.R
 
 /** 스크롤하면 접히는 머리: 제목과 저장한 책 검색창. */
 @Composable
-internal fun FavoriteHeader(query: String, onQueryChange: (String) -> Unit) {
+internal fun FavoriteHeaderView(query: String, onQueryChange: (String) -> Unit) {
     Column(
         modifier = Modifier.padding(Spacing.large),
         verticalArrangement = Arrangement.spacedBy(Spacing.small),
@@ -28,8 +28,8 @@ internal fun FavoriteHeader(query: String, onQueryChange: (String) -> Unit) {
 
 @Preview(showBackground = true)
 @Composable
-private fun FavoriteHeaderPreview() {
+private fun FavoriteHeaderViewPreview() {
     BookSearchTheme {
-        FavoriteHeader(query = "", onQueryChange = {})
+        FavoriteHeaderView(query = "", onQueryChange = {})
     }
 }

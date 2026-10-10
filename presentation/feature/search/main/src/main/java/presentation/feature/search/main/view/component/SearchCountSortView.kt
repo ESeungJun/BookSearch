@@ -21,7 +21,7 @@ import presentation.feature.search.main.R
 
 /** 스크롤해도 남는 고정 줄: 왼쪽 총 개수, 오른쪽 정렬. */
 @Composable
-internal fun CountSortRow(totalCount: Int, sort: SearchSort, onSortChange: (SearchSort) -> Unit) {
+internal fun SearchCountSortView(totalCount: Int, sort: SearchSort, onSortChange: (SearchSort) -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(start = Spacing.large),
         verticalAlignment = Alignment.CenterVertically,
@@ -48,8 +48,8 @@ private fun SearchSort.labelRes(): Int = when (this) {
 
 @Preview(showBackground = true)
 @Composable
-private fun CountSortRowPreview() {
+private fun SearchCountSortViewPreview() {
     BookSearchTheme {
-        CountSortRow(totalCount = 1_234, sort = SearchSort.ACCURACY, onSortChange = {})
+        SearchCountSortView(totalCount = 1_234, sort = SearchSort.ACCURACY, onSortChange = {})
     }
 }

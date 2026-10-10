@@ -35,7 +35,7 @@ internal val CoverHeight = 174.dp // 책 표지 비율(약 1:1.45)
 
 /** 정보 블록: 왼쪽 큰 표지, 오른쪽 저자·출판사·출간일·ISBN·정상가·할인가. 값이 없는 줄은 그리지 않는다. */
 @Composable
-internal fun BookInfo(book: DetailViewData) {
+internal fun DetailInfoView(book: DetailViewData) {
     Row(horizontalArrangement = Arrangement.spacedBy(Spacing.large)) {
         Cover(book.thumbnailUrl)
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
@@ -90,9 +90,9 @@ private fun formatPrice(value: Int): String =
 
 @Preview(showBackground = true)
 @Composable
-private fun BookInfoPreview() {
+private fun DetailInfoViewPreview() {
     BookSearchTheme {
-        BookInfo(
+        DetailInfoView(
             DetailViewData(
                 title = "코틀린 인 액션",
                 authors = "드미트리 제메로프, 스베트라나 이사코바",

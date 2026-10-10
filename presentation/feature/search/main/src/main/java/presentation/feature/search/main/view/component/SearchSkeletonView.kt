@@ -36,7 +36,7 @@ private const val SKELETON_PULSE_MS = 800
 
 /** 첫 검색 중에 보이는 카드 골격. 카드와 같은 자리에 같은 크기로 그려 결과가 왔을 때 화면이 덜 흔들린다. */
 @Composable
-internal fun SearchSkeleton() {
+internal fun SearchSkeletonView() {
     val alpha by rememberInfiniteTransition(label = "skeleton").animateFloat(
         initialValue = SKELETON_MIN_ALPHA,
         targetValue = 1f,
@@ -72,8 +72,8 @@ private fun SkeletonBlock(modifier: Modifier) {
 
 @Preview(showBackground = true)
 @Composable
-private fun SearchSkeletonPreview() {
+private fun SearchSkeletonViewPreview() {
     BookSearchTheme {
-        SearchSkeleton()
+        SearchSkeletonView()
     }
 }

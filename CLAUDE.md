@@ -33,7 +33,7 @@
 ```
 
 - 의존 방향: `presentation → domain ← data`. `:data:*`·`:core:network`·`:core:database` 를 의존하는 곳은 `:app` 하나다(Hilt 가 `:app` 에서 그래프를 만든다). presentation 은 data 를 볼 수 없다.
-- presentation 패키지: `vm`(ViewModel) / `view`(Screen + Content) / `view.component`(화면을 이루는 조각, 파일 하나에 컴포넌트 하나와 그 `@Preview`) / `data`(UiState·화면용 타입) / `mapper`(DTO → ViewData 같은 변환 확장 함수 — ViewModel 안에 두지 않는다). `:presentation:base` 도 `data`(BookViewData·결과 문구) / `mapper`(toViewData) / `view.component`(BookCard).
+- presentation 패키지: `vm`(ViewModel) / `view`(Screen + Content) / `view.component`(화면을 이루는 조각, 파일 하나에 컴포넌트 하나와 그 `@Preview`) / `data`(UiState·화면용 타입) / `mapper`(DTO → ViewData 같은 변환 확장 함수 — ViewModel 안에 두지 않는다). `:presentation:base` 도 `data`(BookViewData) / `mapper`(toViewData) / `view.component`(BookCard).
 - 기능 main 모듈끼리 서로 의존하지 않는다. 다른 기능 화면으로 갈 때는 `:presentation:router` 의 `XxxRouter` 를 주입받아 `open(PageData)` 를 부른다. 구현 `XxxRouterImpl` 은 그 화면의 main 모듈이 `INavigator` 로 만들고 Hilt 로 바인딩한다. PageData → 화면 연결도 각 main 모듈이 Hilt(`@IntoSet EntryProviderInstaller`)로 내놓고 `:app` 이 모아 그린다.
 - 모듈 공통 빌드 설정은 `build-logic`(포함 빌드)의 컨벤션 플러그인에 둔다. 패키지: `convention.config`(SDK·카탈로그 접근·Android 공통 설정) / `convention.base`(application·library·kotlin.jvm·compose·hilt) / `convention.layer`(presentation·domain·data).
 - 의존은 모두 `implementation` 으로 쓴다. `api` 로 다른 모듈을 내보내지 않는다. 레이어 공통 의존(코루틴·`javax.inject`·레이어 base 모듈)은 레이어 컨벤션 플러그인(`convention.domain`·`convention.data`·`convention.presentation`)이 붙이고, 모듈의 build.gradle.kts 에는 그 모듈만 쓰는 의존만 적는다.
@@ -65,6 +65,8 @@
 | domain 데이터(data class) | `~DTO`. enum·예외는 붙이지 않는다 | `BookDTO`, `SearchSort` |
 | 화면 상태 전체 | `~UiState` — ViewModel 의 MutableStateFlow 하나 | `SearchUiState` |
 | 본문에 무엇을 보여 줄지(동시에 하나만: 첫 진입·로딩·결과·빈 결과·오류) | `~UiStatus` (sealed, UiState 의 `status`). 본문과 함께 성립하는 값(새로고침 중·다음 페이지·안내 줄)은 UiState 의 별도 칸 | `SearchUiStatus` |
+| 화면 조각(`view.component`) | `<기능>~View` — 파일 이름도 같다. 기능 모듈 밖에서 쓰지 않으므로 `internal` | `DetailInfoView`, `SearchBookListView` |
+| 화면 | `<기능>Screen`(ViewModel 연결, 라우터가 부르므로 public) / `<기능>Content`(상태만 받는 본문, `internal`) | `SearchScreen` / `SearchContent` |
 | 목록 한 칸·블록 하나의 표시용 데이터 | `~ViewData` (mapper 가 만든다. 여러 화면이 쓰면 `:presentation:base`) | `BookViewData`, `DetailViewData` |
 | 인터페이스 / 구현체 | `I~` / `~Impl` | `IBookRepository` / `BookRepositoryImpl` |
 | 추상 클래스 / 베이스 클래스 | `Abs~` / `Base~` | `AbsBookDatabase` |
