@@ -8,9 +8,9 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.leeseungjun.booksearch.presentation.detail.DetailScreen
-import com.leeseungjun.booksearch.presentation.favorite.FavoriteScreen
-import com.leeseungjun.booksearch.presentation.search.SearchScreen
+import presentation.detail.DetailScreen
+import presentation.favorite.FavoriteScreen
+import presentation.search.SearchScreen
 
 /**
  * 경로 → 화면 연결. 화면 모듈은 서로를 모르고 콜백만 내놓으며, 어디로 갈지는 여기서 정한다.
