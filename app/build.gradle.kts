@@ -7,11 +7,13 @@ plugins {
 
 dependencies {
     // 화면 이동을 아는 곳은 :app 하나다. 화면 모듈끼리는 서로 모른다
-    implementation(projects.presentation.designsystem)
+    implementation(projects.core)
     implementation(projects.presentation.search)
     implementation(projects.presentation.favorite)
     implementation(projects.presentation.detail)
-    implementation(projects.di)
+    implementation(projects.di.book)
+    implementation(projects.di.search)
+    implementation(projects.di.favorite)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)

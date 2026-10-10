@@ -11,7 +11,7 @@
 
 ## 단순하게 — v1 폐기에서 얻은 규칙
 - 작성자가 한 줄씩 설명할 수 있는 코드만 넣는다. 쓰임이 하나뿐인 추상화, 미리 만든 공용 코드는 만들지 않는다.
-- 공용 모듈(`:presentation:designsystem`)에는 두 화면 이상이 실제로 쓰는 것만 둔다.
+- 공통 모듈(`:core`)에는 두 화면 이상이 실제로 쓰는 것만 둔다.
 - 표준 라이브러리가 하는 일은 직접 만들지 않는다(예: 로그는 `HttpLoggingInterceptor`).
 - 작업은 단계별로 한다. 단계를 시작하기 전에 추가할 파일 목록을 작성자에게 확인받고, 끝나면 diff를 보여 주고 병합한다.
 
@@ -19,19 +19,28 @@
 
 ```
 :app                              MainActivity · navigation/ · 탭·2칸 Scaffold
-:di                               Hilt 모듈 — presentation 과 data 를 잇는 유일한 곳
-:presentation:designsystem        테마 · 두 화면 이상이 쓰는 UI
+:core                             designsystem/(테마·두 화면 이상이 쓰는 UI) · util/(공통 유틸) — 기능과 무관한 공통 코드
+:di:book / search / favorite      Hilt 모듈 — 기능별 바인딩. DB 싱글톤은 book, 네트워크 싱글톤은 search
 :presentation:search / favorite / detail    Screen · ViewModel · UiState
-:domain                           data/ · repo/ · usecase/ (순수 Kotlin)
-:data                             api/<API 경로별 패키지>/ · db/<테이블별 패키지>/ · repository/
+:domain:book                      책 자체(BookDTO·BookException)·상세 조회 — search·favorite 가 함께 본다
+:domain:search / favorite         기능별 data/ · repo/ · usecase/ (순수 Kotlin). 서로 의존하지 않는다
+:data:book                        db/(dao·entity — Room 이 한곳에서 모든 테이블을 알아야 함) · source/local · repo/
+:data:search / favorite           repo/ · source/(remote·local) · service/ · data/ — 기능별, :data:book 의 DAO 를 쓴다
 ```
 
-- 의존 방향: `presentation → domain ← data`. `:di`만 `:data`를 의존한다. presentation 은 data 를 볼 수 없다.
+- 의존 방향: `presentation → domain ← data`. `:di:*`만 `:data:*`를 의존한다. presentation 은 data 를 볼 수 없다.
 - 기능 모듈끼리 서로 의존하지 않는다. 화면 이동은 `:app`이 연결한다.
 - **`:domain/usecase`는 사용자 행동 정의서다.** 사용자 행동 하나에 UseCase 하나를 두고 `operator fun invoke`로 부른다. `usecase/` 목록만 읽어도 이 앱으로 무엇을 할 수 있는지 알 수 있어야 한다. 저장소를 그대로 부르기만 하는 UseCase도 이 목적이면 만든다. ViewModel은 Repository가 아니라 UseCase만 부른다.
+- **domain 에는 비즈니스 로직을 두지 않는다 (D-61).** UseCase 는 행동 이름과 입력만 정하고 저장소 함수 하나를 부른다. 데이터를 고르고 바꾸는 판단(필터·정렬·넣기/빼기)은 `:data:<기능>`, 입력·표시 판단(검색어 공백 제거, 표시 가격)은 `:presentation:<기능>` 이 맡는다.
 - 패키지 이름은 모듈 경로 그대로다: `:data` → `data.*`, `:presentation:search` → `presentation.search`. `:app`만 `com.leeseungjun.booksearch`(applicationId)다 (D-55).
-- `:domain` 은 `data`(DTO·enum·예외) · `repo`(저장소 인터페이스) · `usecase` 세 패키지다 (D-54).
-- `:data/api` 아래는 API 경로 하나당 패키지 하나(Service · Api · Mapper). `db` 아래는 테이블 하나당 패키지 하나(Dao · Entity).
+- `:domain:<기능>` 은 `data`(DTO·enum) · `repo`(저장소 인터페이스) · `usecase` 세 패키지다. 화면 모듈은 쓰는 domain 모듈만 build.gradle.kts 에 적는다 (D-54·D-59).
+- `:data:*` 의 책임 (D-56·D-58·D-60)
+  - `repo`: 원격과 로컬 중 어디서 가져올지만 정한다(3초 시간 제한·캐시 대체). Retrofit·Room 을 모른다.
+  - `source/remote`: 서버 호출. `~Api` → DTO 변환, HTTP 오류 → `BookException`. `source/local`: DB·캐시 읽기/쓰기와 캐시 보관 규칙. `~Entity` ↔ DTO 변환.
+  - `service`: Retrofit 인터페이스(`I~Service`). `data`: 서버 응답 데이터(`~Api`)와 그 변환 함수. `db/dao`·`db/entity`: Room.
+  - `~Api` 는 `source/remote` 밖으로, `~Entity` 는 `source/local` 밖으로 나가지 않는다. 데이터 소스는 DTO 로 주고받는다.
+  - `~Api` 필드는 모두 nullable 이고 기본값을 두지 않는다. 서버가 안 보낸 값은 null 그대로 DTO 까지 가고, 어떻게 보일지는 화면이 정한다.
+- Hilt 범위 (D-57·D-59): 저장소와 데이터 소스는 `ViewModelComponent` + `@ViewModelScoped`. `SingletonComponent` 는 앱에 하나여야만 동작하는 것(Room DB, OkHttp·Retrofit)에만 쓰고 이유를 주석으로 남긴다.
 
 ## 이름 (D-52·D-53)
 
@@ -70,6 +79,7 @@
 - 사용자가 하지 않은 판단은 지어내지 않는다. 확인받지 않은 추천은 `추천안 기본 채택`으로 표시하고 `docs/ai/REVIEW.md`에 모은다.
 - AI 제안과 다르게 정한 항목은 `AI 제안과 다름`으로 표시한다. README의 「직접 판단해 바꾼 부분」은 이 표시가 있는 항목에서만 옮긴다.
 - 일시는 `date`로 실측한다.
+- 사소한 결정(이름·위치·패키지 조정 등)은 한 줄씩 늘어놓지 않고, 같은 작업에서 나온 것을 한 행으로 묶어 짧게 쓴다. 사람이 읽고 판단할 수 있는 분량을 유지한다.
 
 ## 커밋·브랜치
 

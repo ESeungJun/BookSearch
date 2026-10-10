@@ -23,8 +23,8 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 rootProject.name = "BookSearch"
 
 include(":app")
-include(":di")
-include(":presentation:designsystem")
+include(":di:book", ":di:search", ":di:favorite")
+include(":core")
 include(":presentation:search", ":presentation:favorite", ":presentation:detail")
-include(":domain")
-include(":data")
+include(":domain:book", ":domain:search", ":domain:favorite")
+include(":data:book", ":data:search", ":data:favorite")
