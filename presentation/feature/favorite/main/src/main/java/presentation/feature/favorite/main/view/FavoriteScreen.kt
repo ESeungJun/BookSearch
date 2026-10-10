@@ -19,6 +19,7 @@ import core.designsystem.component.CollapsingHeader
 import core.designsystem.component.EmptyView
 import core.designsystem.component.ErrorView
 import core.designsystem.component.rememberCollapsingHeaderState
+import core.navigation.LocalCurrentRoute
 import kotlinx.collections.immutable.persistentListOf
 import presentation.base.data.BookViewData
 import presentation.base.view.ToastEffect
@@ -31,6 +32,7 @@ import presentation.feature.favorite.main.view.component.FavoriteBookListView
 import presentation.feature.favorite.main.view.component.FavoriteCountFilterView
 import presentation.feature.favorite.main.view.component.FavoriteHeaderView
 import presentation.feature.favorite.main.vm.FavoriteViewModel
+import presentation.router.DetailRouter
 import presentation.base.R as BaseR
 
 @Composable
@@ -49,6 +51,8 @@ fun FavoriteScreen(
         onRetry = viewModel::retry,
         onBookClick = onBookClick,
         onFavoriteClick = viewModel::onFavoriteClick,
+        // 넓은 창에서 오른쪽 상세에 열린 책을 목록에 표시한다
+        selectedBookKey = (LocalCurrentRoute.current as? DetailRouter.PageData)?.bookId,
     )
 }
 
@@ -63,6 +67,7 @@ internal fun FavoriteContent(
     onBookClick: (String) -> Unit,
     onFavoriteClick: (String) -> Unit,
     modifier: Modifier = Modifier,
+    selectedBookKey: String? = null,
 ) {
     val headerState = rememberCollapsingHeaderState()
     CollapsingHeader(
@@ -96,7 +101,7 @@ internal fun FavoriteContent(
                 },
             )
             FavoriteUiStatus.Error -> ErrorView(stringResource(BaseR.string.result_failure), onRetry)
-            FavoriteUiStatus.Results -> FavoriteBookListView(state, onBookClick, onFavoriteClick, headerState::expand)
+            FavoriteUiStatus.Results -> FavoriteBookListView(state, onBookClick, onFavoriteClick, headerState::expand, selectedBookKey)
         }
     }
 }
