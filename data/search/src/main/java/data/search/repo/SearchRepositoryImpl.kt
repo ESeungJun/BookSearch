@@ -1,6 +1,6 @@
 package data.search.repo
 
-import data.base.dbCall
+import data.base.safeDbCall
 import data.search.source.local.ISearchLocalDataSource
 import data.search.source.remote.ISearchRemoteDataSource
 import domain.base.data.DomainResult
@@ -29,15 +29,15 @@ class SearchRepositoryImpl @Inject constructor(
             ?: DomainResult.Error(SocketTimeoutException("${TIMEOUT_MS}ms 초과"))
         if (result is DomainResult.Success) {
             // 저장에 실패해도 받은 결과는 그대로 보여 준다(다음에 캐시로 볼 수 없을 뿐이다)
-            dbCall { local.saveSearchPage(query, sort, page, result.data) }
+            safeDbCall { local.saveSearchPage(query, sort, page, result.data) }
             return result
         }
         // 실패·에러면 저장해 둔 결과로 대신한다. 저장해 둔 것이 없거나 읽지 못하면 원래 결과를 그대로 돌려준다
-        val cached = (dbCall { local.getSearchPage(query, sort, page) } as? DomainResult.Success)?.data
+        val cached = (safeDbCall { local.getSearchPage(query, sort, page) } as? DomainResult.Success)?.data
         return cached?.let { DomainResult.Success(it) } ?: result
     }
 
-    override suspend fun getLastSearch(): DomainResult<SearchConditionDTO?> = dbCall { local.getLastSearch() }
+    override suspend fun getLastSearch(): DomainResult<SearchConditionDTO?> = safeDbCall { local.getLastSearch() }
 
     companion object {
         private const val TIMEOUT_MS = 3_000L

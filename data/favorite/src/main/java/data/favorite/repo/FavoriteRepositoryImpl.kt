@@ -1,7 +1,7 @@
 package data.favorite.repo
 
-import data.base.asDbResult
-import data.base.dbCall
+import data.base.safeDbFlow
+import data.base.safeDbCall
 import data.favorite.source.local.IFavoriteLocalDataSource
 import domain.base.data.BookDTO
 import domain.base.data.DomainResult
@@ -15,10 +15,10 @@ class FavoriteRepositoryImpl @Inject constructor(
 ) : IFavoriteRepository {
 
     override fun observeFavorites(query: String, priceRange: IntRange?): Flow<DomainResult<List<BookDTO>>> =
-        local.observeFavorites(query, priceRange).asDbResult()
+        local.observeFavorites(query, priceRange).safeDbFlow()
 
-    override fun observeFavoriteKeys(): Flow<DomainResult<Set<String>>> = local.observeFavoriteKeys().asDbResult()
+    override fun observeFavoriteKeys(): Flow<DomainResult<Set<String>>> = local.observeFavoriteKeys().safeDbFlow()
 
     override suspend fun toggleFavorite(book: BookDTO, isFavorite: Boolean): DomainResult<Unit> =
-        dbCall { if (isFavorite) local.removeFavorite(book.key) else local.addFavorite(book) }
+        safeDbCall { if (isFavorite) local.removeFavorite(book.key) else local.addFavorite(book) }
 }
