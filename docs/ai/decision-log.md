@@ -38,6 +38,7 @@ README 의 「AI 활용」 절(어떤 작업에 썼는지 / 어떻게 검증했�
 | D-59 | 2026-10-10 | 3단계 전 | domain 기능별 모듈 분리 | 레이어당 모듈 하나(D-40) | 작성자 지시: **domain 을 search·favorite 모듈로 나눈다.** 함께 쓰는 책 DTO·예외·상세 조회는 AI 권장대로 `:domain:book` 에 두고, 저장소도 셋으로 나눔. 데이터 소스도 `@ViewModelScoped` 로 묶자는 작성자 제안 반영(저장소 셋이 같은 인스턴스를 씀). `:di` 도 기능별 패키지(`book`·`search`·`favorite`)로 나누고 싱글톤(DB·네트워크)만 루트에 둠 | AI 제안과 다름 | `:domain:*`, `:data/repo`, `:di` |
 | D-60 | 2026-10-10 | 3단계 전 | data·di 기능별 모듈, 응답 nullable | 응답 필드에 기본값(`""`·0·-1)을 넣고 매퍼에서 빈 값을 null 로 바꿈 | 작성자 지시: **data·di 도 domain 처럼 book·search·favorite 모듈로 나눈다. 응답 데이터는 nullable·기본값 없음** — 서버가 안 보낸 값은 앱이 그대로 믿고 판단한다(빈 값으로 판단하면 예외가 많다). Room 제약으로 DB·DAO·Entity 는 `:data:book` 에 두고 로컬 데이터 소스는 기능별로 나눔(R-12 대체). `meta`·`documents` 가 없으면 서버 오류, 정가 0 을 null 로 바꾸던 규칙은 없앰 | AI 제안과 다름 | `:data:*`, `:di:*`, `SearchBookApi`, `BookDTO`, `docs/api.md` |
 | D-61 | 2026-10-10 | 3단계 전 | domain 의 비즈니스 로직 | 즐겨찾기 필터·정렬(메모리), 토글 분기, 키 집합 변환, 검색어 공백 제거, 표시 가격을 domain 에 둠 | 작성자 지시: **domain 은 사용자 행동 정의서로만 두고 판단 로직은 기능 단위로 뺀다.** 위치는 AI 권장대로 데이터 판단은 `:data:<기능>`(즐겨찾기 필터·정렬은 Room 쿼리), 입력·표시 판단은 `:presentation:<기능>`(3단계에서 구현) | AI 제안과 다름 | `CLAUDE.md` 구조 절, `IFavoriteDao.observe`, `FavoriteRepositoryImpl` |
+| D-62 | 2026-10-10 | 3단계 전 | 디자인 시스템 위치 | `:presentation:designsystem` | 작성자 지시: **`:core` 모듈로 빼고 공통 유틸·디자인 시스템 등 앱 공통 코드를 모은다** (패키지 `core.designsystem`·`core.util`) | AI 제안과 다름 | `:core` |
 ## 2. 논의 중 (미결)
 
 | ID | 일시 | 주제 | 쟁점 | 현재 상태 |
