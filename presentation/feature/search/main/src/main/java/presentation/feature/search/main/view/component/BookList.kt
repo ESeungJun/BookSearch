@@ -31,7 +31,8 @@ import presentation.feature.search.main.data.SearchUiStatus
 import presentation.feature.search.main.data.SearchUiState
 
 private const val SCROLL_TO_TOP_MIN_INDEX = 5 // 이만큼 내려야 맨 위로 버튼이 보인다
-private const val LOAD_MORE_PREFETCH = 5 // 끝에서 이만큼 남았을 때 다음 페이지를 부른다
+// 끝에서 이만큼 남았을 때 다음 페이지를 부른다. 반 페이지 앞에서 불러야 빠르게 내려도 응답(약 1초)이 끝에 닿기 전에 온다
+private const val LOAD_MORE_PREFETCH = 10
 
 /** 검색 결과 카드 목록. 끝에 가까워지면 다음 페이지를 부르고, 목록 끝에 페이징 상태를 둔다. */
 @Composable
