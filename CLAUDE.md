@@ -23,7 +23,7 @@
 :core:navigation                  INavigator · EntryProviderInstaller — 기능과 :app 이 함께 쓰는 화면 이동 계약
 :core:network                     OkHttp·Retrofit 제공(di/), API 키 BuildConfig — 키를 아는 유일한 모듈
 :core:database                    Room DB · dao/ · entity/ · di/(DB·DAO 제공) — Room 이 한곳에서 모든 테이블을 알아야 해서 core 에 둔다. domain 타입은 모른다
-:presentation:router              화면마다 XxxRouter(PageData + open) — 다른 기능 화면으로 갈 때는 이것만 쓴다
+:presentation:router              화면마다 XxxRouter(PageData, 이동해 오는 화면은 open 도) — 다른 기능 화면으로 갈 때는 이것만 쓴다
 :presentation:<기능>:main          Screen · ViewModel · UiState · router/(XxxRouterImpl) · di/(Router 바인딩, PageData → 화면 등록)
 :domain:base                      공통 타입만 — BookDTO · DomainResult
 :domain:search / favorite / detail   기능별 data/ · repo/ · usecase/ (순수 Kotlin). 서로 의존하지 않는다

@@ -23,7 +23,7 @@ data class BookViewData(
 
 fun BookDTO.toViewData(isFavorite: Boolean): BookViewData {
     val names = authors.orEmpty().filter { it.isNotBlank() }
-    // 서버는 할인이 없으면 sale_price 를 -1 로 보낸다. 0 이하는 할인가로 보지 않는다
+    // 0 이하는 할인가로 보이지 않는다(정가만 보인다). 음수 정가는 가격 정보 없음으로 본다
     val discounted = salePrice?.takeIf { it > 0 }
     val listPrice = price?.takeIf { it >= 0 }
     return BookViewData(
