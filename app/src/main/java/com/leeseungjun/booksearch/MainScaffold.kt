@@ -1,5 +1,6 @@
 package com.leeseungjun.booksearch
 
+import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
@@ -46,7 +47,7 @@ private enum class Tab(@StringRes val label: Int, val icon: ImageVector) {
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun MainScaffold(navigator: AppNavigator, entryInstallers: Set<EntryProviderInstaller>, onExit: () -> Unit) {
+fun MainScaffold(navigator: AppNavigator, entryInstallers: Set<EntryProviderInstaller>) {
     var currentTab by rememberSaveable { mutableStateOf(Tab.SEARCH) }
     val backStacks = mapOf(
         Tab.SEARCH to rememberNavBackStack(SearchRouter.PageData),
@@ -83,15 +84,17 @@ fun MainScaffold(navigator: AppNavigator, entryInstallers: Set<EntryProviderInst
             modifier = Modifier
                 .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Bottom))
                 .imePadding(),
+            // 지금 탭에 이전 화면이 있을 때만 불린다(CurrentTabSceneStrategy). NavDisplay 는 한 번의 뒤로 가기에
+            // (전체 항목 수 − 이전 항목 수)번 부르는데, 이전 항목에 앞쪽 다른 탭 항목을 넣지 않으므로 그 수만큼 더 불린다.
+            // 탭의 백스택은 목록·상세 두 칸까지라(상세는 바꿔 끼운다) 첫 화면만 남기면 한 번 뒤로 간 것과 같다
             onBack = {
                 val stack = backStacks.getValue(currentTab)
-                when {
-                    stack.size > 1 -> stack.removeLastOrNull()
-                    // 다른 탭의 첫 화면에서 뒤로 가면 검색 탭으로, 검색 탭의 첫 화면에서는 앱을 닫는다
-                    currentTab != Tab.SEARCH -> currentTab = Tab.SEARCH
-                    else -> onExit()
-                }
+                if (stack.size > 1) stack.removeLastOrNull()
             },
         )
+    }
+    // 다른 탭의 첫 화면에서 뒤로 가면 검색 탭으로 간다. 검색 탭의 첫 화면에서는 시스템이 처리한다(홈으로)
+    BackHandler(enabled = currentTab != Tab.SEARCH && backStacks.getValue(currentTab).size == 1) {
+        currentTab = Tab.SEARCH
     }
 }

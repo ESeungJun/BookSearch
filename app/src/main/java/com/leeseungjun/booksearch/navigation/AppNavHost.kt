@@ -45,6 +45,8 @@ fun AppNavHost(
     val routeEntries = remember(entryInstallers) {
         entryProvider<NavKey> { entryInstallers.forEach { install -> install() } }
     }
+    val appSceneStrategy = rememberAppSceneStrategy()
+    val sceneStrategy = remember(currentTab, appSceneStrategy) { CurrentTabSceneStrategy(currentTab, appSceneStrategy) }
     NavDisplay(
         backStack = routes,
         onBack = onBack,
@@ -62,7 +64,7 @@ fun AppNavHost(
                 metadata = entry.metadata + paneMetadata(tabRoute),
             ) { entry.Content() }
         },
-        sceneStrategies = listOf(rememberAppSceneStrategy()),
+        sceneStrategies = listOf(sceneStrategy),
         transitionSpec = { forwardTransition(this) },
         popTransitionSpec = { backTransition(this) },
         predictivePopTransitionSpec = { backTransition(this) },
