@@ -1,6 +1,6 @@
 package com.leeseungjun.booksearch.di
 
-import com.leeseungjun.booksearch.data.api.searchbook.SearchBookApi
+import com.leeseungjun.booksearch.data.api.searchbook.ISearchBookService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,7 +37,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideSearchBookApi(client: OkHttpClient): SearchBookApi {
+    fun provideSearchBookApi(client: OkHttpClient): ISearchBookService {
         // 응답에 이 앱이 쓰지 않는 필드(translators·status 등)가 있어 모르는 키는 무시한다
         val json = Json { ignoreUnknownKeys = true }
         return Retrofit.Builder()
@@ -45,6 +45,6 @@ object NetworkModule {
             .client(client)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
-            .create(SearchBookApi::class.java)
+            .create(ISearchBookService::class.java)
     }
 }

@@ -4,11 +4,11 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.leeseungjun.booksearch.data.db.book.BookDao
+import com.leeseungjun.booksearch.data.db.book.IBookDao
 import com.leeseungjun.booksearch.data.db.book.BookEntity
-import com.leeseungjun.booksearch.data.db.favorite.FavoriteDao
+import com.leeseungjun.booksearch.data.db.favorite.IFavoriteDao
 import com.leeseungjun.booksearch.data.db.favorite.FavoriteEntity
-import com.leeseungjun.booksearch.data.db.searchcache.SearchCacheDao
+import com.leeseungjun.booksearch.data.db.searchcache.ISearchCacheDao
 import com.leeseungjun.booksearch.data.db.searchcache.SearchCacheEntity
 import kotlinx.serialization.json.Json
 
@@ -21,11 +21,11 @@ import kotlinx.serialization.json.Json
     version = 1,
     exportSchema = false,
 )
-@TypeConverters(BookDatabase.Converters::class)
-abstract class BookDatabase : RoomDatabase() {
-    abstract fun bookDao(): BookDao
-    abstract fun favoriteDao(): FavoriteDao
-    abstract fun searchCacheDao(): SearchCacheDao
+@TypeConverters(AbsBookDatabase.Converters::class)
+abstract class AbsBookDatabase : RoomDatabase() {
+    abstract fun bookDao(): IBookDao
+    abstract fun favoriteDao(): IFavoriteDao
+    abstract fun searchCacheDao(): ISearchCacheDao
 
     class Converters {
         // 저자 목록은 검색 조건으로 쓰지 않아 별도 테이블 대신 JSON 문자열 한 칸에 둔다

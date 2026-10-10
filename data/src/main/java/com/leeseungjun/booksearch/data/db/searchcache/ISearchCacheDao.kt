@@ -7,7 +7,7 @@ import androidx.room.Transaction
 import com.leeseungjun.booksearch.data.db.book.BookEntity
 
 @Dao
-interface SearchCacheDao {
+interface ISearchCacheDao {
     @Query("SELECT * FROM search_cache WHERE `query` = :query AND sort = :sort AND page = :page ORDER BY position")
     suspend fun getPage(query: String, sort: String, page: Int): List<SearchCacheEntity>
 

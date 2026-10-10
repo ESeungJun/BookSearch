@@ -2,10 +2,10 @@ package com.leeseungjun.booksearch.di
 
 import android.content.Context
 import androidx.room.Room
-import com.leeseungjun.booksearch.data.db.BookDatabase
-import com.leeseungjun.booksearch.data.db.book.BookDao
-import com.leeseungjun.booksearch.data.db.favorite.FavoriteDao
-import com.leeseungjun.booksearch.data.db.searchcache.SearchCacheDao
+import com.leeseungjun.booksearch.data.db.AbsBookDatabase
+import com.leeseungjun.booksearch.data.db.book.IBookDao
+import com.leeseungjun.booksearch.data.db.favorite.IFavoriteDao
+import com.leeseungjun.booksearch.data.db.searchcache.ISearchCacheDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,15 +18,15 @@ import javax.inject.Singleton
 object DatabaseModule {
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): BookDatabase =
-        Room.databaseBuilder(context, BookDatabase::class.java, "book.db").build()
+    fun provideDatabase(@ApplicationContext context: Context): AbsBookDatabase =
+        Room.databaseBuilder(context, AbsBookDatabase::class.java, "book.db").build()
 
     @Provides
-    fun provideBookDao(db: BookDatabase): BookDao = db.bookDao()
+    fun provideBookDao(db: AbsBookDatabase): IBookDao = db.bookDao()
 
     @Provides
-    fun provideFavoriteDao(db: BookDatabase): FavoriteDao = db.favoriteDao()
+    fun provideFavoriteDao(db: AbsBookDatabase): IFavoriteDao = db.favoriteDao()
 
     @Provides
-    fun provideSearchCacheDao(db: BookDatabase): SearchCacheDao = db.searchCacheDao()
+    fun provideSearchCacheDao(db: AbsBookDatabase): ISearchCacheDao = db.searchCacheDao()
 }

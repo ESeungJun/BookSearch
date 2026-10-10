@@ -1,7 +1,7 @@
 package com.leeseungjun.booksearch.domain.usecase
 
-import com.leeseungjun.booksearch.domain.BookRepository
-import com.leeseungjun.booksearch.domain.model.SearchCondition
+import com.leeseungjun.booksearch.domain.IBookRepository
+import com.leeseungjun.booksearch.domain.model.SearchConditionDTO
 import javax.inject.Inject
 
 /**
@@ -10,7 +10,7 @@ import javax.inject.Inject
  * 네트워크가 되면 새 결과를, 안 되면 저장해 둔 결과를 보게 된다.
  */
 class GetLastSearchUseCase @Inject constructor(
-    private val repository: BookRepository,
+    private val repository: IBookRepository,
 ) {
-    suspend operator fun invoke(): SearchCondition? = repository.getLastSearch()
+    suspend operator fun invoke(): SearchConditionDTO? = repository.getLastSearch()
 }
