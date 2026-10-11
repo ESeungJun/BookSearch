@@ -73,9 +73,8 @@ class SearchRepositoryImpl @Inject constructor(
     }
 
     private suspend fun cachedPage(query: String, sort: SearchSort, page: Int): SearchPageDTO? {
-        val head = local.getCachedRows(query, sort, page).firstOrNull() ?: return null
-        val books = local.getCachedBooks(query, sort, page).map { it.toBook() }
-        return SearchPageDTO(books, head.totalCount, head.isEnd, cachedAt = head.savedAt)
+        val (info, books) = local.getCachedPage(query, sort, page) ?: return null
+        return SearchPageDTO(books.map { it.toBook() }, info.totalCount, info.isEnd, cachedAt = info.savedAt)
     }
 
     companion object {

@@ -11,12 +11,12 @@ import domain.search.data.SearchSort
 interface ISearchLocalDataSource {
     suspend fun saveSearchPage(query: String, sort: SearchSort, page: Int, books: List<BookEntity>, totalCount: Int, isEnd: Boolean)
 
-    /** 저장된 페이지의 캐시 행(순서대로). 없으면 빈 목록. 총 개수·끝 여부·저장 시각은 행마다 같다. */
-    suspend fun getCachedRows(query: String, sort: SearchSort, page: Int): List<SearchCacheEntity>
-
-    /** 저장된 페이지의 책 행(캐시 순서대로). */
-    suspend fun getCachedBooks(query: String, sort: SearchSort, page: Int): List<BookEntity>
+    /** 저장된 페이지. 페이지 정보와 책 목록을 한 트랜잭션에서 읽는다. 저장된 페이지가 없으면 null. */
+    suspend fun getCachedPage(query: String, sort: SearchSort, page: Int): CachedPage?
 
     /** 저장된 모든 책에서 검색어로 찾는다. */
     suspend fun findSavedBooks(query: String, sort: SearchSort): List<BookEntity>
 }
+
+/** 저장된 검색 페이지. [info] 는 페이지 정보(총 개수·끝 여부·저장 시각)를 담은 캐시 행 하나, [books] 는 캐시 순서대로의 책 행. */
+data class CachedPage(val info: SearchCacheEntity, val books: List<BookEntity>)
