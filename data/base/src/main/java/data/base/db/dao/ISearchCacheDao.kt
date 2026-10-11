@@ -9,8 +9,9 @@ import data.base.db.entity.SearchCacheEntity
 
 @Dao
 interface ISearchCacheDao {
-    @Query("SELECT * FROM search_cache WHERE `query` = :query AND sort = :sort AND page = :page ORDER BY position")
-    suspend fun getPage(query: String, sort: String, page: Int): List<SearchCacheEntity>
+    /** 페이지 정보(총 개수 · 끝 여부 · 저장 시각)는 그 페이지의 모든 행에 같은 값으로 들어 있어 한 행만 읽는다. */
+    @Query("SELECT * FROM search_cache WHERE `query` = :query AND sort = :sort AND page = :page LIMIT 1")
+    suspend fun getPageInfo(query: String, sort: String, page: Int): SearchCacheEntity?
 
     @Query(
         """
@@ -34,6 +35,7 @@ interface ISearchCacheDao {
     /**
      * [block] 을 한 트랜잭션으로 실행한다. 검색 결과 저장(책 저장 → 캐시 행 교체 → 참조 없는 책 정리) 사이에
      * 다른 저장이 끼면 캐시 행은 있는데 책이 지워진 상태가 될 수 있어 한 번에 묶는다.
+     * 캐시 읽기(페이지 정보 → 책 목록)도 그 사이에 저장이 끼면 서로 다른 시점의 값이 섞여 함께 묶는다.
      */
     @Transaction
     suspend fun inTransaction(block: suspend () -> Unit) {
