@@ -19,7 +19,7 @@ data.<출처>.<이름>
 ├─ source/remote/    I~RemoteDataSource · ~Impl — 서버 호출, 응답(~Api)을 그대로 준다
 ├─ source/local/     I~LocalDataSource · ~Impl — DB 읽기 · 쓰기, 행(~Entity)을 그대로 주고받는다
 ├─ service/          I~Service — Retrofit 인터페이스 (api 모듈만)
-├─ data/             ~Api — 서버 응답 모양과 그 변환 함수 (api 모듈만)
+├─ data/             ~Api — 서버 응답 모양과 그 변환 함수 (api 모듈만), DB 행 묶음(CachedPage)
 └─ di/               Hilt 바인딩
 ```
 
