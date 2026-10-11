@@ -1,6 +1,7 @@
 package data.api.searchbook.repo
 
 import data.api.searchbook.data.SearchBookApi
+import data.api.searchbook.source.local.CachedPage
 import data.api.searchbook.source.local.ISearchLocalDataSource
 import data.api.searchbook.source.remote.ISearchRemoteDataSource
 import data.base.db.entity.BookEntity
@@ -102,8 +103,7 @@ class SearchRepositoryImplTest {
 
     private class FakeLocal : ISearchLocalDataSource {
         val savedPages = mutableSetOf<String>()
-        var cachedPageInfo: SearchCacheEntity? = null
-        var cachedBooks = emptyList<BookEntity>()
+        var cachedPage: CachedPage? = null
         var savedBooks = emptyList<BookEntity>()
         override suspend fun saveSearchPage(
             query: String,
@@ -115,12 +115,10 @@ class SearchRepositoryImplTest {
         ) {
             savedPages += "$query|$page"
         }
-        override suspend fun getCachedPageInfo(query: String, sort: SearchSort, page: Int) = cachedPageInfo
-        override suspend fun getCachedBooks(query: String, sort: SearchSort, page: Int) = cachedBooks
+        override suspend fun getCachedPage(query: String, sort: SearchSort, page: Int) = cachedPage
 
         fun cacheOf(book: BookEntity, totalCount: Int, isEnd: Boolean, savedAt: Long) {
-            cachedPageInfo = SearchCacheEntity("kotlin", "ACCURACY", 1, 0, book.key, totalCount, isEnd, savedAt)
-            cachedBooks = listOf(book)
+            cachedPage = CachedPage(SearchCacheEntity("kotlin", "ACCURACY", 1, 0, book.key, totalCount, isEnd, savedAt), listOf(book))
         }
         override suspend fun findSavedBooks(query: String, sort: SearchSort) = savedBooks
     }
