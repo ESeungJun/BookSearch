@@ -1,7 +1,7 @@
 package data.api.searchbook.repo
 
+import data.api.searchbook.data.CachedPage
 import data.api.searchbook.data.SearchBookApi
-import data.api.searchbook.source.local.CachedPage
 import data.api.searchbook.source.local.ISearchLocalDataSource
 import data.api.searchbook.source.remote.ISearchRemoteDataSource
 import data.base.db.entity.BookEntity
