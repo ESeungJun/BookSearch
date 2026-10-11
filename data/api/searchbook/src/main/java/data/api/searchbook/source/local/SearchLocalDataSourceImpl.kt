@@ -1,5 +1,6 @@
 package data.api.searchbook.source.local
 
+import data.api.searchbook.data.CachedPage
 import data.base.db.dao.IBookDao
 import data.base.db.dao.ISearchCacheDao
 import data.base.db.entity.BookEntity
