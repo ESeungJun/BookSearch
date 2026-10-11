@@ -8,7 +8,8 @@ import data.base.db.entity.SearchCacheEntity
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -48,8 +49,8 @@ class SearchCacheDaoTest {
         dao.savePage("kotlin", SORT, 1, rows("kotlin", 1, "A"), maxCombinations = 20)
         dao.savePage("kotlin", SORT, 2, rows("kotlin", 2, "B"), maxCombinations = 20)
         dao.savePage("kotlin", SORT, 1, rows("kotlin", 1, "C"), maxCombinations = 20)
-        assertEquals(listOf("C"), dao.getPage("kotlin", SORT, 1).map { it.bookKey })
-        assertTrue(dao.getPage("kotlin", SORT, 2).isEmpty())
+        assertEquals("C", dao.getPageInfo("kotlin", SORT, 1)?.bookKey)
+        assertNull(dao.getPageInfo("kotlin", SORT, 2))
     }
 
     @Test
@@ -57,24 +58,24 @@ class SearchCacheDaoTest {
         dao.savePage("kotlin", SORT, 1, rows("kotlin", 1, "A"), maxCombinations = 20)
         dao.savePage("kotlin", SORT, 2, rows("kotlin", 2, "B"), maxCombinations = 20)
         dao.savePage("kotlin", SORT, 2, rows("kotlin", 2, "C"), maxCombinations = 20)
-        assertEquals(listOf("A"), dao.getPage("kotlin", SORT, 1).map { it.bookKey })
-        assertEquals(listOf("C"), dao.getPage("kotlin", SORT, 2).map { it.bookKey })
+        assertEquals("A", dao.getPageInfo("kotlin", SORT, 1)?.bookKey)
+        assertEquals("C", dao.getPageInfo("kotlin", SORT, 2)?.bookKey)
     }
 
     @Test
     fun `가장 최근에 저장한 조합만 정한 개수만큼 남긴다`() = runTest {
         repeat(3) { index -> dao.savePage("q$index", SORT, 1, rows("q$index", 1, "A", savedAt = index.toLong()), maxCombinations = 2) }
-        assertTrue(dao.getPage("q0", SORT, 1).isEmpty())
-        assertEquals(1, dao.getPage("q1", SORT, 1).size)
-        assertEquals(1, dao.getPage("q2", SORT, 1).size)
+        assertNull(dao.getPageInfo("q0", SORT, 1))
+        assertNotNull(dao.getPageInfo("q1", SORT, 1))
+        assertNotNull(dao.getPageInfo("q2", SORT, 1))
     }
 
     @Test
     fun `정렬이 다르면 다른 조합이다`() = runTest {
         dao.savePage("kotlin", "ACCURACY", 1, rows("kotlin", 1, "A", sort = "ACCURACY"), maxCombinations = 20)
         dao.savePage("kotlin", "LATEST", 1, rows("kotlin", 1, "B", sort = "LATEST"), maxCombinations = 20)
-        assertEquals(listOf("A"), dao.getPage("kotlin", "ACCURACY", 1).map { it.bookKey })
-        assertEquals(listOf("B"), dao.getPage("kotlin", "LATEST", 1).map { it.bookKey })
+        assertEquals("A", dao.getPageInfo("kotlin", "ACCURACY", 1)?.bookKey)
+        assertEquals("B", dao.getPageInfo("kotlin", "LATEST", 1)?.bookKey)
     }
 
     private fun rows(query: String, page: Int, vararg keys: String, sort: String = SORT, savedAt: Long = 1L) =

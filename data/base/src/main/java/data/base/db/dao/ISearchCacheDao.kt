@@ -9,8 +9,9 @@ import data.base.db.entity.SearchCacheEntity
 
 @Dao
 interface ISearchCacheDao {
-    @Query("SELECT * FROM search_cache WHERE `query` = :query AND sort = :sort AND page = :page ORDER BY position")
-    suspend fun getPage(query: String, sort: String, page: Int): List<SearchCacheEntity>
+    /** 페이지 정보(총 개수 · 끝 여부 · 저장 시각)는 그 페이지의 모든 행에 같은 값으로 들어 있어 한 행만 읽는다. */
+    @Query("SELECT * FROM search_cache WHERE `query` = :query AND sort = :sort AND page = :page LIMIT 1")
+    suspend fun getPageInfo(query: String, sort: String, page: Int): SearchCacheEntity?
 
     @Query(
         """

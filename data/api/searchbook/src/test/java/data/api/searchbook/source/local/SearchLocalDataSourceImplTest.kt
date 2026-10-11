@@ -8,6 +8,7 @@ import domain.search.data.SearchSort
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -21,7 +22,7 @@ class SearchLocalDataSourceImplTest {
     fun `저장한 페이지의 책을 순서대로, 캐시 행에 저장 시각을 남긴다`() = runTest {
         save(1, "A", "B")
         assertEquals(listOf("A", "B"), local.getCachedBooks("kotlin", SearchSort.ACCURACY, 1).map { it.key })
-        assertTrue(local.getCachedRows("kotlin", SearchSort.ACCURACY, 1).all { it.savedAt > 0 })
+        assertTrue(local.getCachedPageInfo("kotlin", SearchSort.ACCURACY, 1)!!.savedAt > 0)
     }
 
     @Test
@@ -34,7 +35,7 @@ class SearchLocalDataSourceImplTest {
     @Test
     fun `0건 페이지는 캐시에 남기지 않는다`() = runTest {
         save(1)
-        assertTrue(local.getCachedRows("kotlin", SearchSort.ACCURACY, 1).isEmpty())
+        assertNull(local.getCachedPageInfo("kotlin", SearchSort.ACCURACY, 1))
     }
 
     @Test
@@ -60,10 +61,11 @@ class SearchLocalDataSourceImplTest {
 
     private class FakeSearchCacheDao(private val books: FakeBookDao) : ISearchCacheDao {
         val rows = mutableListOf<SearchCacheEntity>()
-        override suspend fun getPage(query: String, sort: String, page: Int) =
-            rows.filter { it.query == query && it.sort == sort && it.page == page }.sortedBy { it.position }
+        override suspend fun getPageInfo(query: String, sort: String, page: Int) = pageRows(query, sort, page).firstOrNull()
         override suspend fun getBooks(query: String, sort: String, page: Int) =
-            getPage(query, sort, page).mapNotNull { books.saved[it.bookKey] }
+            pageRows(query, sort, page).mapNotNull { books.saved[it.bookKey] }
+        private fun pageRows(query: String, sort: String, page: Int) =
+            rows.filter { it.query == query && it.sort == sort && it.page == page }.sortedBy { it.position }
         override suspend fun insert(rows: List<SearchCacheEntity>) { this.rows += rows }
         override suspend fun deleteCombination(query: String, sort: String) { rows.removeAll { it.query == query && it.sort == sort } }
         override suspend fun deletePage(query: String, sort: String, page: Int) {

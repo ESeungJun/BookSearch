@@ -36,8 +36,8 @@ class SearchLocalDataSourceImpl @Inject constructor(
         if (page == 1) bookDao.deleteUnreferenced()
     }
 
-    override suspend fun getCachedRows(query: String, sort: SearchSort, page: Int): List<SearchCacheEntity> =
-        searchCacheDao.getPage(query, sort.name, page)
+    override suspend fun getCachedPageInfo(query: String, sort: SearchSort, page: Int): SearchCacheEntity? =
+        searchCacheDao.getPageInfo(query, sort.name, page)
 
     override suspend fun getCachedBooks(query: String, sort: SearchSort, page: Int): List<BookEntity> =
         searchCacheDao.getBooks(query, sort.name, page)

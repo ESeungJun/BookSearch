@@ -102,7 +102,7 @@ class SearchRepositoryImplTest {
 
     private class FakeLocal : ISearchLocalDataSource {
         val savedPages = mutableSetOf<String>()
-        var cachedRows = emptyList<SearchCacheEntity>()
+        var cachedPageInfo: SearchCacheEntity? = null
         var cachedBooks = emptyList<BookEntity>()
         var savedBooks = emptyList<BookEntity>()
         override suspend fun saveSearchPage(
@@ -115,11 +115,11 @@ class SearchRepositoryImplTest {
         ) {
             savedPages += "$query|$page"
         }
-        override suspend fun getCachedRows(query: String, sort: SearchSort, page: Int) = cachedRows
+        override suspend fun getCachedPageInfo(query: String, sort: SearchSort, page: Int) = cachedPageInfo
         override suspend fun getCachedBooks(query: String, sort: SearchSort, page: Int) = cachedBooks
 
         fun cacheOf(book: BookEntity, totalCount: Int, isEnd: Boolean, savedAt: Long) {
-            cachedRows = listOf(SearchCacheEntity("kotlin", "ACCURACY", 1, 0, book.key, totalCount, isEnd, savedAt))
+            cachedPageInfo = SearchCacheEntity("kotlin", "ACCURACY", 1, 0, book.key, totalCount, isEnd, savedAt)
             cachedBooks = listOf(book)
         }
         override suspend fun findSavedBooks(query: String, sort: SearchSort) = savedBooks
