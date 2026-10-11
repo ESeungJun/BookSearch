@@ -1,7 +1,7 @@
 package data.api.searchbook.source.local
 
+import data.api.searchbook.data.CachedPage
 import data.base.db.entity.BookEntity
-import data.base.db.entity.SearchCacheEntity
 import domain.search.data.SearchSort
 
 /**
@@ -17,6 +17,3 @@ interface ISearchLocalDataSource {
     /** 저장된 모든 책에서 검색어로 찾는다. */
     suspend fun findSavedBooks(query: String, sort: SearchSort): List<BookEntity>
 }
-
-/** 저장된 검색 페이지. [info] 는 페이지 정보(총 개수·끝 여부·저장 시각)를 담은 캐시 행 하나, [books] 는 캐시 순서대로의 책 행. */
-data class CachedPage(val info: SearchCacheEntity, val books: List<BookEntity>)
