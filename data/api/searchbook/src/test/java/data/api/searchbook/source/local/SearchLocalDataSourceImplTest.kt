@@ -21,8 +21,9 @@ class SearchLocalDataSourceImplTest {
     @Test
     fun `저장한 페이지의 책을 순서대로, 캐시 행에 저장 시각을 남긴다`() = runTest {
         save(1, "A", "B")
-        assertEquals(listOf("A", "B"), local.getCachedBooks("kotlin", SearchSort.ACCURACY, 1).map { it.key })
-        assertTrue(local.getCachedPageInfo("kotlin", SearchSort.ACCURACY, 1)!!.savedAt > 0)
+        val cached = local.getCachedPage("kotlin", SearchSort.ACCURACY, 1)!!
+        assertEquals(listOf("A", "B"), cached.books.map { it.key })
+        assertTrue(cached.info.savedAt > 0)
     }
 
     @Test
@@ -35,7 +36,7 @@ class SearchLocalDataSourceImplTest {
     @Test
     fun `0건 페이지는 캐시에 남기지 않는다`() = runTest {
         save(1)
-        assertNull(local.getCachedPageInfo("kotlin", SearchSort.ACCURACY, 1))
+        assertNull(local.getCachedPage("kotlin", SearchSort.ACCURACY, 1))
     }
 
     @Test

@@ -36,11 +36,14 @@ class SearchLocalDataSourceImpl @Inject constructor(
         if (page == 1) bookDao.deleteUnreferenced()
     }
 
-    override suspend fun getCachedPageInfo(query: String, sort: SearchSort, page: Int): SearchCacheEntity? =
-        searchCacheDao.getPageInfo(query, sort.name, page)
-
-    override suspend fun getCachedBooks(query: String, sort: SearchSort, page: Int): List<BookEntity> =
-        searchCacheDao.getBooks(query, sort.name, page)
+    override suspend fun getCachedPage(query: String, sort: SearchSort, page: Int): CachedPage? {
+        var cached: CachedPage? = null
+        searchCacheDao.inTransaction {
+            val info = searchCacheDao.getPageInfo(query, sort.name, page) ?: return@inTransaction
+            cached = CachedPage(info, searchCacheDao.getBooks(query, sort.name, page))
+        }
+        return cached
+    }
 
     override suspend fun findSavedBooks(query: String, sort: SearchSort): List<BookEntity> =
         bookDao.search(query.toLikePattern(), latest = sort == SearchSort.LATEST, limit = MAX_LOCAL_RESULTS)
